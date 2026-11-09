@@ -7,6 +7,21 @@
 .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: #3F66B0; transform: scaleX(0); transition: transform .25s; }
 .nav-link.active::after { transform: scaleX(1); }
 
+/* ---------- Second row (xl): research poles + next event ---------- */
+#nav-sub { height: 44px; border-top: 1px solid rgba(221,227,236,.08); }
+.sub-link { position: relative; display: flex; flex: none; white-space: nowrap; align-items: center; gap: .5rem; height: 100%; font-size: 13.5px; font-weight: 500; color: rgba(221,227,236,.62); transition: color .2s; }
+.sub-link:hover, .sub-link.active { color: #fff; }
+.sub-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #7F97C7; transition: color .2s; }
+.sub-link:hover .sub-num, .sub-link.active .sub-num { color: #AEC6FF; }
+.sub-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: #3F66B0; transform: scaleX(0); transition: transform .25s; }
+.sub-link.active::after { transform: scaleX(1); }
+.sub-next { display: flex; align-items: center; gap: .75rem; min-width: 0; font-size: 13.5px; font-weight: 500; color: rgba(221,227,236,.8); transition: color .2s; }
+.sub-next:hover { color: #fff; }
+.sub-next-label { flex: none; font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #AEC6FF; }
+.sub-next svg { transition: transform .25s var(--ease); }
+.sub-next:hover svg { transform: translateX(3px); }
+.sub-link:focus-visible, .sub-next:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 4px; }
+
 /* ---------- Menu button: two lines that morph into an X ---------- */
 .menu-btn { position: relative; }
 .mb-line { position: absolute; left: 50%; top: 50%; width: 18px; height: 1.5px; background: currentColor; transition: transform .45s cubic-bezier(.76,0,.24,1); }
@@ -54,3 +69,6 @@ html.menu-open .mm-item { opacity: 1; transform: none; transition: opacity .55s 
 
 /* Small phones (360–399px): slimmer Join button so logo, Join and menu fit on one line */
 @media (max-width: 399px) { #nav .btn-sm { padding: 0 .75rem; } }
+
+/* xl: the navbar has the poles row (72 + 44px), so in-page jumps land 44px lower to stay clear of it */
+@media (min-width: 1280px) { html { scroll-padding-top: 44px; } }

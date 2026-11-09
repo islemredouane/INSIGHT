@@ -1,9 +1,20 @@
 ---
 // Full-width navbar (home-v3): transparent over the hero, solid ink + hairline once you scroll.
+import { getCollection } from 'astro:content';
 import { mainNav, secondaryNav, site } from '../../data/site';
 import { isActive } from '../../lib/nav';
+import { getPoles } from '../../lib/content';
+import { shortDate, todayUTC } from '../../lib/format';
 const path = Astro.url.pathname;
 const collaborate = secondaryNav[0];
+
+// Second row (xl screens): the 4 research poles + the next event (or the latest one when nothing is planned).
+const poles = await getPoles();
+const today = todayUTC();
+const events = (await getCollection('events')).sort((a, b) => +a.data.date - +b.data.date);
+const next = events.find((e) => e.data.date >= today);
+const latest = events.filter((e) => e.data.date < today).at(-1);
+const featured = next ?? latest;
 ---
 <header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent transition-colors duration-300">
   <div class="max-w-[1240px] mx-auto h-[72px] px-6 md:px-12 flex items-center justify-between gap-3 sm:gap-6">
@@ -33,6 +44,30 @@ const collaborate = secondaryNav[0];
       </button>
     </div>
   </div>
+  <!-- Second row, xl screens only: research poles + next event. Stays visible while scrolling. -->
+  <div id="nav-sub" class="hidden xl:block">
+    <div class="max-w-[1240px] mx-auto h-11 px-12 flex items-center justify-between gap-8">
+      <nav class="flex items-center gap-8 h-full" aria-label="Research poles">
+        <span class="font-mono text-[11px] font-semibold uppercase tracking-[.16em] text-muted">Poles</span>
+        {poles.map((p) => {
+          const href = `/research/${p.id}`;
+          const active = isActive(path, href);
+          return (
+            <a href={href} class:list={['sub-link', { active }]} aria-current={active ? 'page' : undefined}>
+              <span class="sub-num">{String(p.data.number).padStart(2, '0')}</span>{p.data.name}
+            </a>
+          );
+        })}
+      </nav>
+      {featured && (
+        <a href={`/events/${featured.id}`} class="sub-next" data-event-date={featured.data.date.toISOString()}>
+          <span class="sub-next-label">{next ? 'Next' : 'Latest'} · {shortDate(featured.data.date).replace(/ \d{4}$/, '')}</span>
+          <span class="truncate">{featured.data.title.split(':')[0]}</span>
+          <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
+        </a>
+      )}
+    </div>
+  </div>
 </header>
 
 <script>
@@ -42,6 +77,13 @@ const collaborate = secondaryNav[0];
   const onScroll = () => nav.classList.toggle('scrolled', scrollY > 24 || root.classList.contains('menu-open'));
   onScroll();
   addEventListener('scroll', onScroll, { passive: true });
+
+  // The site is static: once the "Next" event's day has passed, call it "Latest" until the next rebuild
+  const nextLink = document.querySelector<HTMLElement>('.sub-next[data-event-date]');
+  const label = nextLink?.querySelector('.sub-next-label');
+  if (nextLink && label && Date.now() > Date.parse(nextLink.dataset.eventDate!) + 864e5) {
+    label.textContent = label.textContent!.replace(/^Next/, 'Latest');
+  }
 
   const btn = document.getElementById('menu-btn') as HTMLButtonElement;
   const menu = document.getElementById('menu')!;
