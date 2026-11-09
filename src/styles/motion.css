@@ -33,7 +33,14 @@ html.js [data-split]:not(.split-done) { visibility: hidden; }
   html.js .route.in .vstop { opacity: 1; }
   html.js .route.in .vstop > span:first-child, html.js .route.in .vstop > svg { transform: none; }
 
-  /* FAQ chevron */
+  /* Safety net: motion.ts did not start within 4 s (see BaseLayout), so show everything */
+html.js.reveal-all .rv, html.js.reveal-all .rv-stagger > *, html.js.reveal-all .rv-cells > * > * { opacity: 1; transform: none; transition: none; }
+html.js.reveal-all [data-split]:not(.split-done) { visibility: visible; }
+html.js.reveal-all .route .route-cover { stroke-dashoffset: -1; }
+html.js.reveal-all .route .vstop { opacity: 1; }
+html.js.reveal-all .route .vstop > span:first-child, html.js.reveal-all .route .vstop > svg { transform: none; }
+
+/* FAQ chevron */
   details summary svg { transition: transform .35s var(--ease) !important; }
   details.is-closing summary svg { transform: none !important; }
 }

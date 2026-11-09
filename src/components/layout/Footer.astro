@@ -32,8 +32,8 @@ const year = new Date().getFullYear();
     <!-- 2. Brand · links · affiliation -->
     <div class="py-14 grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-12">
       <div class="col-span-2 md:col-span-12 lg:col-span-4">
-        <a href="/" class="inline-flex items-center gap-3" aria-label={`${site.name}, back to the home page`}>
-          <img src="/brand/insight-logo.png" alt="" width="61" height="36" class="h-9 w-auto logo-glow" loading="lazy" />
+        <a href="/" class="inline-flex items-center gap-3" aria-label={`${site.name} ${site.shortDescription}, home`}>
+          <img src="/brand/insight-logo-sm.png" alt="" width="61" height="36" class="h-9 w-auto logo-glow" loading="lazy" />
           <span class="flex flex-col leading-none">
             <span class="font-display text-xl font-bold tracking-tight text-white">{site.name}</span>
             <span class="mt-1 text-[13px] text-muted">{site.shortDescription}</span>
@@ -52,7 +52,7 @@ const year = new Date().getFullYear();
             <h3 class="eyebrow text-silver">{col.title}</h3>
             <ul class="mt-5 space-y-3 text-[15px]">
               {col.links.map((link) => link.soon ? (
-                <li class="flex items-center gap-2 whitespace-nowrap"><span class="text-silver/40">{link.label}</span><span class="inline-flex items-center h-5 px-1.5 border border-white/15 font-mono text-[11px] text-muted">Soon</span></li>
+                <li class="flex items-center gap-2 whitespace-nowrap"><span class="text-silver/60">{link.label}</span><span class="inline-flex items-center h-5 px-1.5 border border-white/15 font-mono text-[11px] text-muted">Soon</span></li>
               ) : (
                 <li><a href={link.href} class="footer-link">{link.label}</a></li>
               ))}
@@ -73,7 +73,7 @@ const year = new Date().getFullYear();
     <!-- 3. Bottom bar -->
     <div class="py-6 border-t border-white/10 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
       <p class="text-[13px] text-muted">© {year} {site.fullName} · {site.school.name} · <a href="/privacy" class="hover:text-white transition-colors">Privacy</a></p>
-      <p class="hidden md:block eyebrow text-silver/40">{site.tagline}</p>
+      <p class="hidden md:block eyebrow text-silver/60">{site.tagline}</p>
       <a href="#top" id="to-top" class="inline-flex items-center gap-2 text-[13px] text-silver/70 hover:text-white transition-colors">
         <Icon name="arrow-up" />
         Back to top

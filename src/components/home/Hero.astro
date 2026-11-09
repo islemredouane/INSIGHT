@@ -2,7 +2,7 @@
 // Home hero (home-v3): headline words rise in, then the real logo and its particle beam.
 import { site } from '../../data/site';
 ---
-<section class="relative min-h-screen overflow-hidden bg-ink flex flex-col">
+<section class="relative min-h-screen min-h-[100svh] overflow-hidden bg-ink flex flex-col">
   <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
   <div class="absolute top-1/3 left-[8%] w-[560px] h-[560px] rounded-full bg-blue/10 blur-[130px] pointer-events-none"></div>
   <!-- Beam canvas: full-bleed on the right, starts at the logo's rays -->
@@ -23,7 +23,7 @@ import { site } from '../../data/site';
     </div>
     <!-- Real logo, large; the canvas beam leaves from its rays -->
     <div class="lg:col-span-6 relative h-[300px] lg:h-[460px] flex items-center">
-      <img id="hero-logo" src="/brand/insight-logo.png" alt="" width="340" height="201" class="relative z-10 w-[230px] sm:w-[300px] lg:w-[340px] h-auto logo-glow" fetchpriority="high" />
+      <img id="hero-logo" src="/brand/insight-logo.webp" alt="" width="340" height="201" class="relative z-10 w-[230px] sm:w-[300px] lg:w-[340px] h-auto logo-glow" fetchpriority="high" />
     </div>
   </div>
 
@@ -86,9 +86,19 @@ import { site } from '../../data/site';
         ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
       }
       ctx.globalAlpha = 1;
-      if (!reduce) requestAnimationFrame(frame);
+      if (!reduce && running) requestAnimationFrame(frame);
     };
-    const start = () => { resize(); init(); frame(); };
+    // Only animate while the hero is on screen and the tab is visible (saves battery and keeps scrolling smooth on phones)
+    let running = false, onScreen = true;
+    const sync = () => {
+      const should = onScreen && !document.hidden && !reduce && !document.documentElement.classList.contains('menu-open');
+      if (should && !running) { running = true; requestAnimationFrame(frame); }
+      else if (!should) running = false;
+    };
+    new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; sync(); }).observe(canvas);
+    document.addEventListener('visibilitychange', sync);
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] }); // pause while the menu is open
+    const start = () => { resize(); init(); if (reduce) frame(); else sync(); };
     logo.complete ? start() : logo.addEventListener('load', start);
     addEventListener('resize', () => { resize(); init(); if (reduce) frame(); });
   }

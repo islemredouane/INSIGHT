@@ -1,6 +1,8 @@
 // Motion (from home-v3): split headlines, reveal on scroll, count-up, smooth FAQ.
 // Everything is a no-op when the page has none of the hooks, so it is safe to load on every page.
 
+document.documentElement.classList.add('motion-ready'); // tells the 4 s safety net in BaseLayout that this script is running
+
 const reduceQuery = matchMedia('(prefers-reduced-motion: reduce)');
 const reduce = reduceQuery.matches;
 
@@ -38,19 +40,43 @@ if (!reduce) counters.forEach((g) => {
   if (g.getBoundingClientRect().top > innerHeight) g.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => (el.textContent = '0'));
 });
 
-/* ---- Reveal on scroll (once) ---- */
-const targets = document.querySelectorAll<HTMLElement>('.rv, .rv-stagger, .rv-cells, .route, [data-countup], [data-split]:not([data-split="hero"])');
+/* ---- Reveal on scroll (once) ----
+   Phones scroll fast and the browser reports IntersectionObserver results late (especially during a fling),
+   which left content invisible on screen until the next scroll. So three things work together:
+   1. the observer reveals a little BEFORE an element reaches the screen (rootMargin below the viewport);
+   2. a plain position check runs on scroll/resize/pageshow, so reveal never depends on one browser mechanism;
+   3. anything already scrolled past is revealed at once (anchor jumps, restored scroll position). */
+const targets = [...document.querySelectorAll<HTMLElement>('.rv, .rv-stagger, .rv-cells, .route, [data-countup], [data-split]:not([data-split="hero"])')];
+const pending = new Set(targets);
+const reveal = (t: HTMLElement) => {
+  if (!pending.delete(t)) return;
+  t.classList.add('in');
+  if (t.hasAttribute('data-countup')) countUp(t);
+};
 if (reduce || !('IntersectionObserver' in window)) {
-  targets.forEach((t) => t.classList.add('in'));
+  targets.forEach(reveal);
 } else {
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-    if (!e.isIntersecting) return;
-    const t = e.target as HTMLElement;
-    t.classList.add('in');
-    if (t.hasAttribute('data-countup')) countUp(t);
-    io.unobserve(t);
-  }), { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+    if (e.isIntersecting || e.boundingClientRect.bottom < 0) { reveal(e.target as HTMLElement); io.unobserve(e.target); }
+  }), { threshold: 0, rootMargin: '0px 0px 20% 0px' });
   targets.forEach((t) => io.observe(t));
+
+  let queued = false;
+  const check = () => {
+    queued = false;
+    const edge = innerHeight * 1.1;
+    // read every position first, then write: no layout recalculation between elements
+    const due = [...pending].filter((t) => t.getBoundingClientRect().top < edge);
+    due.forEach(reveal);
+    if (!pending.size) { removeEventListener('scroll', queue); removeEventListener('resize', queue); }
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(check); } };
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  addEventListener('pageshow', queue);
+  addEventListener('load', queue);
+  document.addEventListener('visibilitychange', queue);
+  queue();
 }
 
 /* ---- FAQ: smooth open/close (same technique as the Rasa site) ---- */

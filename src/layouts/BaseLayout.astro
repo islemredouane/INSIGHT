@@ -42,13 +42,17 @@ const organization = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline>document.documentElement.classList.add('js')</script>
+    <script is:inline>
+      // `js` hides reveal-on-scroll content until motion.ts runs. If that script is slow or fails (weak mobile network),
+      // `reveal-all` shows everything after 4 s, so a page is never left blank.
+      (function (d) { d.classList.add('js'); setTimeout(function () { if (!d.classList.contains('motion-ready')) d.classList.add('reveal-all'); }, 4000); })(document.documentElement);
+    </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {(noindex || reviewMode) && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0B1120" />
-    <link rel="icon" type="image/png" href="/brand/insight-logo.png" />
+    <link rel="icon" type="image/png" href="/brand/insight-logo-sm.png" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.fullName} />

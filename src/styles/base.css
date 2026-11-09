@@ -23,6 +23,11 @@ html, body { background: #0B1120; }
 #scrollbar-thumb::before { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 2px; background: #7F97C7; transition: background .2s; }
 #scrollbar-thumb:hover::before, #scrollbar.dragging #scrollbar-thumb::before { background: #3F66B0; }
 
+/* Phones: the big soft glows use a heavy blur filter, which costs a lot of GPU on mobile. A smaller radius looks the same and scrolls smoother. */
+@media (max-width: 767px) {
+  [class*="blur-["] { filter: blur(60px) !important; }
+}
+
 /* Dot grid texture (dark sections) */
 .dots { background-image: radial-gradient(circle, rgba(221,227,236,.16) 1px, transparent 1px); background-size: 24px 24px; }
 
