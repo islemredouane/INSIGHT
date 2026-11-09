@@ -24,7 +24,7 @@ export const site = {
 /** Membership. Set `open` and `applyUrl` when the board confirms registrations (the Join page follows). */
 /**
  * Review mode: set PUBLIC_REVIEW_MODE=true (e.g. on the Vercel project) to share a work-in-progress
- * version with the team. It shows every "[…]" placeholder, adds a small "Review version" badge,
+ * version with the team. It shows every "[…]" placeholder
  * and asks search engines not to index the site. Remove the variable for the real launch.
  */
 export const reviewMode = import.meta.env.PUBLIC_REVIEW_MODE === 'true';

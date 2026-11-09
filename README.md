@@ -25,7 +25,7 @@ npm run preview    # serve dist/ locally
 1. On vercel.com: **Add New → Project → Import** this GitHub repository.
 2. Vercel detects Astro automatically. Keep the defaults (build `npm run build`, output `dist`).
 3. **Review version for the team:** in *Settings → Environment Variables*, add `PUBLIC_REVIEW_MODE` = `true`, then redeploy.
-   It shows every missing item as `[text in brackets]`, adds a small "Review version" badge, and asks search engines not to index the site.
+   It shows every missing item as `[text in brackets]` and asks search engines not to index the site.
 4. **Real launch:** remove `PUBLIC_REVIEW_MODE`, redeploy, and connect the domain `insight.estin.dz` (*Settings → Domains*).
 
 Every push to `main` redeploys automatically.
