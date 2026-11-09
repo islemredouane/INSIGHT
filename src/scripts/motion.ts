@@ -21,7 +21,7 @@ if (hero) {
 
 /* ---- Index children for the cascades ---- */
 document.querySelectorAll('.rv-stagger, .rv-cells').forEach((g) =>
-  [...g.children].forEach((c, i) => (c as HTMLElement).style.setProperty('--i', String(i))),
+  [...g.children].forEach((c, i) => (c as HTMLElement).style.setProperty('--i', String(Math.min(i, 7)))), // capped: no long waits in big lists
 );
 
 /* ---- Count-up (elements with data-count inside [data-countup]) ---- */
@@ -41,33 +41,36 @@ if (!reduce) counters.forEach((g) => {
 });
 
 /* ---- Reveal on scroll (once) ----
-   Phones scroll fast and the browser reports IntersectionObserver results late (especially during a fling),
-   which left content invisible on screen until the next scroll. So three things work together:
-   1. the observer reveals a little BEFORE an element reaches the screen (rootMargin below the viewport);
-   2. a plain position check runs on scroll/resize/pageshow, so reveal never depends on one browser mechanism;
-   3. anything already scrolled past is revealed at once (anchor jumps, restored scroll position). */
+   A section animates when its top crosses the trigger line (88% down the screen), so the motion
+   happens where you can see it. Positions are checked on every scroll frame (requestAnimationFrame),
+   not with a delayed observer callback: on phones those callbacks arrive late during a fling and left
+   content invisible on screen. Two edge cases:
+   - at the bottom of the page, the last sections can never reach the line, so anything on screen reveals;
+   - sections already scrolled past (anchor jump, restored scroll) appear at once, without animation. */
 const targets = [...document.querySelectorAll<HTMLElement>('.rv, .rv-stagger, .rv-cells, .route, [data-countup], [data-split]:not([data-split="hero"])')];
 const pending = new Set(targets);
-const reveal = (t: HTMLElement) => {
+const TRIGGER = 0.88;
+const reveal = (t: HTMLElement, instant = false) => {
   if (!pending.delete(t)) return;
+  if (instant) t.classList.add('rv-instant');
   t.classList.add('in');
   if (t.hasAttribute('data-countup')) countUp(t);
 };
-if (reduce || !('IntersectionObserver' in window)) {
-  targets.forEach(reveal);
+if (reduce) {
+  targets.forEach((t) => reveal(t, true));
 } else {
-  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-    if (e.isIntersecting || e.boundingClientRect.bottom < 0) { reveal(e.target as HTMLElement); io.unobserve(e.target); }
-  }), { threshold: 0, rootMargin: '0px 0px 20% 0px' });
-  targets.forEach((t) => io.observe(t));
-
   let queued = false;
   const check = () => {
     queued = false;
-    const edge = innerHeight * 1.1;
-    // read every position first, then write: no layout recalculation between elements
-    const due = [...pending].filter((t) => t.getBoundingClientRect().top < edge);
-    due.forEach(reveal);
+    const root = document.documentElement;
+    const atBottom = scrollY + innerHeight >= root.scrollHeight - 4;
+    const line = atBottom ? innerHeight : innerHeight * TRIGGER;
+    // read every position first, then write (no layout recalculation between elements)
+    const rects = [...pending].map((t) => [t, t.getBoundingClientRect()] as const);
+    rects.forEach(([t, r]) => {
+      if (r.bottom < 0) reveal(t, true);   // already passed
+      else if (r.top < line) reveal(t);    // crossing the line: animate
+    });
     if (!pending.size) { removeEventListener('scroll', queue); removeEventListener('resize', queue); }
   };
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(check); } };
