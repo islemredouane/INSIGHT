@@ -1,0 +1,105 @@
+---
+// Training — Training department (Welcome Day deck, slides 18–20).
+import { getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import EmptyState from '../components/ui/EmptyState.astro';
+import EventRow from '../components/cards/EventRow.astro';
+import FinalCTA from '../components/sections/FinalCTA.astro';
+import { getDepartmentHeads, getEventsSorted } from '../lib/content';
+import { trainingLevels, shipyard } from '../data/club';
+import { todayUTC } from '../lib/format';
+
+const dept = (await getEntry('departments', 'training'))!;
+const [head] = await getDepartmentHeads('training');
+const today = todayUTC();
+const sessions = (await getEventsSorted())
+  .filter((e) => ['training', 'workshop', 'paper-reading'].includes(e.data.type) && e.data.date >= today)
+  .reverse();
+---
+<BaseLayout title="Training" description="INSIGHT's training path, from Rookie to Captain: paper reading, research methodology, academic writing and technical workshops.">
+  <PageHeader
+    eyebrow="Training"
+    title="Every captain started as a rookie."
+    lead="Before a long voyage, a crew trains. The Training department runs our workshops and learning paths, paper reading and scientific discussions, and sessions on research methodology and academic writing."
+    chip={head && { label: 'Head of Training', value: head.data.name }}
+  />
+
+  <!-- LOG 01 · The mission -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 01 · The mission" title="What Training does." subtitle={dept.data.closing} />
+      <div class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-navy/10 rv-cells">
+        {dept.data.handles.map((h, i) => (
+          <article class="p-8 bg-white">
+            <span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+            <p class="mt-6 font-display text-xl font-bold leading-snug text-ink">{h}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG 02 · From rookie to captain -->
+  <section class="bg-white text-ink py-24 sm:py-28 border-y border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12 grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <SectionHeader eyebrow="Log 02 · The path" title="From rookie to captain." subtitle="Don't worry if you are starting from zero." />
+      </div>
+      <ol class="rv-stagger lg:col-span-7 relative border-l-2 border-dashed border-navy/30 ml-5 space-y-6">
+        {trainingLevels.map((l, i) => (
+          <li class="relative pl-12">
+            <span class:list={['absolute -left-[23px] top-1 flex w-11 h-11 rounded-full border-2 items-center justify-center font-mono text-[13px] font-semibold', i === 0 ? 'bg-blue border-blue text-white' : 'bg-white border-navy text-navy']}>{l.level}</span>
+            <div class="border border-navy/10 bg-paper p-6">
+              <p class="eyebrow text-blue">Level {l.level} · {l.rank}</p>
+              <h3 class="mt-2 font-display text-xl font-bold text-ink">{l.title}</h3>
+              <p class="mt-1.5 text-[15px] text-body leading-relaxed">{l.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- LOG 03 · The shipyard and the voyage -->
+  <section class="relative bg-ink py-24 sm:py-28 overflow-hidden">
+    <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[420px] rounded-full bg-blue/15 blur-[130px] pointer-events-none"></div>
+    <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 03 · How it fits" title="The shipyard and the voyage." tone="dark" />
+      <div class="rv mt-14 grid md:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
+        {[shipyard.training, null, shipyard.research].map((side) => side ? (
+          <div class="rounded-2xl border border-silver/10 bg-ink-2 p-8 lg:p-10">
+            <p class="eyebrow text-peri">{side.label}</p>
+            <h3 class="mt-3 font-display text-3xl font-bold text-white tracking-tight">{side.title}</h3>
+            <p class="mt-2 text-[17px] text-silver/75">{side.text}</p>
+          </div>
+        ) : (
+          <div class="flex md:flex-col items-center justify-center gap-4 font-mono text-[12px] text-peri-light text-center">
+            <span class="max-w-[11rem]">{shipyard.loop[0]} →</span>
+            <span class="max-w-[11rem]">← {shipyard.loop[1]}</span>
+          </div>
+        ))}
+      </div>
+      <p class="rv mt-12 text-center font-serif italic text-2xl text-peri">“{shipyard.motto}”</p>
+    </div>
+  </section>
+
+  <!-- LOG 04 · Upcoming sessions -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 04 · Sessions" title="Upcoming sessions." class="mb-12" />
+      {sessions.length > 0
+        ? <div class="rv-stagger divide-y divide-navy/10 border-y border-navy/10">{sessions.map((e) => <EventRow event={e} upcoming />)}</div>
+        : <EmptyState label="Coming soon" title="The training calendar is being prepared." text="Paper readings, methodology sessions and workshops will be listed here. Follow @insight.estin to hear first." action={{ href: '/events', label: 'See all events →' }} />}
+    </div>
+  </section>
+
+  <FinalCTA
+    eyebrow="Start at level I"
+    title="Every captain started as a rookie."
+    line="Learn by doing. Do by learning."
+    secondary={{ href: '/research', label: 'Explore our research →' }}
+  />
+</BaseLayout>

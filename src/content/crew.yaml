@@ -1,0 +1,67 @@
+# The crew, 2026/27 — from the Welcome Day 2026 deck.
+# group: helm | department | pole | member      photo: put the file in public/crew/ and write e.g. /crew/faci.jpg
+# TODO (HR): add photos (with consent) and confirm every spelling (e.g. "Madoui" vs "Madaoui").
+
+# ---------- The Helm ----------
+- id: faci-souhaib-abdelouakil
+  name: Faci Souhaib Abdelouakil
+  role: President
+  group: helm
+  duty: Leads the club and represents it.
+  order: 1
+- id: madaoui-sara
+  name: Madaoui Sara
+  role: Vice-president
+  group: helm
+  duty: Runs meetings and strategy.
+  order: 2
+- id: redouane-mohamed-islem
+  name: Redouane Mohamed Islem
+  role: Vice-president
+  group: helm
+  duty: Runs meetings and strategy.
+  order: 3
+- id: feltane-anayis
+  name: Feltane Anayis
+  role: Secretary general
+  group: helm
+  duty: Keeps the club's records and documents.
+  order: 4
+- id: madoui-roufaida
+  name: Madoui Roufaida
+  role: Secretary general
+  group: helm
+  duty: Keeps the club's records and documents.
+  order: 5
+- id: ghasmoune-mohammed
+  name: Ghasmoune Mohammed
+  role: Treasurer
+  group: helm
+  duty: Manages the budget and funding.
+  order: 6
+
+# ---------- Department heads ----------
+- { id: manadi-tasnime, name: Manadi Tasnime, role: Head, group: department, department: communication, order: 10 }
+- { id: bouras-firas, name: Bouras Firas, role: Head, group: department, department: communication, order: 11 }
+- { id: rachedi-aya-meriem, name: Rachedi Aya Meriem, role: Head, group: department, department: communication, order: 12 }
+- { id: boursasa-lotfi-abdelmoumene, name: Boursasa Lotfi Abdelmoumene, role: Head, group: department, department: design, order: 20 }
+- { id: boubrioua-riham, name: Boubrioua Riham, role: Head, group: department, department: design, order: 21 }
+- { id: richi-roufaida, name: Richi Roufaida, role: Head, group: department, department: events, order: 30 }
+- { id: belkaioua-nouha, name: Belkaioua Nouha, role: Head, group: department, department: events, order: 31 }
+- { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, order: 32 }
+- { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, order: 40 }
+- { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, order: 41 }
+- { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, order: 50 }
+- { id: hachemi-zakaria, name: Hachemi Zakaria, role: Head, group: department, department: hr, order: 51 }
+- { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, order: 60 }
+- { id: sakhri-mohammed-firas, name: Sakhri Mohammed Firas, role: Head of Training, group: department, department: training, order: 70 }
+
+# ---------- Research pole leads ----------
+- { id: ouattara-majide-rafiou, name: Ouattara Majide Rafiou, role: Pole lead, group: pole, pole: ai, order: 80 }
+- { id: ghedjati-maroua, name: Ghedjati Maroua, role: Pole lead, group: pole, pole: ai, order: 81 }
+- { id: kaouche-malek, name: Kaouche Malek, role: Pole lead, group: pole, pole: ai, order: 82 }
+- { id: belaloui-taha-abderrahmane, name: Belaloui Taha Abderrahmane, role: Pole lead, group: pole, pole: security, order: 90 }
+- { id: laghrour-mohamed-dhia-eddine, name: Laghrour Mohamed Dhia Eddine, role: Pole lead, group: pole, pole: security, order: 91 }
+- { id: koua-mohamed-anis, name: Koua Mohamed Anis, role: Pole lead, group: pole, pole: software, order: 100 }
+- { id: merzougui-abdellah-el-ghazali, name: Merzougui Abdellah El Ghazali, role: Pole lead, group: pole, pole: networks, order: 110 }
+- { id: nacef-abdelmouheimene, name: Nacef Abdelmouheimene, role: Pole lead, group: pole, pole: networks, order: 111 }

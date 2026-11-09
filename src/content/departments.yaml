@@ -1,0 +1,80 @@
+# The 7 departments — wording from the Welcome Day 2026 deck. Heads are listed in crew.yaml (department: <id>).
+
+- id: communication
+  number: 1
+  name: Communication & Media
+  onBoardAs: The lookouts and messengers — every island hears about us.
+  handles:
+    - Social media (@insight.estin)
+    - Announcing events and workshops
+    - Photos, videos and recaps
+    - Sharing the club's work
+  closing: Makes our voyage visible, at ESTIN and beyond.
+
+- id: design
+  number: 2
+  name: Design
+  onBoardAs: The ship's artists and mapmakers.
+  handles:
+    - The club's visual identity
+    - Posters, slides and visuals
+    - Design for events and the stand
+    - Visual support for members
+  closing: Gives every idea a clear and beautiful form.
+
+- id: events
+  number: 3
+  name: Events & Logistics
+  onBoardAs: The quartermasters — nothing sets sail without them.
+  handles:
+    - Planning workshops, talks and events
+    - Rooms, equipment and schedules
+    - Coordination with the administration
+    - Running events on the day
+  closing: Turns plans into real events.
+
+- id: external-relations
+  number: 4
+  name: External Relations & Partnerships
+  onBoardAs: The navigators who chart the way to other islands.
+  handles:
+    - Contact with researchers and labs
+    - Inviting guest speakers
+    - Partnerships and sponsors
+    - Collaborations with other clubs
+  closing: Opens doors to the scientific community.
+
+- id: hr
+  number: 5
+  name: Human Resources
+  onBoardAs: The heart of the crew — no crew member left behind.
+  handles:
+    - Recruiting new members
+    - Welcoming and onboarding
+    - Following up with members
+    - Keeping teams connected
+  closing: Keeps the crew strong and united.
+
+- id: research
+  number: 6
+  name: Research Programs
+  onBoardAs: The heart of INSIGHT — where projects are born.
+  handles:
+    - Develop research projects in the four poles
+    - Form and guide project teams
+    - Take projects from a question to a paper
+    - Connect members with researchers
+  closing: Where questions become discoveries.
+  heart: true
+
+- id: training
+  number: 7
+  name: Training
+  onBoardAs: The shipyard — it builds the skills.
+  handles:
+    - Technical workshops and learning paths
+    - Paper reading and scientific discussions
+    - Research methodology
+    - Academic writing
+  closing: Trains every crew member for the voyage.
+  heart: true

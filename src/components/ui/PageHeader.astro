@@ -1,0 +1,30 @@
+---
+// Inner-page header, built from the home-v3 hero pieces: dark ink, dot grid, soft glow,
+// mono eyebrow, rising-word headline, lead line, optional person chip and actions.
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  chip?: { label: string; value: string | string[] };
+}
+const { eyebrow, title, lead, chip } = Astro.props;
+const chipValues = chip ? [chip.value].flat() : [];
+---
+<section class="relative overflow-hidden bg-ink">
+  <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
+  <div class="absolute -top-24 left-[10%] w-[560px] h-[460px] rounded-full bg-blue/12 blur-[130px] pointer-events-none"></div>
+  <div class="relative max-w-[1240px] mx-auto px-6 md:px-12 pt-40 pb-20 sm:pb-24">
+    <p class="eyebrow text-peri flex items-center gap-3 hero-in" style="--hd:.05s">{eyebrow} <span class="w-8 h-px bg-peri/30"></span></p>
+    <h1 data-split="hero" class="mt-6 max-w-4xl font-display font-bold text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-[-0.03em]">{title}</h1>
+    {lead && <p style="--hd:.6s" class="hero-in mt-6 max-w-2xl text-[17px] sm:text-lg text-silver/75 leading-relaxed">{lead}</p>}
+    {chip && (
+      <p style="--hd:.75s" class="hero-in mt-8 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-silver/15 px-4 py-2.5">
+        <span class="font-mono text-[12px] uppercase tracking-[.12em] text-peri">{chip.label}</span>
+        {chipValues.map((v, i) => (
+          <span class="whitespace-nowrap text-[15px] font-medium text-white">{i > 0 && <span class="hidden sm:inline mr-3 text-peri/60" aria-hidden="true">·</span>}{v}</span>
+        ))}
+      </p>
+    )}
+    <slot />
+  </div>
+</section>

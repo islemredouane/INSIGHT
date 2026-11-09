@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>document.documentElement.classList.add('js')</script>
+<title>INSIGHT Research Club · ESTIN</title>
+<meta name="description" content="INSIGHT is the student-led research club of ESTIN, Béjaïa. Read, question and contribute to science."/>
+<!-- Essay v2: the Stitch "Full Home Experience" with the 8 review fixes applied. Prototype only (Tailwind CDN). -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Lora:ital,wght@1,400;1,500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: "#0B1120", "ink-2": "#121A2E", "ink-deep": "#080E1D",
+          navy: "#1B2A55", blue: "#3F66B0", "blue-hover": "#345596",
+          peri: "#7F97C7", "peri-light": "#AEC6FF", silver: "#DDE3EC",
+          paper: "#F5F6F8", muted: "#8A94A8", body: "#3A4458", signal: "#C2463A"
+        },
+        fontFamily: {
+          display: ["Space Grotesk", "sans-serif"],
+          sans: ["Inter", "system-ui", "sans-serif"],
+          mono: ["JetBrains Mono", "monospace"],
+          serif: ["Lora", "serif"]
+        }
+      }
+    }
+  };
+</script>
+<style>
+  html, body { background: #0B1120; }
+  /* Scrollbar: 2px line, no track, like AiQC. Periwinkle stays visible on both dark and light sections. */
+  ::-webkit-scrollbar { width: 2px; height: 2px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #7F97C7; transition: background .2s; }
+  ::-webkit-scrollbar-thumb:hover { background: #3F66B0; }
+  /* Firefox can't do 2px: use its thin bar in the same colours (set only there, or Chrome ignores the 2px rules) */
+  @supports (-moz-appearance: none) { html { scrollbar-width: thin; scrollbar-color: #7F97C7 transparent; } }
+  .dots { background-image: radial-gradient(circle, rgba(221,227,236,.16) 1px, transparent 1px); background-size: 24px 24px; }
+  .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+  .logo-glow { filter: drop-shadow(0 0 18px rgba(127,151,199,.35)) drop-shadow(0 0 2px rgba(221,227,236,.4)); }
+  details summary::-webkit-details-marker { display: none; }
+  .pole-dot { transition: all .3s; }
+  /* icon tile in the Six ways grid: square, faint blue tint, hairline */
+  .tile { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid rgba(63,102,176,.22); background: rgba(63,102,176,.06); color: #3F66B0; transition: background-color .2s, border-color .2s; }
+  .group:hover .tile { border-color: rgba(63,102,176,.5); }
+  .tile-on, .group:hover .tile-on { background: #3F66B0; border-color: #3F66B0; color: #fff; }
+  /* full-width navbar */
+  #nav.scrolled { background: rgba(11,17,32,.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: rgba(221,227,236,.10); }
+  .nav-link { position: relative; display: flex; align-items: center; height: 100%; font-size: 15px; font-weight: 500; color: rgba(221,227,236,.75); transition: color .2s; }
+  .nav-link:hover, .nav-link.active { color: #fff; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: #3F66B0; transform: scaleX(0); transition: transform .25s; }
+  .nav-link.active::after { transform: scaleX(1); }
+  .footer-link { color: rgba(221,227,236,.7); transition: color .2s; }
+  .footer-link:hover { color: #fff; }
+
+  /* ================= Motion =================
+     Only opacity/transform (plus one stroke draw), each plays once, all off with prefers-reduced-motion,
+     and nothing is hidden unless JS is running (html.js). */
+  :root { --ease: cubic-bezier(.2,.7,.2,1); }
+  .route-cover { stroke-dasharray: 1 1; stroke-dashoffset: -1; }
+  html.js [data-split]:not(.split-done) { visibility: hidden; }
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .hero-in { opacity: 0; animation: heroUp .9s var(--ease) forwards; animation-delay: var(--hd, 0s); }
+    html.js #hero-logo { opacity: 0; animation: fadeIn 1.2s ease .35s forwards; }
+    html.js #beam { opacity: 0; animation: fadeIn 1.6s ease 1s forwards; }
+    @keyframes heroUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    html.js [data-split] .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+    html.js [data-split] .w > span { display: inline-block; transform: translateY(105%); transition: transform 1s var(--ease); transition-delay: calc(var(--i) * 70ms + var(--d, 0ms)); }
+    html.js [data-split].in .w > span { transform: none; }
+
+    html.js .rv { opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: var(--d, 0ms); }
+    html.js .rv.in { opacity: 1; transform: none; }
+    html.js .rv-stagger > *, html.js .rv-cells > * > * { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(var(--i, 0) * 70ms); }
+    html.js .rv-stagger.in > *, html.js .rv-cells.in > * > * { opacity: 1; transform: none; }
+
+    html.js .route .route-cover { stroke-dashoffset: 0; transition: stroke-dashoffset 2s cubic-bezier(.45,0,.25,1); }
+    html.js .route.in .route-cover { stroke-dashoffset: -1; }
+    html.js .route .vstop { opacity: 0; transition: opacity .5s ease; transition-delay: calc(var(--i) * 280ms + 150ms); }
+    html.js .route .vstop > span:first-child { transform: scale(.4); transition: transform .55s cubic-bezier(.34,1.56,.64,1); transition-delay: calc(var(--i) * 280ms + 150ms); }
+    html.js .route .vstop > svg { transform: scale(0) rotate(-90deg); transition: transform .6s cubic-bezier(.34,1.56,.64,1); transition-delay: calc(var(--i) * 280ms + 150ms); }
+    html.js .route.in .vstop { opacity: 1; }
+    html.js .route.in .vstop > span:first-child, html.js .route.in .vstop > svg { transform: none; }
+
+    details summary svg { transition: transform .35s var(--ease) !important; }
+    details.is-closing summary svg { transform: none !important; }
+  }
+  /* Research network cards (dark) */
+  .rcard { display: flex; flex-direction: column; background: #121A2E; transition: background-color .2s; }
+  .rcard:hover { background: #162038; }
+  .rportrait { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-bottom: 1px solid rgba(221,227,236,.08);
+               background: radial-gradient(circle, rgba(221,227,236,.14) 1px, transparent 1px) 0 0 / 14px 14px, linear-gradient(160deg, #2a4a8a 0%, #1B2A55 50%, #0B1120 100%); }
+  .rportrait-initials { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 700; letter-spacing: -.02em; color: rgba(221,227,236,.85); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .rportrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(.3); transition: transform .5s cubic-bezier(.2,.7,.2,1), filter .3s; }
+  .rcard:hover .rportrait-initials, .rcard:hover .rportrait img { transform: scale(1.04); }
+  .rcard:hover .rportrait img { filter: none; }
+  .rportrait-tag { position: absolute; left: 10px; bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(221,227,236,.55); }
+  .rbadge { position: absolute; left: 10px; top: 10px; padding: 3px 8px; background: #3F66B0; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: #fff; }
+  .rbody { display: flex; flex-direction: column; flex: 1; padding: 1.25rem 1.25rem 1.5rem; }
+  .rname { margin-top: .5rem; font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 700; line-height: 1.2; color: #fff; }
+  .rtitle { margin-top: .25rem; font-size: 14px; line-height: 1.45; color: rgba(221,227,236,.7); }
+  .rtags { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: 6px; }
+  .rtags span { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border: 1px solid rgba(127,151,199,.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #DDE3EC; }
+  .rlink { margin-top: auto; padding-top: 1rem; font-size: 14px; font-weight: 500; color: #AEC6FF; transition: color .2s; align-self: flex-start; }
+  .rlink:hover { color: #fff; }
+  .rcard-invite { background: linear-gradient(160deg, rgba(63,102,176,.18), rgba(18,26,46,1) 60%); }
+  .rcard-invite:hover { background: linear-gradient(160deg, rgba(63,102,176,.26), rgba(22,32,56,1) 60%); }
+  @media (prefers-reduced-motion: reduce) { .rportrait-initials, .rportrait img { transition: none; } }
+  /* Phones: compact row layout (small portrait left), so 7 researchers don't make a 4,000px scroll */
+  @media (max-width: 639px) {
+    .rcard:not(.rcard-invite) { flex-direction: row; align-items: stretch; }
+    .rcard:not(.rcard-invite) .rportrait { width: 104px; flex: none; aspect-ratio: auto; min-height: 130px; border-bottom: 0; border-right: 1px solid rgba(221,227,236,.08); }
+    .rportrait-initials { font-size: 26px; }
+    .rportrait-tag { display: none; }
+    .rbadge { left: 6px; right: 6px; top: 6px; padding: 2px 5px; font-size: 9px; line-height: 1.3; white-space: normal; }
+    .rbody { padding: 1rem 1rem 1.1rem; }
+  }
+  /* ================= Mobile menu ================= */
+  .menu-btn { position: relative; }
+  .mb-line { position: absolute; left: 50%; top: 50%; width: 18px; height: 1.5px; background: currentColor; transition: transform .45s cubic-bezier(.76,0,.24,1); }
+  .mb-line:nth-child(1) { transform: translate(-50%, -4px); }
+  .mb-line:nth-child(2) { transform: translate(-50%, 3px); }
+  html.menu-open .mb-line:nth-child(1) { transform: translate(-50%, -.5px) rotate(45deg); }
+  html.menu-open .mb-line:nth-child(2) { transform: translate(-50%, -.5px) rotate(-45deg); }
+  html.menu-open .menu-btn { border-color: rgba(221,227,236,.5); color: #fff; }
+  #nav .btn-sm { transition: opacity .3s, visibility 0s linear 0s, background-color .2s, border-color .2s, color .2s; }
+  html.menu-open #nav .btn-sm { opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s linear .2s; }  /* the menu has its own big CTA */
+
+  #menu { position: fixed; inset: 0; z-index: 40; padding-top: 72px; background: rgba(11,17,32,.97);
+          -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+          clip-path: inset(0 0 100% 0); visibility: hidden;
+          transition: clip-path .6s cubic-bezier(.76,0,.24,1), visibility 0s linear .6s; }
+  html.menu-open #menu { clip-path: inset(0 0 0 0); visibility: visible; transition: clip-path .6s cubic-bezier(.76,0,.24,1), visibility 0s; }
+  @media (min-width: 1024px) { #menu { display: none; } }
+
+  .mm-item { opacity: 0; transform: translateY(22px); transition: opacity .3s ease, transform .3s ease; }
+  html.menu-open .mm-item { opacity: 1; transform: none; transition: opacity .55s var(--ease), transform .7s var(--ease); transition-delay: calc(.2s + var(--i) * 60ms); }
+
+  .mm-link { display: flex; align-items: center; gap: 1rem; padding: 1.05rem 0; border-bottom: 1px solid rgba(255,255,255,.1);
+             font-family: 'Space Grotesk', sans-serif; font-size: clamp(30px, 8.5vw, 44px); font-weight: 700; letter-spacing: -.025em; line-height: 1; color: #fff; }
+  .mm-num { width: 2rem; flex: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: .08em; color: #7F97C7; transition: color .25s; }
+  .mm-label { transition: color .25s, transform .35s var(--ease); }
+  .mm-arrow { width: 24px; height: 24px; margin-left: auto; flex: none; color: #AEC6FF; opacity: 0; transform: translateX(-10px); transition: opacity .25s, transform .35s var(--ease); }
+  .mm-link:hover .mm-arrow, .mm-link:focus-visible .mm-arrow { opacity: 1; transform: none; }
+  .mm-link:hover .mm-label, .mm-link:focus-visible .mm-label { transform: translateX(6px); }
+  .mm-link:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 4px; }
+  .mm-link.active .mm-label { color: #AEC6FF; }
+  .mm-link.active .mm-num { color: #AEC6FF; }
+  .mm-link.active .mm-num::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: #AEC6FF; vertical-align: middle; transform: translateY(-1px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #menu, html.menu-open #menu { transition: none; }
+    .mm-item, html.menu-open .mm-item { transition: none; transform: none; }
+    .mb-line, .mm-label, .mm-arrow { transition: none; }
+  }
+  /* Crew masthead */
+  .member { display: flex; gap: 1.25rem; align-items: center; padding: 1.5rem; background: #fff; transition: background-color .2s; }
+  .member:hover { background: #F5F6F8; }
+  .portrait { position: relative; flex: none; width: 104px; aspect-ratio: 4 / 5; overflow: hidden;
+              background: radial-gradient(circle, rgba(221,227,236,.18) 1px, transparent 1px) 0 0 / 12px 12px, linear-gradient(160deg, #3F66B0 0%, #1B2A55 55%, #0B1120 100%); }
+  .portrait-initials { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -.02em; color: rgba(221,227,236,.9); transition: transform .4s cubic-bezier(.2,.7,.2,1); }
+  .portrait-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(.35); transition: transform .4s cubic-bezier(.2,.7,.2,1), filter .3s; }
+  .member:hover .portrait-initials, .member:hover .portrait-img { transform: scale(1.06); }
+  .member:hover .portrait-img { filter: none; }
+  .portrait-tag { position: absolute; left: 6px; bottom: 5px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(221,227,236,.6); }
+  .wanted { position: absolute; top: 8px; right: -4px; transform: rotate(8deg) scale(.9); opacity: 0; padding: 2px 6px; background: #fff; border: 1px solid rgba(194,70,58,.5);
+            font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #C2463A; transition: opacity .2s, transform .2s; }
+  .member:hover .wanted { opacity: 1; transform: rotate(8deg) scale(1); }
+  .member-name { margin-top: .4rem; font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; color: #0B1120; }
+  .member-duty { margin-top: .35rem; font-size: 14px; line-height: 1.5; color: #3A4458; }
+  @media (prefers-reduced-motion: reduce) { .portrait-initials, .portrait-img, .wanted { transition: none; } }
+
+  /* Button system: square corners everywhere.
+     primary   = solid blue, the main action only ("Join the crew")
+     secondary = outline in periwinkle on dark (blue on light), fills blue on hover
+     text link = blue text + arrow (no box) */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; height: 48px; padding: 0 1.75rem;
+         border: 1px solid transparent; border-radius: 0; font-family: Inter, system-ui, sans-serif; font-size: 15px; font-weight: 500;
+         line-height: 1; white-space: nowrap; transition: background-color .2s, border-color .2s, color .2s; }
+  .btn:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 3px; }
+  .btn-sm { height: 44px; padding: 0 1.25rem; }
+  .btn-lg { height: 56px; padding: 0 2.5rem; font-size: 16px; font-weight: 600; }
+  .btn-primary { background: #3F66B0; color: #fff; }
+  .btn-primary:hover { background: #345596; }
+  .btn-secondary { border-color: #7F97C7; color: #7F97C7; background: transparent; }
+  .btn-secondary:hover { background: #3F66B0; border-color: #3F66B0; color: #fff; }
+  .btn-secondary.btn-on-light { border-color: #3F66B0; color: #3F66B0; }
+  .btn-secondary.btn-on-light:hover { color: #fff; }
+  @media (max-width: 639px) { .btn-sm { padding: 0 1rem; font-size: 14px; } .btn-lg { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .animate-ping { animation: none; } }
+</style>
+</head>
+<body class="bg-ink text-silver font-sans text-[16px] antialiased selection:bg-blue selection:text-white">
+
+<!-- ============ NAVBAR ============ -->
+<!-- v3: full-width bar. Transparent over the hero, solid ink + hairline once you scroll. -->
+<header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent transition-colors duration-300">
+  <div class="max-w-[1240px] mx-auto h-[72px] px-6 md:px-12 flex items-center justify-between gap-6">
+    <a href="#" class="flex items-center gap-3 shrink-0">
+      <img src="assets/logo.png" alt="INSIGHT logo" class="h-8 w-auto logo-glow"/>
+      <span class="flex flex-col leading-none">
+        <span class="font-display text-[18px] font-bold tracking-tight text-white">INSIGHT</span>
+        <span class="hidden sm:block mt-1 text-[12px] text-muted">ESTIN Research Club</span>
+      </span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-9 h-full" aria-label="Main">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#research" class="nav-link">Research</a>
+      <a href="#training" class="nav-link">Training</a>
+      <a href="#crew" class="nav-link">Crew</a>
+      <a href="#events" class="nav-link">Events</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <!-- Secondary button: square outline, periwinkle on dark, fills blue on hover -->
+      <a href="#join" class="btn btn-sm btn-secondary">Join the crew</a>
+      <button id="menu-btn" class="menu-btn lg:hidden w-11 h-11 rounded-none border border-silver/20 text-silver hover:border-silver/50 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span class="mb-line" aria-hidden="true"></span><span class="mb-line" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MOBILE MENU (below 1024px) ============
+     Full-screen sheet that drops from the navbar (clip-path curtain), staggered links, CTA + contact at the bottom.
+     Sits outside <header>: the header's backdrop blur would otherwise become the containing block for position:fixed. -->
+<div id="menu" class="lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
+  <div class="absolute -top-20 -right-24 w-[420px] h-[420px] rounded-full bg-blue/20 blur-[110px] pointer-events-none"></div>
+  <div class="relative h-full overflow-y-auto">
+    <div class="min-h-full max-w-[1240px] mx-auto px-6 md:px-12 pt-6 pb-8 flex flex-col">
+      <p class="mm-item eyebrow text-peri" style="--i:0">Menu</p>
+      <nav class="mt-5" aria-label="Main (mobile)">
+        <ul class="border-t border-white/10">
+        <li class="mm-item" style="--i:1"><a href="#about" class="mm-link"><span class="mm-num">01</span><span class="mm-label">About</span><svg class="mm-arrow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"/></svg></a></li>
+        <li class="mm-item" style="--i:2"><a href="#research" class="mm-link"><span class="mm-num">02</span><span class="mm-label">Research</span><svg class="mm-arrow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"/></svg></a></li>
+        <li class="mm-item" style="--i:3"><a href="#training" class="mm-link"><span class="mm-num">03</span><span class="mm-label">Training</span><svg class="mm-arrow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"/></svg></a></li>
+        <li class="mm-item" style="--i:4"><a href="#crew" class="mm-link"><span class="mm-num">04</span><span class="mm-label">Crew</span><svg class="mm-arrow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"/></svg></a></li>
+        <li class="mm-item" style="--i:5"><a href="#events" class="mm-link"><span class="mm-num">05</span><span class="mm-label">Events</span><svg class="mm-arrow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"/></svg></a></li>
+        </ul>
+      </nav>
+      <div class="mm-item mt-auto pt-10" style="--i:6">
+        <a href="#join" class="mm-cta btn btn-primary w-full">Join the crew</a>
+        <div class="mt-6 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-[14px]">
+          <a href="mailto:insight@estin.dz" class="text-silver/80 hover:text-white transition-colors">insight@estin.dz</a>
+          <a href="https://www.instagram.com/insight.estin/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-silver/80 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            @insight.estin
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="relative min-h-screen overflow-hidden bg-ink flex flex-col">
+  <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
+  <div class="absolute top-1/3 left-[8%] w-[560px] h-[560px] rounded-full bg-blue/10 blur-[130px] pointer-events-none"></div>
+  <!-- Beam canvas: full-bleed on the right, starts at the logo's rays -->
+  <canvas id="beam" class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true"></canvas>
+
+  <div class="relative flex-1 w-full max-w-[1240px] mx-auto px-6 md:px-12 pt-32 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    <div class="lg:col-span-6 z-10">
+      <div class="eyebrow text-peri flex items-center gap-3 hero-in" style="--hd:.05s">
+        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-peri-light opacity-70"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-peri-light"></span></span>
+        ESTIN Research Club · Est. 2026
+      </div>
+      <h1 data-split="hero" class="mt-6 font-display font-bold text-white text-5xl sm:text-6xl lg:text-[76px] leading-[1.02] tracking-[-0.035em]">Where curiosity meets clarity.</h1>
+      <p style="--hd:.75s" class="hero-in mt-7 max-w-lg border-l-2 border-blue/60 pl-5 font-serif italic text-xl sm:text-2xl text-silver/85 leading-relaxed">“somewhere, something incredible is waiting to be known”</p>
+      <div class="mt-10 flex flex-wrap gap-4 hero-in" style="--hd:.9s">
+        <a href="#join" class="btn btn-primary">Join the crew</a>
+        <a href="#research" class="btn btn-secondary">Explore our research →</a>
+      </div>
+    </div>
+    <!-- Real logo, large; the canvas beam leaves from its rays -->
+    <div class="lg:col-span-6 relative h-[300px] lg:h-[460px] flex items-center">
+      <img id="hero-logo" src="assets/logo.png" alt="" class="relative z-10 w-[230px] sm:w-[300px] lg:w-[340px] h-auto logo-glow"/>
+    </div>
+  </div>
+
+  <a href="#about" style="--hd:1.4s" class="hero-in relative z-10 mx-auto mb-8 flex flex-col items-center gap-2 eyebrow text-muted hover:text-white transition">
+    Scroll to explore
+    <span class="w-px h-8 bg-gradient-to-b from-blue via-peri-light to-transparent"></span>
+  </a>
+</section>
+
+<!-- ============ LOG 01 · WHO WE ARE (merged with vision) ============ -->
+<section id="about" class="bg-paper text-ink py-24 sm:py-32">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="eyebrow text-blue flex items-center gap-3 rv">Log 01 · Who we are <span class="w-8 h-px bg-blue/40"></span></div>
+    <div class="mt-5 grid lg:grid-cols-12 gap-8 items-end">
+      <h2 style="--d:80ms" class="rv lg:col-span-7 font-display font-bold text-4xl sm:text-5xl tracking-tight leading-[1.08]">A student-led research community at ESTIN.</h2>
+      <p style="--d:180ms" class="rv lg:col-span-5 text-[17px] text-body leading-relaxed">Run by students, free and open to everyone. No experience required, only curiosity.</p>
+    </div>
+
+    <blockquote class="rv mt-20 max-w-4xl mx-auto text-center font-serif italic text-navy text-3xl sm:text-4xl leading-snug">
+      “A crew of ESTIN students who read, question and contribute to science.”
+    </blockquote>
+    <p style="--d:120ms" class="rv mt-4 text-center eyebrow text-muted">Our vision</p>
+
+    <div class="rv-stagger mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 pt-10 border-t border-navy/10">
+      <div><span class="font-mono text-xl font-semibold text-blue">I</span><h3 class="mt-3 font-display text-xl font-bold">Spark curiosity</h3><p class="mt-2 text-[15px] text-body leading-relaxed">Make asking questions a habit.</p></div>
+      <div><span class="font-mono text-xl font-semibold text-blue">II</span><h3 class="mt-3 font-display text-xl font-bold">Open the door to research</h3><p class="mt-2 text-[15px] text-body leading-relaxed">Introduce students to academic research.</p></div>
+      <div><span class="font-mono text-xl font-semibold text-blue">III</span><h3 class="mt-3 font-display text-xl font-bold">Sharpen the mind</h3><p class="mt-2 text-[15px] text-body leading-relaxed">Develop research and critical-thinking skills.</p></div>
+      <div><span class="font-mono text-xl font-semibold text-blue">IV</span><h3 class="mt-3 font-display text-xl font-bold">Build bridges</h3><p class="mt-2 text-[15px] text-body leading-relaxed">Connect students with researchers, labs and the scientific community.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NUMBERS ============ -->
+<section class="bg-white text-ink border-y border-navy/10 py-20">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+    <dl id="stats" class="rv-stagger grid grid-cols-2 sm:grid-cols-4 gap-y-8 sm:divide-x divide-navy/10">
+      <div class="sm:pr-8"><dt class="sr-only">Crew members</dt><dd class="font-display text-6xl font-bold tracking-tight" data-count="27">27</dd><dd class="mt-2 eyebrow text-muted">Crew members</dd></div>
+      <div class="sm:px-8"><dt class="sr-only">Departments</dt><dd class="font-display text-6xl font-bold tracking-tight" data-count="7">7</dd><dd class="mt-2 eyebrow text-muted">Departments</dd></div>
+      <div class="sm:px-8"><dt class="sr-only">Research poles</dt><dd class="font-display text-6xl font-bold tracking-tight" data-count="4">4</dd><dd class="mt-2 eyebrow text-muted">Research poles</dd></div>
+      <div class="sm:pl-8"><dt class="sr-only">Guest from IBM Research</dt><dd class="font-display text-6xl font-bold tracking-tight" data-count="1">1</dd><dd class="mt-2 eyebrow text-muted">Guest from IBM Research</dd></div>
+    </dl>
+    <p style="--d:320ms" class="rv lg:max-w-sm lg:border-l lg:border-navy/10 lg:pl-12 font-display text-2xl sm:text-3xl font-medium text-navy leading-snug tracking-tight">27 students. 4 research poles. One question at a time.</p>
+  </div>
+</section>
+
+<!-- ============ LOG 02 · WHAT WE DO (hairline grid, Tawjihi-style, light) ============ -->
+<section id="training" class="bg-paper text-ink py-24 sm:py-28">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="eyebrow text-blue flex items-center gap-3 rv">Log 02 · What we do <span class="w-8 h-px bg-blue/40"></span></div>
+    <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight">Six ways in.</h2>
+    <p style="--d:160ms" class="rv mt-3 font-serif italic text-xl sm:text-2xl text-blue">From your first paper to your first publication.</p>
+
+    <!-- One 16px container; cells are split by 1px hairlines (gap-px over a hairline-coloured background) -->
+    <div class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-navy/10 rv-cells">
+      <article class="group p-8 bg-white hover:bg-paper transition-colors">
+        <div class="flex items-start justify-between">
+          <span class="tile"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5" stroke-linecap="round"/></svg></span>
+          <span class="font-mono text-[12px] text-muted">01</span>
+        </div>
+        <h3 class="mt-8 font-display text-xl font-bold text-ink">Research projects</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">Teams explore real research questions.</p>
+      </article>
+      <!-- Highlighted cell: paper reading is level I (Rookie) of the training path -->
+      <article class="group p-8 bg-white hover:bg-paper transition-colors">
+        <div class="flex items-start justify-between">
+          <span class="tile tile-on"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z" stroke-linejoin="round"/></svg></span>
+          <span class="font-mono text-[12px] text-muted">02</span>
+        </div>
+        <h3 class="mt-8 font-display text-xl font-bold text-ink">Paper reading</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">We read scientific papers, the records of discovery.</p>
+        <span class="mt-5 inline-flex items-center h-7 px-2.5 border border-blue/40 font-mono text-[12px] text-blue">Start here · Rookie level</span>
+      </article>
+      <article class="group p-8 bg-white hover:bg-paper transition-colors">
+        <div class="flex items-start justify-between">
+          <span class="tile"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 10 3 2.5L7 15M12.5 15H17" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="font-mono text-[12px] text-muted">03</span>
+        </div>
+        <h3 class="mt-8 font-display text-xl font-bold text-ink">Workshops &amp; training</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">Hands-on technical sessions.</p>
+      </article>
+      <article class="group p-8 bg-white hover:bg-paper transition-colors">
+        <div class="flex items-start justify-between">
+          <span class="tile"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M14.5 4.5 19.5 9.5 9 20H4v-5z" stroke-linejoin="round"/><path d="m12.5 6.5 5 5"/></svg></span>
+          <span class="font-mono text-[12px] text-muted">04</span>
+        </div>
+        <h3 class="mt-8 font-display text-xl font-bold text-ink">Writing &amp; publishing</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">Academic writing, from first draft to paper.</p>
+      </article>
+      <article class="group p-8 bg-white hover:bg-paper transition-colors">
+        <div class="flex items-start justify-between">
+          <span class="tile"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.9 7.6-3.8M8.2 13.1l7.6 3.8"/></svg></span>
+          <span class="font-mono text-[12px] text-muted">05</span>
+        </div>
+        <h3 class="mt-8 font-display text-xl font-bold text-ink">Events &amp; collaborations</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">Research events with other clubs and labs.</p>
+      </article>
+      <article class="group p-8 bg-white hover:bg-paper transition-colors">
+        <div class="flex items-start justify-between">
+          <span class="tile"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" stroke-linecap="round"/></svg></span>
+          <span class="font-mono text-[12px] text-muted">06</span>
+        </div>
+        <h3 class="mt-8 font-display text-xl font-bold text-ink">Guest talks</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">Meet researchers and ask them anything.</p>
+      </article>
+    </div>
+    <p class="rv mt-14 text-center font-serif italic text-muted text-lg">“Side effects may include reading papers at 2 a.m.”</p>
+  </div>
+</section>
+
+<!-- ============ LOG 03 · RESEARCH POLES (interactive compass) ============ -->
+<section id="research" class="relative bg-ink py-24 sm:py-28 overflow-hidden">
+  <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-blue/15 blur-[120px] pointer-events-none"></div>
+  <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="eyebrow text-peri flex items-center gap-3 rv">Log 03 · Research poles <span class="w-8 h-px bg-peri/30"></span></div>
+    <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight text-white">Four poles. One fleet.</h2>
+
+    <div class="mt-14 grid lg:grid-cols-12 gap-12 items-center">
+      <div class="rv lg:col-span-6 flex flex-col items-center">
+        <svg viewBox="-60 -6 520 412" class="w-full max-w-[480px]" fill="none" role="img" aria-label="Compass of the four research poles">
+          <defs>
+            <linearGradient id="ng" x1="200" y1="200" x2="200" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#1B2A55" stop-opacity=".2"/><stop offset=".6" stop-color="#3F66B0"/><stop offset="1" stop-color="#AEC6FF"/>
+            </linearGradient>
+          </defs>
+          <circle cx="200" cy="200" r="185" stroke="#DDE3EC" stroke-opacity=".15" stroke-dasharray="3 3"/>
+          <circle cx="200" cy="200" r="160" stroke="#DDE3EC" stroke-opacity=".25"/>
+          <circle cx="200" cy="200" r="125" stroke="#3F66B0" stroke-opacity=".35"/>
+          <circle cx="200" cy="200" r="85" stroke="#DDE3EC" stroke-opacity=".12"/>
+          <path d="M200 15v370M15 200h370" stroke="#DDE3EC" stroke-opacity=".15"/>
+          <path d="M70 70l260 260M330 70 70 330" stroke="#DDE3EC" stroke-opacity=".08" stroke-dasharray="2 4"/>
+          <g id="needle">
+            <polygon points="200,40 207,200 200,212 193,200" fill="url(#ng)"/>
+            <polygon points="200,360 205,200 200,188 195,200" fill="#1B2A55" fill-opacity=".7"/>
+          </g>
+          <circle cx="200" cy="200" r="7" fill="#AEC6FF"/><circle cx="200" cy="200" r="2.5" fill="#0B1120"/>
+          <g class="pole" data-i="0"><circle class="pole-dot" cx="200" cy="40" r="12"/><text x="200" y="16" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="600">AI &amp; DATA SCIENCE</text></g>
+          <g class="pole" data-i="1"><circle class="pole-dot" cx="360" cy="200" r="12"/><text x="360" y="230" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="600">CYBERSECURITY</text></g>
+          <g class="pole" data-i="2"><circle class="pole-dot" cx="200" cy="360" r="12"/><text x="200" y="392" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="600">SOFTWARE &amp; SYSTEMS</text></g>
+          <g class="pole" data-i="3"><circle class="pole-dot" cx="40" cy="200" r="12"/><text x="40" y="230" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="600">NETWORKS &amp; IOT</text></g>
+        </svg>
+        <div class="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Research poles">
+          <button role="tab" data-i="0" class="pole-tab px-4 h-10 rounded-none text-[14px] font-medium border transition">AI &amp; Data Science</button>
+          <button role="tab" data-i="1" class="pole-tab px-4 h-10 rounded-none text-[14px] font-medium border transition">Cybersecurity</button>
+          <button role="tab" data-i="2" class="pole-tab px-4 h-10 rounded-none text-[14px] font-medium border transition">Software &amp; Systems</button>
+          <button role="tab" data-i="3" class="pole-tab px-4 h-10 rounded-none text-[14px] font-medium border transition">Networks &amp; IoT</button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6">
+        <div id="pole-panel" style="--d:150ms" class="rv p-8 lg:p-10 rounded-2xl bg-ink-2/80 border border-silver/10" role="tabpanel" aria-live="polite">
+          <p id="pole-num" class="eyebrow text-peri">Pole 01</p>
+          <h3 id="pole-name" class="mt-3 font-display text-3xl font-bold text-white tracking-tight">AI &amp; Data Science</h3>
+          <p class="mt-4 text-[16px] text-silver/75 leading-relaxed">[One-line description of the pole, from its leads]</p>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-none font-mono text-[12px] text-silver border border-peri/30">[Topic 1]</span>
+            <span class="px-3 py-1 rounded-none font-mono text-[12px] text-silver border border-peri/30">[Topic 2]</span>
+            <span class="px-3 py-1 rounded-none font-mono text-[12px] text-silver border border-peri/30">[Topic 3]</span>
+          </div>
+          <div class="mt-8 pt-6 border-t border-silver/10">
+            <p class="eyebrow text-muted">Pole leads</p>
+            <ul id="pole-leads" class="mt-4 grid sm:grid-cols-2 gap-x-8 gap-y-5"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOG 04 · THE VOYAGE (route) ============ -->
+<section class="bg-paper text-ink py-24 sm:py-28 overflow-hidden">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="eyebrow text-blue flex items-center gap-3 rv">Log 04 · How research works <span class="w-8 h-px bg-blue/40"></span></div>
+    <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight max-w-2xl leading-[1.08]">Every research project is a voyage.</h2>
+
+    <!-- Desktop: drawn route -->
+    <div class="route hidden lg:block relative mt-16 h-[380px]">
+      <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1200 380" preserveAspectRatio="none" fill="none" aria-hidden="true">
+        <path d="M60 130 C150 130 150 260 240 260 S330 130 420 130 S510 260 600 260 S690 130 780 130 S870 260 960 260 S1060 170 1130 170"
+              stroke="#1B2A55" stroke-width="2.5" stroke-dasharray="8 8" vector-effect="non-scaling-stroke"/>
+        <!-- Cover in the background colour: it slides off along the route, so the route seems to draw itself -->
+        <path class="route-cover" d="M60 130 C150 130 150 260 240 260 S330 130 420 130 S510 260 600 260 S690 130 780 130 S870 260 960 260 S1060 170 1130 170" stroke="#F5F6F8" stroke-width="14" pathLength="1"/>
+      </svg>
+      <!-- stops: x/1200, y/380 -->
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:0;left:5%;top:34.2%"><span class="flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">01</span>
+        <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-44 text-center"><p class="font-display text-lg font-bold">Set sail</p><p class="text-[15px] text-body">Start with a question</p></div></div>
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:1;left:20%;top:68.4%"><span class="flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">02</span>
+        <div class="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-44 text-center"><p class="font-display text-lg font-bold">Read the records</p><p class="text-[15px] text-body">Study what is known</p></div></div>
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:2;left:35%;top:34.2%"><span class="flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">03</span>
+        <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-44 text-center"><p class="font-display text-lg font-bold">Plot the course</p><p class="text-[15px] text-body">Choose a method</p></div></div>
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:3;left:50%;top:68.4%"><span class="flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">04</span>
+        <div class="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-44 text-center"><p class="font-display text-lg font-bold">Explore</p><p class="text-[15px] text-body">Run the experiments</p></div></div>
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:4;left:65%;top:34.2%"><span class="flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">05</span>
+        <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-44 text-center"><p class="font-display text-lg font-bold">Write the log</p><p class="text-[15px] text-body">Write the paper</p></div></div>
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:5;left:80%;top:68.4%"><span class="flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">06</span>
+        <div class="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-44 text-center"><p class="font-display text-lg font-bold">Bring the treasure</p><p class="text-[15px] text-body">Share and publish</p></div></div>
+      <!-- The One Paper -->
+      <div class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:6;left:94.2%;top:44.7%">
+        <svg class="w-14 h-14" viewBox="0 0 56 56" aria-hidden="true"><path d="M12 12l32 32M44 12 12 44" stroke="#C2463A" stroke-width="7" stroke-linecap="round"/></svg>
+        <div class="absolute bottom-full mb-3 right-0 w-56 text-right"><p class="font-display text-2xl font-bold text-navy">The One Paper</p><p class="text-[15px] text-body">Your first research publication. It's real, and it's waiting for you.</p></div>
+      </div>
+    </div>
+
+    <!-- Mobile / tablet: vertical route -->
+    <ol class="rv-stagger lg:hidden mt-12 relative border-l-2 border-dashed border-navy/40 ml-5 space-y-8">
+      <li class="pl-8 relative"><span class="absolute -left-[23px] top-0 flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">01</span><p class="font-display text-lg font-bold pt-2">Set sail</p><p class="text-[15px] text-body">Start with a question</p></li>
+      <li class="pl-8 relative"><span class="absolute -left-[23px] top-0 flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">02</span><p class="font-display text-lg font-bold pt-2">Read the records</p><p class="text-[15px] text-body">Study what is known</p></li>
+      <li class="pl-8 relative"><span class="absolute -left-[23px] top-0 flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">03</span><p class="font-display text-lg font-bold pt-2">Plot the course</p><p class="text-[15px] text-body">Choose a method</p></li>
+      <li class="pl-8 relative"><span class="absolute -left-[23px] top-0 flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">04</span><p class="font-display text-lg font-bold pt-2">Explore</p><p class="text-[15px] text-body">Run the experiments</p></li>
+      <li class="pl-8 relative"><span class="absolute -left-[23px] top-0 flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">05</span><p class="font-display text-lg font-bold pt-2">Write the log</p><p class="text-[15px] text-body">Write the paper</p></li>
+      <li class="pl-8 relative"><span class="absolute -left-[23px] top-0 flex w-11 h-11 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[13px] font-semibold text-navy">06</span><p class="font-display text-lg font-bold pt-2">Bring the treasure</p><p class="text-[15px] text-body">Share and publish</p></li>
+      <li class="pl-8 relative"><svg class="absolute -left-[25px] top-0 w-12 h-12 bg-paper" viewBox="0 0 56 56" aria-hidden="true"><path d="M14 14l28 28M42 14 14 42" stroke="#C2463A" stroke-width="7" stroke-linecap="round"/></svg><p class="font-display text-2xl font-bold text-navy pt-2">The One Paper</p><p class="text-[15px] text-body">Your first research publication. It's real, and it's waiting for you.</p></li>
+    </ol>
+
+    <div class="rv mt-16 lg:mt-24 flex justify-center">
+      <a href="#join" class="btn btn-secondary btn-on-light">Start your voyage →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOG 05 · RESEARCH NETWORK ============
+     1. Partner lab (featured)  2. Researchers grid (7 + 1 invitation cell)
+     Only Dr. Pin-Yu Chen is filled in; everything in [brackets] waits for real, approved details. -->
+<section id="network" class="relative bg-ink py-24 sm:py-28 overflow-hidden">
+  <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+  <div class="absolute -top-24 right-1/4 w-[440px] h-[440px] rounded-full bg-blue/15 blur-[120px] pointer-events-none"></div>
+  <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="eyebrow text-peri flex items-center gap-3 rv">Log 05 · Research network <span class="w-8 h-px bg-peri/30"></span></div>
+    <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight text-white">A network of researchers.</h2>
+    <p style="--d:160ms" class="rv mt-3 font-serif italic text-xl sm:text-2xl text-peri">Researchers from around the world who work with our crew.</p>
+
+    <!-- 1. Partner lab -->
+    <div style="--d:200ms" class="rv mt-14 rounded-2xl border border-silver/10 bg-ink-2 p-6 sm:p-8 grid md:grid-cols-12 gap-6 md:items-center">
+      <div class="md:col-span-2">
+        <div class="w-20 h-20 border border-silver/15 bg-white/[.03] flex items-center justify-center font-mono text-[11px] text-muted text-center leading-tight">[Lab<br/>logo]</div>
+      </div>
+      <div class="md:col-span-7">
+        <p class="eyebrow text-peri-light">Research partner</p>
+        <h3 class="mt-2 font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">[Laboratory name]</h3>
+        <p class="mt-1 font-mono text-[13px] text-muted">[University or institute] · [Country]</p>
+        <p class="mt-3 text-[15px] text-silver/75 leading-relaxed max-w-xl">[What we do together, in one line: e.g. co-supervised projects, internships, joint seminars]</p>
+      </div>
+      <div class="md:col-span-3 md:justify-self-end">
+        <a href="#" class="btn btn-sm btn-secondary">Visit the lab ↗</a>
+      </div>
+    </div>
+
+    <!-- 2. Researchers -->
+    <div class="mt-16 flex flex-col sm:flex-row sm:items-end justify-between gap-4 rv">
+      <h3 class="font-display text-2xl font-bold text-white tracking-tight">Researchers</h3>
+      <p class="font-mono text-[13px] text-muted">7 researchers · [N] countries</p>
+    </div>
+    <ul class="mt-6 rounded-2xl overflow-hidden border border-silver/10 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-silver/10 rv-cells" role="list">
+      <!-- Researcher 1 (real) -->
+      <li class="rcard group">
+        <div class="rportrait"><span class="rportrait-initials">PYC</span><span class="rportrait-tag">[Official photo]</span><span class="rbadge">Welcome Day guest</span></div>
+        <div class="rbody">
+          <p class="eyebrow text-peri">IBM Research · USA</p>
+          <h4 class="rname">Dr. Pin-Yu Chen</h4>
+          <p class="rtitle">Principal Research Scientist</p>
+          <div class="rtags"><span>Trustworthy AI</span><span>LLM safety</span></div>
+          <a href="https://research.ibm.com/people/pin-yu-chen" target="_blank" rel="noopener" class="rlink">Profile ↗</a>
+        </div>
+      </li>
+      <!-- Researchers 2-7 (placeholders) -->
+      <li class="rcard group"><div class="rportrait"><span class="rportrait-initials">—</span><span class="rportrait-tag">[Photo]</span></div><div class="rbody"><p class="eyebrow text-peri">[Institution] · [Country]</p><h4 class="rname">[Researcher name]</h4><p class="rtitle">[Title]</p><div class="rtags"><span>[Field]</span><span>[Field]</span></div><a href="#" class="rlink">Profile ↗</a></div></li>
+      <li class="rcard group"><div class="rportrait"><span class="rportrait-initials">—</span><span class="rportrait-tag">[Photo]</span></div><div class="rbody"><p class="eyebrow text-peri">[Institution] · [Country]</p><h4 class="rname">[Researcher name]</h4><p class="rtitle">[Title]</p><div class="rtags"><span>[Field]</span><span>[Field]</span></div><a href="#" class="rlink">Profile ↗</a></div></li>
+      <li class="rcard group"><div class="rportrait"><span class="rportrait-initials">—</span><span class="rportrait-tag">[Photo]</span></div><div class="rbody"><p class="eyebrow text-peri">[Institution] · [Country]</p><h4 class="rname">[Researcher name]</h4><p class="rtitle">[Title]</p><div class="rtags"><span>[Field]</span><span>[Field]</span></div><a href="#" class="rlink">Profile ↗</a></div></li>
+      <li class="rcard group"><div class="rportrait"><span class="rportrait-initials">—</span><span class="rportrait-tag">[Photo]</span></div><div class="rbody"><p class="eyebrow text-peri">[Institution] · [Country]</p><h4 class="rname">[Researcher name]</h4><p class="rtitle">[Title]</p><div class="rtags"><span>[Field]</span><span>[Field]</span></div><a href="#" class="rlink">Profile ↗</a></div></li>
+      <li class="rcard group"><div class="rportrait"><span class="rportrait-initials">—</span><span class="rportrait-tag">[Photo]</span></div><div class="rbody"><p class="eyebrow text-peri">[Institution] · [Country]</p><h4 class="rname">[Researcher name]</h4><p class="rtitle">[Title]</p><div class="rtags"><span>[Field]</span><span>[Field]</span></div><a href="#" class="rlink">Profile ↗</a></div></li>
+      <li class="rcard group"><div class="rportrait"><span class="rportrait-initials">—</span><span class="rportrait-tag">[Photo]</span></div><div class="rbody"><p class="eyebrow text-peri">[Institution] · [Country]</p><h4 class="rname">[Researcher name]</h4><p class="rtitle">[Title]</p><div class="rtags"><span>[Field]</span><span>[Field]</span></div><a href="#" class="rlink">Profile ↗</a></div></li>
+      <!-- Invitation cell -->
+      <li class="rcard rcard-invite">
+        <div class="rbody h-full flex flex-col justify-between gap-8">
+          <div>
+            <span class="inline-flex w-11 h-11 items-center justify-center border border-peri/40 text-peri-light">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="square"/></svg>
+            </span>
+            <h4 class="mt-6 font-display text-xl font-bold text-white">Are you a researcher?</h4>
+            <p class="mt-2 text-[15px] text-silver/70 leading-relaxed">Mentor a project team, give a talk, or co-supervise a student project.</p>
+          </div>
+          <a href="mailto:insight@estin.dz?subject=Joining%20the%20INSIGHT%20research%20network" class="btn btn-sm btn-secondary self-start">Get in touch →</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ LOG 06 · NEXT ON THE MAP ============ -->
+<section id="events" class="bg-white text-ink py-24 sm:py-28">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="eyebrow text-blue flex items-center gap-3 rv">Log 06 · Next on the map <span class="w-8 h-px bg-blue/40"></span></div>
+    <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight">Next on the map.</h2>
+    <div class="rv-stagger mt-14 divide-y divide-navy/10 border-y border-navy/10">
+      <article class="py-10 grid lg:grid-cols-12 gap-8 items-center group">
+        <div class="lg:col-span-4 aspect-[16/10] rounded-2xl overflow-hidden relative bg-gradient-to-br from-navy to-ink">
+          <div class="absolute inset-0 dots opacity-30"></div>
+          <span class="absolute left-4 bottom-4 font-mono text-[12px] text-silver/80">[Event poster or photo]</span>
+        </div>
+        <div class="lg:col-span-8">
+          <p class="eyebrow text-signal flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-signal"></span>Upcoming · [Date]</p>
+          <h3 class="mt-3 font-display text-2xl sm:text-3xl font-bold group-hover:text-blue transition">[Next event title]</h3>
+          <p class="mt-3 text-[16px] text-body leading-relaxed">[Short description] · [Room], ESTIN</p>
+          <a href="#" class="mt-4 inline-block text-[15px] font-medium text-blue hover:text-navy transition">Details →</a>
+        </div>
+      </article>
+      <article class="py-10 grid lg:grid-cols-12 gap-8 items-center group">
+        <div class="lg:col-span-4 aspect-[16/10] rounded-2xl overflow-hidden relative bg-gradient-to-br from-blue/80 to-navy">
+          <div class="absolute inset-0 dots opacity-30"></div>
+          <span class="absolute left-4 bottom-4 font-mono text-[12px] text-silver/80">[Welcome Day photo]</span>
+        </div>
+        <div class="lg:col-span-8">
+          <p class="eyebrow text-blue">Event · 4 Nov 2026</p>
+          <h3 class="mt-3 font-display text-2xl sm:text-3xl font-bold group-hover:text-blue transition">Welcome Day 2026: INSIGHT sets sail</h3>
+          <p class="mt-3 text-[16px] text-body leading-relaxed">The official start of INSIGHT, with our four research poles and a live talk by Dr. Pin-Yu Chen from IBM Research.</p>
+          <a href="#" class="mt-4 inline-block text-[15px] font-medium text-blue hover:text-navy transition">Read the recap →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLLABORATE ============ -->
+<section class="bg-navy py-14">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+    <h3 class="rv font-display text-2xl font-medium text-white max-w-2xl tracking-tight">Are you a researcher, a lab or a club? Let's work together.</h3>
+    <a href="mailto:insight@estin.dz?subject=Collaboration%20with%20INSIGHT" style="--d:120ms" class="rv btn btn-secondary shrink-0">Collaborate with us →</a>
+  </div>
+</section>
+
+<!-- ============ LOG 07 · THE HELM (masthead) ============
+     Same hairline grid as "Six ways in". Each cell: 4:5 portrait + role + name + duty (from the Welcome Day deck).
+     Swap .portrait-initials for <img class="portrait-img" src="..." alt="Name"> when photos arrive. -->
+<section id="crew" class="bg-paper text-ink py-24 sm:py-28">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div>
+        <div class="eyebrow text-blue flex items-center gap-3 rv">Log 07 · The helm <span class="w-8 h-px bg-blue/40"></span></div>
+        <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight">Meet the crew.</h2>
+        <p style="--d:160ms" class="rv mt-3 font-serif italic text-xl sm:text-2xl text-blue">Every great voyage needs more than a captain.</p>
+      </div>
+      <a href="#" class="group inline-flex items-center gap-2 whitespace-nowrap shrink-0 text-[15px] font-medium text-blue hover:text-navy transition-colors">
+        Meet the full crew <span class="font-mono text-[13px] text-muted group-hover:text-navy">(27)</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"/></svg>
+      </a>
+    </div>
+
+    <ul class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-navy/10 rv-cells" role="list">
+      <li class="member group">
+        <div class="portrait"><span class="portrait-initials">FS</span><span class="portrait-tag">[Photo]</span><span class="wanted">Wanted</span></div>
+        <div class="min-w-0"><p class="eyebrow text-blue">President</p><h3 class="member-name">Faci Souhaib Abdelouakil</h3><p class="member-duty">Leads the club and represents it.</p></div>
+      </li>
+      <li class="member group">
+        <div class="portrait"><span class="portrait-initials">MS</span><span class="portrait-tag">[Photo]</span><span class="wanted">Wanted</span></div>
+        <div class="min-w-0"><p class="eyebrow text-blue">Vice-president</p><h3 class="member-name">Madaoui Sara</h3><p class="member-duty">Runs meetings and strategy.</p></div>
+      </li>
+      <li class="member group">
+        <div class="portrait"><span class="portrait-initials">RM</span><span class="portrait-tag">[Photo]</span><span class="wanted">Wanted</span></div>
+        <div class="min-w-0"><p class="eyebrow text-blue">Vice-president</p><h3 class="member-name">Redouane Mohamed Islem</h3><p class="member-duty">Runs meetings and strategy.</p></div>
+      </li>
+      <li class="member group">
+        <div class="portrait"><span class="portrait-initials">FA</span><span class="portrait-tag">[Photo]</span><span class="wanted">Wanted</span></div>
+        <div class="min-w-0"><p class="eyebrow text-blue">Secretary general</p><h3 class="member-name">Feltane Anayis</h3><p class="member-duty">Keeps the club's records and documents.</p></div>
+      </li>
+      <li class="member group">
+        <div class="portrait"><span class="portrait-initials">MR</span><span class="portrait-tag">[Photo]</span><span class="wanted">Wanted</span></div>
+        <div class="min-w-0"><p class="eyebrow text-blue">Secretary general</p><h3 class="member-name">Madoui Roufaida</h3><p class="member-duty">Keeps the club's records and documents.</p></div>
+      </li>
+      <li class="member group">
+        <div class="portrait"><span class="portrait-initials">GM</span><span class="portrait-tag">[Photo]</span><span class="wanted">Wanted</span></div>
+        <div class="min-w-0"><p class="eyebrow text-blue">Treasurer</p><h3 class="member-name">Ghasmoune Mohammed</h3><p class="member-duty">Manages the budget and funding.</p></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ LOG 08 · FAQ ============ -->
+<section class="bg-white text-ink py-24 sm:py-28">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12 grid lg:grid-cols-12 gap-12">
+    <div class="lg:col-span-4">
+      <div class="eyebrow text-blue flex items-center gap-3 rv">Log 08 · FAQ <span class="w-8 h-px bg-blue/40"></span></div>
+      <h2 style="--d:80ms" class="rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight">Questions, answered.</h2>
+    </div>
+    <div class="rv-stagger lg:col-span-8 divide-y divide-navy/15 border-y border-navy/15">
+      <details class="group py-6" open>
+        <summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-display text-xl font-bold group-hover:text-blue transition">Do I need research experience?</span><svg class="w-5 h-5 shrink-0 text-navy transition group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <p class="mt-4 text-[16px] text-body leading-relaxed">No. We start from paper reading and guide you step by step to your first research project.</p>
+      </details>
+      <details class="group py-6">
+        <summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-display text-xl font-bold group-hover:text-blue transition">Is membership free?</span><svg class="w-5 h-5 shrink-0 text-navy transition group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <p class="mt-4 text-[16px] text-body leading-relaxed">Yes, free and open to all ESTIN students.</p>
+      </details>
+      <details class="group py-6">
+        <summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-display text-xl font-bold group-hover:text-blue transition">Which year can join?</span><svg class="w-5 h-5 shrink-0 text-navy transition group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <p class="mt-4 text-[16px] text-body leading-relaxed">[Answer from the board]</p>
+      </details>
+      <details class="group py-6">
+        <summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-display text-xl font-bold group-hover:text-blue transition">How do I pick a research pole?</span><svg class="w-5 h-5 shrink-0 text-navy transition group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <p class="mt-4 text-[16px] text-body leading-relaxed">Explore the four poles during your first weeks, then join the one that excites you most.</p>
+      </details>
+      <details class="group py-6">
+        <summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-display text-xl font-bold group-hover:text-blue transition">How much time does it take?</span><svg class="w-5 h-5 shrink-0 text-navy transition group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <p class="mt-4 text-[16px] text-body leading-relaxed">[Answer from the board]</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section id="join" class="relative bg-ink py-28 overflow-hidden">
+  <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[480px] rounded-full bg-blue/20 blur-[140px] pointer-events-none"></div>
+  <div class="relative max-w-4xl mx-auto px-6 text-center">
+    <p class="rv eyebrow text-peri-light">Join the crew · 2026/27</p>
+    <h2 data-split class="mt-6 font-display font-bold text-white text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08]">Every great discovery begins with a question.</h2>
+    <p style="--d:550ms" class="rv mt-6 font-serif italic text-xl sm:text-2xl text-peri">“Set sail. Explore the unknown.”</p>
+    <div style="--d:700ms" class="rv mt-10 flex flex-col sm:flex-row justify-center gap-4">
+      <a href="#" class="btn btn-lg btn-primary">Join the crew</a>
+      <a href="#research" class="btn btn-lg btn-secondary">Explore our research →</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============
+     1. Contact band (for researchers, labs, clubs; the section above already asks students to join)
+     2. Brand · 3 link columns by intent · affiliation (ESTIN)
+     3. Bottom bar: copyright · sign-off · back to top
+-->
+<footer class="bg-ink-deep border-t border-white/10" aria-labelledby="footer-title">
+  <h2 id="footer-title" class="sr-only">INSIGHT Research Club, footer</h2>
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+
+    <!-- 1. Contact band -->
+    <div class="py-14 md:py-16 grid lg:grid-cols-12 gap-8 lg:items-end border-b border-white/10">
+      <div class="lg:col-span-7">
+        <p class="eyebrow text-peri">Get in touch</p>
+        <a href="mailto:insight@estin.dz" class="group mt-4 inline-flex items-center gap-4 font-display font-bold text-white text-3xl sm:text-5xl tracking-tight hover:text-peri-light transition-colors break-all sm:break-normal">
+          insight@estin.dz
+          <svg class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+      <div class="lg:col-span-5 lg:justify-self-end flex flex-col sm:flex-row sm:items-center gap-4 lg:flex-col lg:items-end">
+        <p class="text-[15px] text-silver/70 leading-relaxed lg:text-right max-w-sm">Questions, guest talks, collaborations: students, researchers, labs and clubs are all welcome to write.</p>
+        <button id="copy-email" type="button" class="btn btn-sm btn-secondary shrink-0" data-email="insight@estin.dz">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12"/><path d="M16 8V4H4v12h4"/></svg>
+          <span>Copy email</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Brand · links · affiliation -->
+    <div class="py-14 grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-12">
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-12 lg:col-span-4">
+        <a href="#" class="inline-flex items-center gap-3" aria-label="INSIGHT, back to the home page">
+          <img src="assets/logo.png" alt="" class="h-9 w-auto logo-glow"/>
+          <span class="flex flex-col leading-none">
+            <span class="font-display text-xl font-bold tracking-tight text-white">INSIGHT</span>
+            <span class="mt-1 text-[13px] text-muted">ESTIN Research Club</span>
+          </span>
+        </a>
+        <p class="mt-5 max-w-xs text-[15px] text-silver/70 leading-relaxed">The student-led research club of ESTIN. We read, question and contribute to science.</p>
+        <a href="https://www.instagram.com/insight.estin/" target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-2.5 h-10 px-3.5 border border-white/15 text-[14px] text-silver/80 hover:text-white hover:border-white/40 transition-colors" aria-label="Instagram @insight.estin (opens in a new tab)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          @insight.estin
+        </a>
+      </div>
+
+      <!-- Link columns -->
+      <nav class="col-span-2 md:col-span-8 lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-8" aria-label="Footer">
+        <div>
+          <h3 class="eyebrow text-silver">Club</h3>
+          <ul class="mt-5 space-y-3 text-[15px]">
+            <li><a href="#about" class="footer-link">About</a></li>
+            <li><a href="#crew" class="footer-link">Crew</a></li>
+            <li><a href="#events" class="footer-link">Events</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="eyebrow text-silver">Research</h3>
+          <ul class="mt-5 space-y-3 text-[15px]">
+            <li><a href="#research" class="footer-link">Research poles</a></li>
+            <li><a href="#training" class="footer-link">Training</a></li>
+            <li class="flex items-center gap-2 whitespace-nowrap"><span class="text-silver/40">Publications</span><span class="inline-flex items-center h-5 px-1.5 border border-white/15 font-mono text-[11px] text-muted">Soon</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="eyebrow text-silver">Get involved</h3>
+          <ul class="mt-5 space-y-3 text-[15px]">
+            <li><a href="#join" class="footer-link">Join the crew</a></li>
+            <li><a href="mailto:insight@estin.dz?subject=Collaboration%20with%20INSIGHT" class="footer-link">Collaborate</a></li>
+            <li><a href="mailto:insight@estin.dz" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Affiliation -->
+      <div class="col-span-2 md:col-span-4 lg:col-span-3 md:justify-self-end">
+        <h3 class="eyebrow text-silver">A club of</h3>
+        <a href="https://estin.dz/" target="_blank" rel="noopener" class="mt-5 inline-block opacity-80 hover:opacity-100 transition-opacity" aria-label="ESTIN, École Supérieure en Sciences et Technologies de l'Informatique et du Numérique (opens in a new tab)">
+          <img src="assets/estin-logo-white.png" alt="ESTIN" class="h-10 w-auto"/>
+        </a>
+        <p class="mt-4 text-[14px] text-silver/60 leading-relaxed">École Supérieure en Sciences et Technologies de l'Informatique et du Numérique<br/>Amizour, Béjaïa, Algeria</p>
+      </div>
+    </div>
+
+    <!-- 3. Bottom bar -->
+    <div class="py-6 border-t border-white/10 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
+      <p class="text-[13px] text-muted">© 2026 INSIGHT Research Club · ESTIN</p>
+      <p class="hidden md:block eyebrow text-silver/40">Where curiosity meets clarity.</p>
+      <a href="#" id="to-top" class="inline-flex items-center gap-2 text-[13px] text-silver/70 hover:text-white transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" stroke-linecap="square"/></svg>
+        Back to top
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---- Hero beam: particles leave the logo's rays and run off the right edge ---- */
+(function () {
+  const canvas = document.getElementById('beam'), logo = document.getElementById('hero-logo');
+  if (!canvas || !logo) return;
+  const ctx = canvas.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  let W, H, ox, oy, parts = [];
+  const colors = ['#DDE3EC', '#DDE3EC', '#AEC6FF', '#7F97C7', '#FFFFFF'];
+
+  function origin() {
+    const c = canvas.getBoundingClientRect(), l = logo.getBoundingClientRect();
+    ox = l.right - c.left - l.width * 0.02;   // tip of the rays
+    oy = l.top - c.top + l.height * 0.53;     // rays sit at ~53% of the logo height
+  }
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    origin();
+  }
+  function spawn(p, fresh) {
+    p.x = ox; p.y = oy + (Math.random() - .5) * 6;
+    const a = (Math.random() - .5) * 0.34 + (Math.random() < .5 ? -.04 : .04);
+    const s = Math.random() * 2.2 + 0.8;
+    p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s;
+    p.r = Math.random() * 1.5 + 0.4;
+    p.c = colors[(Math.random() * colors.length) | 0];
+    p.life = fresh ? 0 : Math.random() * 400;
+    if (!fresh) { p.x += p.vx * p.life; p.y += p.vy * p.life; }
+  }
+  function init() { parts = []; const n = W < 768 ? 260 : 650; for (let i = 0; i < n; i++) { const p = {}; spawn(p, false); parts.push(p); } }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    // soft light shaft
+    const g = ctx.createLinearGradient(ox, oy, W, oy);
+    g.addColorStop(0, 'rgba(174,198,255,.28)'); g.addColorStop(.35, 'rgba(127,151,199,.10)'); g.addColorStop(1, 'rgba(11,17,32,0)');
+    ctx.fillStyle = g; ctx.beginPath();
+    ctx.moveTo(ox, oy - 3); ctx.lineTo(W, oy - H * .26); ctx.lineTo(W, oy + H * .26); ctx.lineTo(ox, oy + 3); ctx.closePath(); ctx.fill();
+    for (const p of parts) {
+      if (!reduce) { p.x += p.vx; p.y += p.vy; p.life++; }
+      const d = (p.x - ox) / (W - ox);
+      if (p.x > W + 10 || p.y < -10 || p.y > H + 10) { spawn(p, true); continue; }
+      ctx.globalAlpha = Math.max(0, Math.min(1, d * 6)) * (1 - d * .75);
+      ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  const start = () => { resize(); init(); frame(); };
+  logo.complete ? start() : logo.addEventListener('load', start);
+  addEventListener('resize', () => { resize(); init(); if (reduce) frame(); });
+})();
+
+/* ---- Navbar: solid after scrolling, underline the section in view, phone menu ---- */
+(function () {
+  const nav = document.getElementById('nav');
+  const root = document.documentElement;
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 24 || root.classList.contains('menu-open'));
+  onScroll(); addEventListener('scroll', onScroll, { passive: true });
+
+  const links = [...document.querySelectorAll('.nav-link, .mm-link')];
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  // watch every section, so sections that aren't in the menu clear the underline
+  document.querySelectorAll('main > section').forEach(s => io.observe(s));
+
+  // ---- Mobile menu controller ----
+  const btn = document.getElementById('menu-btn'), menu = document.getElementById('menu');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isOpen = () => root.classList.contains('menu-open');
+  const focusables = () => [btn, ...menu.querySelectorAll('a[href], button')];
+  function openMenu() {
+    root.classList.add('menu-open'); onScroll();
+    btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Close menu');
+    root.style.overflow = 'hidden';                       // lock the page behind
+    setTimeout(() => menu.querySelector('.mm-link').focus({ preventScroll: true }), reduce ? 0 : 300);
+  }
+  function closeMenu(returnFocus = true) {
+    root.classList.remove('menu-open'); onScroll();
+    btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Open menu');
+    root.style.overflow = '';
+    if (returnFocus) btn.focus({ preventScroll: true });
+  }
+  btn.addEventListener('click', () => (isOpen() ? closeMenu() : openMenu()));
+  document.addEventListener('keydown', e => {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(); return; }
+    if (e.key === 'Tab') {                                 // keep focus inside the menu
+      const f = focusables(), first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  // In-page links: close first, then glide to the section once the page is unlocked
+  menu.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    closeMenu(false);
+    setTimeout(() => target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }), reduce ? 0 : 320);
+  }));
+  menu.querySelectorAll('a:not([href^="#"])').forEach(a => a.addEventListener('click', () => closeMenu(false)));
+  addEventListener('resize', () => { if (isOpen() && innerWidth >= 1024) closeMenu(false); });
+})();
+
+/* ---- Footer: copy email, back to top ---- */
+(function () {
+  const btn = document.getElementById('copy-email');
+  if (btn) btn.addEventListener('click', async () => {
+    const label = btn.querySelector('span');
+    try { await navigator.clipboard.writeText(btn.dataset.email); label.textContent = 'Copied'; }
+    catch (e) {  // older browsers / blocked clipboard: copy through a hidden field
+      const t = document.createElement('textarea'); t.value = btn.dataset.email; t.setAttribute('readonly', '');
+      t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select();
+      label.textContent = document.execCommand('copy') ? 'Copied' : 'insight@estin.dz'; t.remove();
+    }
+    setTimeout(() => { label.textContent = 'Copy email'; }, 1800);
+  });
+  const top = document.getElementById('to-top');
+  if (top) top.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
+})();
+
+/* ---- Motion: reveals, split headlines, count-up, voyage, FAQ ---- */
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Split headlines into words (kept as real text for search engines and screen readers)
+  document.querySelectorAll('[data-split]').forEach(el => {
+    const esc = t => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    el.innerHTML = el.textContent.trim().split(/\s+/).map((w, i) => '<span class="w"><span style="--i:' + i + '">' + esc(w) + '</span></span>').join(' ');
+    el.classList.add('split-done');
+  });
+  const hero = document.querySelector('[data-split="hero"]');
+  if (hero) { hero.style.setProperty('--d', '150ms'); requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.add('in'))); }
+
+  // Index children for the cascades
+  document.querySelectorAll('.rv-stagger, .rv-cells').forEach(g => [...g.children].forEach((c, i) => c.style.setProperty('--i', i)));
+
+  // Count-up for the numbers band
+  const stats = document.getElementById('stats');
+  const nums = stats ? [...stats.querySelectorAll('[data-count]')] : [];
+  const countUp = () => nums.forEach(el => {
+    const end = +el.dataset.count, t0 = performance.now(), dur = 1300;
+    const tick = now => { const k = Math.min(1, (now - t0) / dur); el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+  if (!reduce && stats && stats.getBoundingClientRect().top > innerHeight) nums.forEach(el => el.textContent = '0');
+
+  // Reveal on scroll (once)
+  const targets = document.querySelectorAll('.rv, .rv-stagger, .rv-cells, .route, [data-split]:not([data-split="hero"])');
+  if (reduce || !('IntersectionObserver' in window)) { targets.forEach(t => t.classList.add('in')); return; }
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    if (e.target === stats) countUp();
+    io.unobserve(e.target);
+  }), { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+  targets.forEach(t => io.observe(t));
+})();
+
+/* ---- FAQ: smooth open/close (same technique as the Rasa site) ---- */
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const ease = 'cubic-bezier(.22,.61,.36,1)';
+  document.querySelectorAll('details').forEach(el => {
+    const summary = el.querySelector('summary'), answer = summary.nextElementSibling;
+    let grow = null, fade = null;
+    const closedHeight = () => { const cs = getComputedStyle(el); return summary.offsetHeight + ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth'].reduce((h, k) => h + parseFloat(cs[k]), 0); };
+    summary.addEventListener('click', e => {
+      if (reduce.matches || !el.animate) return;
+      e.preventDefault();
+      const from = el.offsetHeight, opening = !el.open || el.classList.contains('is-closing');
+      grow && grow.cancel(); fade && fade.cancel();
+      el.style.overflow = 'hidden';
+      el.classList.toggle('is-closing', !opening);
+      if (opening) el.open = true;
+      const to = opening ? el.offsetHeight : closedHeight();
+      const duration = Math.min(440, 240 + Math.abs(to - from) * 0.6);
+      grow = el.animate({ height: [from + 'px', to + 'px'] }, { duration, easing: ease });
+      fade = answer.animate(opening ? { opacity: [0, 1], transform: ['translateY(-6px)', 'none'] } : { opacity: [1, 0], transform: ['none', 'translateY(-6px)'] },
+                            { duration: opening ? duration : duration * 0.7, easing: ease, fill: opening ? 'none' : 'forwards' });
+      grow.onfinish = () => { grow = null; el.style.overflow = ''; if (!opening) { el.open = false; el.classList.remove('is-closing'); fade && fade.cancel(); fade = null; } };
+    });
+  });
+})();
+
+/* ---- Compass: tabs and pole dots switch the panel and turn the needle ---- */
+(function () {
+  const poles = [
+    { name: 'AI & Data Science', leads: ['Ouattara Majide Rafiou', 'Ghedjati Maroua', 'Kaouche Malek'] },
+    { name: 'Cybersecurity', leads: ['Belaloui Taha Abderrahmane', 'Laghrour Mohamed Dhia Eddine'] },
+    { name: 'Software & Systems', leads: ['Koua Mohamed Anis'] },
+    { name: 'Networks & IoT', leads: ['Merzougui Abdellah El Ghazali', 'Nacef Abdelmouheimene'] }
+  ];
+  const needle = document.getElementById('needle');
+  const tabs = document.querySelectorAll('.pole-tab'), dots = document.querySelectorAll('.pole');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let angle = 0, anim;
+  function turn(target) {
+    let delta = ((target - angle) % 360 + 540) % 360 - 180;   // shortest way round
+    const from = angle, t0 = performance.now(), dur = reduce ? 0 : 700;
+    cancelAnimationFrame(anim);
+    const step = now => {
+      const k = dur ? Math.min(1, (now - t0) / dur) : 1;
+      const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      angle = from + delta * e;
+      needle.setAttribute('transform', `rotate(${angle} 200 200)`);
+      if (k < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  }
+  let firstSelect = true;
+  const panel = document.getElementById('pole-panel');
+  function select(i) {
+    turn(i * 90);
+    if (!firstSelect && !reduce && panel && panel.animate) [...panel.children].forEach((c, j) => c.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 380, delay: j * 50, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
+    firstSelect = false;
+    document.getElementById('pole-num').textContent = 'Pole 0' + (i + 1);
+    document.getElementById('pole-name').textContent = poles[i].name;
+    document.getElementById('pole-leads').innerHTML = poles[i].leads
+      .map(n => `<li><p class="text-[16px] font-semibold text-white">${n}</p><p class="mt-1 font-mono text-[12px] text-peri-light">Pole lead</p></li>`).join('');
+    tabs.forEach((t, k) => {
+      const on = k === i; t.setAttribute('aria-selected', on);
+      t.className = 'pole-tab px-4 h-10 rounded-none text-[14px] font-medium border transition ' +
+        (on ? 'bg-blue border-blue text-white shadow-[0_0_15px_rgba(63,102,176,.4)]' : 'border-silver/15 text-silver/70 hover:text-white hover:border-silver/30');
+    });
+    dots.forEach((g, k) => {
+      const on = k === i, c = g.querySelector('circle'), t = g.querySelector('text');
+      c.setAttribute('fill', on ? 'rgba(63,102,176,.35)' : '#121A2E');
+      c.setAttribute('stroke', on ? '#AEC6FF' : 'rgba(127,151,199,.45)');
+      t.setAttribute('fill', on ? '#AEC6FF' : '#8A94A8');
+    });
+  }
+  tabs.forEach(t => t.addEventListener('click', () => select(+t.dataset.i)));
+  dots.forEach(g => { g.style.cursor = 'pointer'; g.addEventListener('click', () => select(+g.dataset.i)); });
+  select(0);
+})();
+</script>
+</body>
+</html>

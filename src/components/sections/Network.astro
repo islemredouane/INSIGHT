@@ -1,0 +1,48 @@
+---
+// Research network (home-v3): partner lab + researchers grid + "Are you a researcher?" cell.
+import SectionHeader from '../ui/SectionHeader.astro';
+import Icon from '../ui/Icon.astro';
+import ResearcherCard from '../cards/ResearcherCard.astro';
+import PartnerBand from '../cards/PartnerBand.astro';
+import { contactUrl } from '../../data/site';
+import { getResearchers, getPartners } from '../../lib/content';
+
+interface Props { eyebrow?: string; detailed?: boolean; showHeader?: boolean }
+const { eyebrow = 'Log 05 · Research network', detailed = false, showHeader = true } = Astro.props;
+
+const researchers = await getResearchers();
+const partners = await getPartners();
+const real = researchers.filter((r) => !r.data.placeholder);
+const countries = new Set(real.map((r) => r.data.country));
+const allReal = real.length === researchers.length;
+// Grid follows the number of cards (researchers + the invite cell), so no cell is left empty.
+const cells = researchers.length + 1;
+const gridCols = cells >= 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : cells === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:max-w-[50%]';
+---
+<section id="network" class:list={['relative bg-ink overflow-hidden', showHeader ? 'py-24 sm:py-28' : 'pt-2 pb-24 sm:pb-28']}>
+  <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+  <div class="absolute -top-24 right-1/4 w-[440px] h-[440px] rounded-full bg-blue/15 blur-[120px] pointer-events-none"></div>
+  <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+    {showHeader && <SectionHeader eyebrow={eyebrow} title="A network of researchers." subtitle="Researchers from around the world who work with our crew." tone="dark" class="mb-14" />}
+
+    {partners.map((p) => <PartnerBand partner={p} />)}
+
+    <div class:list={[partners.length > 0 && 'mt-16', 'flex flex-col sm:flex-row sm:items-end justify-between gap-4 rv']}>
+      <h3 class="font-display text-2xl font-bold text-white tracking-tight">Researchers</h3>
+      <p class="font-mono text-[13px] text-muted">{researchers.length} {researchers.length === 1 ? 'researcher' : 'researchers'} · {allReal ? `${countries.size} ${countries.size === 1 ? 'country' : 'countries'}` : '[N] countries'}</p>
+    </div>
+    <ul class:list={['mt-6 rounded-2xl overflow-hidden border border-silver/10 grid gap-px bg-silver/10 rv-cells', gridCols, cells >= 4 && cells % 2 === 1 && 'sm:max-lg:[&>li:last-child]:col-span-2']} role="list">
+      {researchers.map((r) => <ResearcherCard researcher={r} detailed={detailed} />)}
+      <li class="rcard rcard-invite">
+        <div class="rbody h-full flex flex-col justify-between gap-8">
+          <div>
+            <span class="inline-flex w-11 h-11 items-center justify-center border border-peri/40 text-peri-light"><Icon name="plus" class="w-5 h-5" /></span>
+            <h3 class="mt-6 font-display text-xl font-bold text-white">Are you a researcher?</h3>
+            <p class="mt-2 text-[15px] text-silver/70 leading-relaxed">Mentor a project team, give a talk, or co-supervise a student project.</p>
+          </div>
+          <a href={contactUrl('researcher', 'Joining the INSIGHT research network')} class="btn btn-sm btn-secondary self-start">Get in touch →</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>

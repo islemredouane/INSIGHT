@@ -1,0 +1,31 @@
+---
+// Researcher card (home-v3 "Research network"): 4:5 portrait, institution · country, name, title, fields, profile link.
+import type { CollectionEntry } from 'astro:content';
+import { showPlaceholders } from '../../data/site';
+interface Props { researcher: CollectionEntry<'researchers'>; detailed?: boolean }
+const { researcher, detailed = false } = Astro.props;
+const r = researcher.data;
+const link = r.links.profile ?? r.links.scholar ?? r.links.site;
+---
+<li class="rcard group">
+  <div class="rportrait">
+    {r.photo ? <img src={r.photo} alt={r.name} loading="lazy" /> : <span class="rportrait-initials">{r.initials}</span>}
+    {!r.photo && showPlaceholders && <span class="rportrait-tag">{r.placeholder ? '[Photo]' : '[Official photo]'}</span>}
+    {r.badge && <span class="rbadge">{r.badge}</span>}
+  </div>
+  <div class="rbody">
+    <p class="eyebrow text-peri">{r.institution} · {r.country}</p>
+    <h3 class="rname">{r.name}</h3>
+    <p class="rtitle">{r.title}</p>
+    <div class="rtags">{r.fields.map((f) => <span>{f}</span>)}</div>
+    {detailed && r.bio && <p class="mt-4 text-[14px] leading-relaxed text-silver/70">{r.bio}</p>}
+    {detailed && r.highlights.length > 0 && (
+      <ul class="mt-4 space-y-1.5 text-[13px] leading-relaxed text-silver/65">
+        {r.highlights.map((h) => <li class="pl-3 border-l border-peri/30">{h}</li>)}
+      </ul>
+    )}
+    {link
+      ? <a href={link} target="_blank" rel="noopener" class="rlink">Profile ↗</a>
+      : <a href="#" class="rlink">Profile ↗</a>}
+  </div>
+</li>

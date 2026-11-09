@@ -1,0 +1,12 @@
+---
+// Honest "not yet" block (dashed hairline box). Used where content doesn't exist yet, instead of inventing it.
+interface Props { label: string; title: string; text?: string; action?: { href: string; label: string }; tone?: 'light' | 'dark' }
+const { label, title, text, action, tone = 'light' } = Astro.props;
+const dark = tone === 'dark';
+---
+<div class:list={['rv border border-dashed p-8 sm:p-10', dark ? 'border-silver/20' : 'border-navy/20 bg-white/60']}>
+  <p class:list={['eyebrow', dark ? 'text-peri' : 'text-blue']}>{label}</p>
+  <h3 class:list={['mt-3 font-display text-2xl font-bold tracking-tight', dark ? 'text-white' : 'text-ink']}>{title}</h3>
+  {text && <p class:list={['mt-2 max-w-xl text-[15px] leading-relaxed', dark ? 'text-silver/70' : 'text-body']}>{text}</p>}
+  {action && <a href={action.href} class:list={['mt-6 btn btn-sm btn-secondary', !dark && 'btn-on-light']}>{action.label}</a>}
+</div>

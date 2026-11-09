@@ -1,0 +1,39 @@
+/* Motion — from home-v3.
+   Only opacity/transform (plus one stroke draw), each plays once, all off with prefers-reduced-motion,
+   and nothing is hidden unless JS is running (html.js, set in BaseLayout <head>). */
+
+.route-cover { stroke-dasharray: 1 1; stroke-dashoffset: -1; }
+html.js [data-split]:not(.split-done) { visibility: hidden; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero (plays on load) */
+  html.js .hero-in { opacity: 0; animation: heroUp .9s var(--ease) forwards; animation-delay: var(--hd, 0s); }
+  html.js #hero-logo { opacity: 0; animation: fadeIn 1.2s ease .35s forwards; }
+  html.js #beam { opacity: 0; animation: fadeIn 1.6s ease 1s forwards; }
+  @keyframes heroUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* Headlines split into rising words */
+  html.js [data-split] .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+  html.js [data-split] .w > span { display: inline-block; transform: translateY(105%); transition: transform 1s var(--ease); transition-delay: calc(var(--i) * 70ms + var(--d, 0ms)); }
+  html.js [data-split].in .w > span { transform: none; }
+
+  /* Reveal on scroll */
+  html.js .rv { opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: var(--d, 0ms); }
+  html.js .rv.in { opacity: 1; transform: none; }
+  html.js .rv-stagger > *, html.js .rv-cells > * > * { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(var(--i, 0) * 70ms); }
+  html.js .rv-stagger.in > *, html.js .rv-cells.in > * > * { opacity: 1; transform: none; }
+
+  /* Voyage route draws itself, stops pop in, the X lands last */
+  html.js .route .route-cover { stroke-dashoffset: 0; transition: stroke-dashoffset 2s cubic-bezier(.45,0,.25,1); }
+  html.js .route.in .route-cover { stroke-dashoffset: -1; }
+  html.js .route .vstop { opacity: 0; transition: opacity .5s ease; transition-delay: calc(var(--i) * 280ms + 150ms); }
+  html.js .route .vstop > span:first-child { transform: scale(.4); transition: transform .55s cubic-bezier(.34,1.56,.64,1); transition-delay: calc(var(--i) * 280ms + 150ms); }
+  html.js .route .vstop > svg { transform: scale(0) rotate(-90deg); transition: transform .6s cubic-bezier(.34,1.56,.64,1); transition-delay: calc(var(--i) * 280ms + 150ms); }
+  html.js .route.in .vstop { opacity: 1; }
+  html.js .route.in .vstop > span:first-child, html.js .route.in .vstop > svg { transform: none; }
+
+  /* FAQ chevron */
+  details summary svg { transition: transform .35s var(--ease) !important; }
+  details.is-closing summary svg { transform: none !important; }
+}

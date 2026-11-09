@@ -1,0 +1,82 @@
+---
+// Every page uses this layout: SEO tags, fonts, navbar, mobile menu, footer, motion.
+import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/lora/wght-italic.css';
+import '../styles/global.css';
+import Navbar from '../components/layout/Navbar.astro';
+import MobileMenu from '../components/layout/MobileMenu.astro';
+import Footer from '../components/layout/Footer.astro';
+import { site, reviewMode } from '../data/site';
+
+interface Props {
+  /** Page title; the site name is appended (the home page passes nothing). */
+  title?: string;
+  description?: string;
+  /** Absolute or root-relative path to a 1200×630 share image. */
+  image?: string;
+  noindex?: boolean;
+}
+const { title, description = site.description, image = '/brand/insight-logo.png', noindex = false } = Astro.props;
+const fullTitle = title ? `${title} · ${site.fullName}` : `${site.fullName} · ${site.school.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+// Who we are, for search engines: a club of ESTIN, with its contact and Instagram.
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.fullName,
+  alternateName: site.name,
+  url: Astro.site?.href,
+  logo: new URL('/brand/insight-logo.png', Astro.site).href,
+  description: site.description,
+  email: site.email,
+  foundingDate: site.founded,
+  sameAs: [site.instagram.url],
+  parentOrganization: { '@type': 'CollegeOrUniversity', name: site.school.fullName, alternateName: site.school.name, url: site.school.url },
+};
+---
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add('js')</script>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {(noindex || reviewMode) && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#0B1120" />
+    <link rel="icon" type="image/png" href="/brand/insight-logo.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.fullName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+    <slot name="head" />
+  </head>
+  <body id="top" class="bg-ink text-silver font-sans text-[16px] antialiased selection:bg-blue selection:text-white">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:bg-blue focus:text-white">Skip to content</a>
+    <Navbar />
+    <MobileMenu />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    {reviewMode && (
+      <p class="fixed left-4 bottom-4 z-[60] max-w-[calc(100vw-2rem)] border border-peri/40 bg-ink/95 px-3 py-2 font-mono text-[11px] leading-snug text-peri-light shadow-lg">
+        Review version · text in [brackets] is still to be added
+      </p>
+    )}
+    <div id="scrollbar" aria-hidden="true" hidden><div id="scrollbar-thumb"></div></div>
+    <script>
+      import '../scripts/motion.ts';
+      import '../scripts/scrollbar.ts';
+    </script>
+  </body>
+</html>

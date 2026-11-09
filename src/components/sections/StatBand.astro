@@ -1,0 +1,21 @@
+---
+// Numbers band (home-v3): count up when they come into view.
+import { stats } from '../../data/club';
+interface Props { statement?: string }
+const { statement = '28 students. 4 research poles. One question at a time.' } = Astro.props;
+const pad = ['sm:pr-8', 'sm:px-8', 'sm:px-8', 'sm:pl-8'];
+---
+<section class="bg-white text-ink border-y border-navy/10 py-20">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+    <dl data-countup class="rv-stagger grid grid-cols-2 sm:grid-cols-4 gap-y-8 sm:divide-x divide-navy/10">
+      {stats.map((s, i) => (
+        <div class={pad[i]}>
+          <dt class="sr-only">{s.label}</dt>
+          <dd class="font-display text-6xl font-bold tracking-tight" data-count={s.value}>{s.value}</dd>
+          <dd class="mt-2 eyebrow text-muted">{s.label}</dd>
+        </div>
+      ))}
+    </dl>
+    {statement && <p style="--d:320ms" class="rv lg:max-w-sm lg:border-l lg:border-navy/10 lg:pl-12 font-display text-2xl sm:text-3xl font-medium text-navy leading-snug tracking-tight">{statement}</p>}
+  </div>
+</section>

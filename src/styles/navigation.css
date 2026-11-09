@@ -1,0 +1,56 @@
+/* Navbar (full-width) and mobile menu — from home-v3 */
+
+/* ---------- Navbar: transparent over the hero, solid ink + hairline once you scroll ---------- */
+#nav.scrolled { background: rgba(11,17,32,.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: rgba(221,227,236,.10); }
+.nav-link { position: relative; display: flex; align-items: center; height: 100%; font-size: 15px; font-weight: 500; color: rgba(221,227,236,.75); transition: color .2s; }
+.nav-link:hover, .nav-link.active { color: #fff; }
+.nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: #3F66B0; transform: scaleX(0); transition: transform .25s; }
+.nav-link.active::after { transform: scaleX(1); }
+
+/* ---------- Menu button: two lines that morph into an X ---------- */
+.menu-btn { position: relative; }
+.mb-line { position: absolute; left: 50%; top: 50%; width: 18px; height: 1.5px; background: currentColor; transition: transform .45s cubic-bezier(.76,0,.24,1); }
+.mb-line:nth-child(1) { transform: translate(-50%, -4px); }
+.mb-line:nth-child(2) { transform: translate(-50%, 3px); }
+html.menu-open .mb-line:nth-child(1) { transform: translate(-50%, -.5px) rotate(45deg); }
+html.menu-open .mb-line:nth-child(2) { transform: translate(-50%, -.5px) rotate(-45deg); }
+html.menu-open .menu-btn { border-color: rgba(221,227,236,.5); color: #fff; }
+#nav .btn-sm { transition: opacity .3s, visibility 0s linear 0s, background-color .2s, border-color .2s, color .2s; }
+html.menu-open #nav .btn-sm { opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s linear .2s; }  /* the menu has its own big CTA */
+
+/* ---------- Mobile menu: full-screen sheet that drops from the navbar ---------- */
+#menu { position: fixed; inset: 0; z-index: 40; padding-top: 72px; background: rgba(11,17,32,.97);
+        -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+        clip-path: inset(0 0 100% 0); visibility: hidden;
+        transition: clip-path .6s cubic-bezier(.76,0,.24,1), visibility 0s linear .6s; }
+html.menu-open #menu { clip-path: inset(0 0 0 0); visibility: visible; transition: clip-path .6s cubic-bezier(.76,0,.24,1), visibility 0s; }
+@media (min-width: 1024px) { #menu { display: none; } }
+
+.mm-item { opacity: 0; transform: translateY(22px); transition: opacity .3s ease, transform .3s ease; }
+html.menu-open .mm-item { opacity: 1; transform: none; transition: opacity .55s var(--ease), transform .7s var(--ease); transition-delay: calc(.2s + var(--i) * 60ms); }
+
+.mm-link { display: flex; align-items: center; gap: 1rem; padding: 1.05rem 0; border-bottom: 1px solid rgba(255,255,255,.1);
+           font-family: var(--font-display); font-size: clamp(30px, 8.5vw, 44px); font-weight: 700; letter-spacing: -.025em; line-height: 1; color: #fff; }
+.mm-num { width: 2rem; flex: none; font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .08em; color: #7F97C7; transition: color .25s; }
+.mm-label { transition: color .25s, transform .35s var(--ease); }
+.mm-arrow { width: 24px; height: 24px; margin-left: auto; flex: none; color: #AEC6FF; opacity: 0; transform: translateX(-10px); transition: opacity .25s, transform .35s var(--ease); }
+.mm-link:hover .mm-arrow, .mm-link:focus-visible .mm-arrow { opacity: 1; transform: none; }
+.mm-link:hover .mm-label, .mm-link:focus-visible .mm-label { transform: translateX(6px); }
+.mm-link:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 4px; }
+.mm-link.active .mm-label { color: #AEC6FF; }
+.mm-link.active .mm-num { color: #AEC6FF; }
+/* Secondary rows (Collaborate, Contact) under the main list */
+.mm-sub { display: flex; align-items: center; justify-content: space-between; gap: .75rem; height: 52px; padding: 0 1rem;
+          border: 1px solid rgba(255,255,255,.12); font-size: 16px; font-weight: 500; color: rgba(221,227,236,.85); transition: color .2s, border-color .2s; }
+.mm-sub:hover, .mm-sub.active { color: #fff; border-color: rgba(174,198,255,.45); }
+.mm-sub:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 3px; }
+.mm-link.active .mm-num::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: #AEC6FF; vertical-align: middle; transform: translateY(-1px); }
+
+@media (prefers-reduced-motion: reduce) {
+  #menu, html.menu-open #menu { transition: none; }
+  .mm-item, html.menu-open .mm-item { transition: none; transform: none; }
+  .mb-line, .mm-label, .mm-arrow { transition: none; }
+}
+
+/* Small phones (360–399px): slimmer Join button so logo, Join and menu fit on one line */
+@media (max-width: 399px) { #nav .btn-sm { padding: 0 .75rem; } }

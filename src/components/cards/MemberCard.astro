@@ -1,0 +1,22 @@
+---
+// Crew masthead cell (home-v3): 4:5 portrait + role (mono) + name + one-line duty; WANTED stamp on hover.
+import type { CollectionEntry } from 'astro:content';
+import { initials } from '../../lib/format';
+import { showPlaceholders } from '../../data/site';
+interface Props { member: CollectionEntry<'crew'>; roleLabel?: string }
+const { member, roleLabel } = Astro.props;
+const m = member.data;
+---
+<li class="member group">
+  <div class="portrait">
+    {m.photo
+      ? <img class="portrait-img" src={m.photo} alt={m.name} loading="lazy" />
+      : <><span class="portrait-initials">{initials(m.name)}</span>{showPlaceholders && <span class="portrait-tag">[Photo]</span>}</>}
+    <span class="wanted" aria-hidden="true">Wanted</span>
+  </div>
+  <div class="min-w-0">
+    <p class="eyebrow text-blue">{roleLabel ?? m.role}</p>
+    <h3 class="member-name">{m.name}</h3>
+    {m.duty && <p class="member-duty">{m.duty}</p>}
+  </div>
+</li>

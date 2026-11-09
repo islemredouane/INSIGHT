@@ -1,0 +1,36 @@
+/* INSIGHT design system — ported 1:1 from design/prototypes/home-v3.html.
+   Order: Tailwind → base → components → navigation → motion, then the theme tokens. */
+@import "tailwindcss";
+@import "./base.css";
+@import "./components.css";
+@import "./navigation.css";
+@import "./motion.css";
+
+/* Always scan every page and component for class names (new files included) */
+@source "../";
+
+@theme {
+  /* Colours */
+  --color-ink: #0B1120;
+  --color-ink-2: #121A2E;
+  --color-ink-deep: #080E1D;
+  --color-navy: #1B2A55;
+  --color-blue: #3F66B0;
+  --color-blue-hover: #345596;
+  --color-peri: #7F97C7;
+  --color-peri-light: #AEC6FF;
+  --color-silver: #DDE3EC;
+  --color-paper: #F5F6F8;
+  --color-muted: #8A94A8;
+  --color-body: #3A4458;
+  --color-signal: #C2463A;
+
+  /* Fonts (self-hosted through @fontsource, see BaseLayout) */
+  --font-display: "Space Grotesk Variable", "Space Grotesk", sans-serif;
+  --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", monospace;
+  --font-serif: "Lora Variable", Lora, serif;
+
+  /* Motion */
+  --ease: cubic-bezier(.2,.7,.2,1);
+}

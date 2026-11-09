@@ -1,0 +1,37 @@
+/* Base: page background, scrollbar, shared utilities */
+
+html, body { background: #0B1120; }
+
+/* Scrollbar: 2px line, no track, like AiQC. Periwinkle stays visible on both dark and light sections. */
+::-webkit-scrollbar { width: 2px; height: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #7F97C7; transition: background .2s; }
+::-webkit-scrollbar-thumb:hover { background: #3F66B0; }
+/* Firefox can't do 2px: use its thin bar in the same colours (set only there, or Chrome ignores the 2px rules) */
+@supports (-moz-appearance: none) { html { scrollbar-width: thin; scrollbar-color: #7F97C7 transparent; } }
+
+/* Page scrollbar, same thumb height on every page (src/scripts/scrollbar.ts).
+   Mouse/trackpad only: the native page bar is hidden and replaced by the same 2px line.
+   Touch devices keep their own indicator. */
+@media (hover: hover) and (pointer: fine) {
+  html.js { scrollbar-width: none; }
+  html.js::-webkit-scrollbar { display: none; }
+}
+#scrollbar { position: fixed; top: 0; right: 0; bottom: 0; width: 10px; z-index: 70; }
+#scrollbar[hidden] { display: none; }
+#scrollbar-thumb { position: absolute; top: 0; right: 0; width: 10px; cursor: default; touch-action: none; will-change: transform; }
+#scrollbar-thumb::before { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 2px; background: #7F97C7; transition: background .2s; }
+#scrollbar-thumb:hover::before, #scrollbar.dragging #scrollbar-thumb::before { background: #3F66B0; }
+
+/* Dot grid texture (dark sections) */
+.dots { background-image: radial-gradient(circle, rgba(221,227,236,.16) 1px, transparent 1px); background-size: 24px 24px; }
+
+/* Monospace "LOG 01 · …" label */
+.eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+
+/* Soft glow around the logo on dark backgrounds */
+.logo-glow { filter: drop-shadow(0 0 18px rgba(127,151,199,.35)) drop-shadow(0 0 2px rgba(221,227,236,.4)); }
+
+details summary::-webkit-details-marker { display: none; }
+
+@media (prefers-reduced-motion: reduce) { .animate-ping { animation: none; } }

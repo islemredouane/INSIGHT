@@ -1,0 +1,43 @@
+# Researchers in the INSIGHT network.
+# Only list someone after they agree to it. placeholder: true → shown as "[…]" until real details arrive.
+# TODO (External Relations): replace the 6 placeholders (name, title, institution, country, fields, bio, links, photo).
+
+- id: pin-yu-chen
+  name: Dr. Pin-Yu Chen
+  initials: PYC
+  title: Principal Research Scientist
+  institution: IBM Research
+  country: USA
+  fields: [Trustworthy AI, LLM safety]
+  badge: Welcome Day guest
+  bio: Principal Research Scientist at the IBM Thomas J. Watson Research Center (Yorktown Heights, New York). His long-term goal is to build trustworthy machine learning systems, with a focus on AI safety and robustness.
+  highlights:
+    - Chief Scientist, RPI–IBM AI Research Collaboration
+    - PI of MIT–IBM Watson AI Lab projects
+    - PhD in Electrical Engineering & Computer Science and MA in Statistics, University of Michigan (2016)
+    - IEEE Fellow · IJCAI Computers & Thought Award 2023 · IBM Master Inventor
+  links:
+    profile: https://research.ibm.com/people/pin-yu-chen
+  order: 1
+  # Research areas, from the Welcome Day deck (slide 23)
+  research:
+    - title: Adversarial robustness
+      works: ["ZOO: black-box attacks on deep neural networks (ACM AISec 2017)", 'Co-author of the book "Adversarial Robustness for Machine Learning"']
+    - title: Safety of large language models
+      works: ["Gradient Cuff: detecting jailbreak attempts on LLMs", "Attention Tracker: detecting prompt-injection attacks (NAACL Findings 2025)"]
+    - title: Looking inside models
+      works: ["vLLM Hook (2026): open-source plug-in to inspect and steer the internal states of LLMs served on vLLM", "Contributor to IBM's AI Explainability 360 toolkits"]
+    - title: Open science
+      works: ["Contributor to IBM's Adversarial Robustness Toolbox (ART)", 'Co-author of the book "Introduction to Foundation Models"']
+  # Why it matters to the crew (slide 24)
+  relevance:
+    - AI now runs in critical systems. It must hold up under attack.
+    - AI agents read untrusted content. Prompt injection is a real threat.
+    - Looking inside models gives defenders new tools.
+
+- { id: researcher-2, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 2 }
+- { id: researcher-3, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 3 }
+- { id: researcher-4, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 4 }
+- { id: researcher-5, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 5 }
+- { id: researcher-6, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 6 }
+- { id: researcher-7, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 7 }

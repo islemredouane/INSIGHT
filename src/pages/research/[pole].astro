@@ -1,0 +1,122 @@
+---
+// One page per research pole (/research/ai, /research/security, /research/software, /research/networks).
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import Icon from '../../components/ui/Icon.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import MemberCard from '../../components/cards/MemberCard.astro';
+import EventRow from '../../components/cards/EventRow.astro';
+import FinalCTA from '../../components/sections/FinalCTA.astro';
+import { getPoles, getPoleLeads, getEventsSorted, type Pole } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const poles = await getPoles();
+  return poles.map((pole) => ({ params: { pole: pole.id }, props: { pole } }));
+}
+interface Props { pole: Pole }
+const { pole } = Astro.props;
+const p = pole.data;
+const number = String(p.number).padStart(2, '0');
+const leads = await getPoleLeads(pole.id);
+const others = (await getPoles()).filter((o) => o.id !== pole.id);
+const events = (await getEventsSorted()).filter((e) => e.data.poles.includes(pole.id));
+---
+<BaseLayout title={p.name} description={`${p.name}, research pole ${number} of INSIGHT: ${p.short}`}>
+  <PageHeader
+    eyebrow={`Research pole ${number}`}
+    title={p.name}
+    lead={p.description}
+    chip={{ label: leads.length > 1 ? 'Pole leads' : 'Pole lead', value: leads.map((l) => l.data.name) }}
+  >
+    <a href="/research" class="hero-in mt-8 ml-0 sm:ml-4 inline-flex items-center gap-2 text-[14px] text-silver/70 hover:text-white transition-colors" style="--hd:.85s">← All research poles</a>
+  </PageHeader>
+
+  <!-- LOG 01 · What we explore -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 01 · Topics" title="What we explore." subtitle={p.short} />
+      <div class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid md:grid-cols-3 gap-px bg-navy/10 rv-cells">
+        {p.topics.map((t, i) => (
+          <article class="p-8 bg-white">
+            <span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="mt-6 font-display text-xl font-bold text-ink">{t.title}</h3>
+            <p class="mt-2 text-[15px] text-body leading-relaxed">{t.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG 02 · Pole leads -->
+  <section class="bg-white text-ink py-24 sm:py-28 border-y border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 02 · The team" title={leads.length > 1 ? 'Pole leads.' : 'Pole lead.'} subtitle="They guide the project teams of this pole." />
+      <ul class:list={['mt-14 rounded-2xl overflow-hidden border border-navy/10 grid gap-px bg-navy/10 rv-cells', leads.length >= 3 ? 'sm:grid-cols-2 lg:grid-cols-3 sm:max-lg:[&>li:last-child:nth-child(odd)]:col-span-2' : leads.length === 2 ? 'sm:grid-cols-2 max-w-4xl' : 'max-w-md']} role="list">
+        {leads.map((l) => <MemberCard member={l} roleLabel={`Pole lead · ${p.name}`} />)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- LOG 03 · Reading list -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 03 · Reading list" title="Start reading." subtitle="Papers chosen by the pole leads to get started." class="mb-12" />
+      {p.readingList.length > 0 ? (
+        <ol class="rv-stagger divide-y divide-navy/10 border-y border-navy/10">
+          {p.readingList.map((r, i) => (
+            <li class="py-6 grid sm:grid-cols-12 gap-4 items-baseline">
+              <span class="sm:col-span-1 font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+              <div class="sm:col-span-9">
+                <p class="font-display text-lg font-bold text-ink">{r.title}</p>
+                <p class="mt-1 text-[14px] text-body">{r.authors} · {r.year}</p>
+              </div>
+              <a href={r.url} target="_blank" rel="noopener" class="sm:col-span-2 sm:justify-self-end text-[15px] font-medium text-blue hover:text-navy">Read paper ↗</a>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <EmptyState label="In preparation" title="The reading list is being prepared." text={`The ${p.name} leads are selecting the first papers to read. It will appear here.`} />
+      )}
+    </div>
+  </section>
+
+  <!-- LOG 04 · Sessions -->
+  <section class="bg-white text-ink py-24 sm:py-28 border-t border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 04 · Sessions" title="Sessions of this pole." class="mb-12" />
+      {events.length > 0
+        ? <div class="rv-stagger divide-y divide-navy/10 border-y border-navy/10">{events.map((e) => <EventRow event={e} />)}</div>
+        : <EmptyState label="Coming soon" title="No sessions yet." text="Paper readings and workshops of this pole will be listed here." action={{ href: '/events', label: 'See all events →' }} />}
+    </div>
+  </section>
+
+  <!-- Other poles -->
+  <section class="relative bg-ink py-20 overflow-hidden">
+    <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+    <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+      <p class="rv eyebrow text-peri">The other poles</p>
+      <ul class="mt-8 rounded-2xl overflow-hidden border border-silver/10 grid md:grid-cols-3 gap-px bg-silver/10 rv-cells" role="list">
+        {others.map((o) => (
+          <li class="group bg-ink-2 hover:bg-[#162038] transition-colors">
+            <a href={`/research/${o.id}`} class="flex items-center justify-between gap-4 p-7">
+              <span>
+                <span class="block font-mono text-[12px] text-peri">Pole {String(o.data.number).padStart(2, '0')}</span>
+                <span class="mt-1.5 block font-display text-xl font-bold text-white">{o.data.name}</span>
+              </span>
+              <Icon name="arrow-right" class="w-5 h-5 text-peri-light transition-transform group-hover:translate-x-1" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <FinalCTA
+    eyebrow={`Join ${p.name}`}
+    title="Pick the ship that excites you."
+    primary={{ href: '/join', label: 'Join the crew' }}
+    secondary={{ href: '/research', label: 'All research poles →' }}
+  />
+</BaseLayout>

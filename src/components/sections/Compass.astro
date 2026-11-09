@@ -1,0 +1,146 @@
+---
+// Interactive compass of the 4 research poles (home-v3).
+// All 4 panels are rendered in the HTML (readable without JS); the script switches them and turns the needle.
+import { getCollection } from 'astro:content';
+import SectionHeader from '../ui/SectionHeader.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props { eyebrow?: string; id?: string }
+const { eyebrow = 'Log 03 · Research poles', id } = Astro.props;
+
+const poles = (await getCollection('poles')).sort((a, b) => a.data.number - b.data.number);
+const leads = (await getCollection('crew', (m) => m.data.group === 'pole')).sort((a, b) => a.data.order - b.data.order);
+const dots = [
+  { cx: 200, cy: 40, tx: 200, ty: 16 },
+  { cx: 360, cy: 200, tx: 360, ty: 230 },
+  { cx: 200, cy: 360, tx: 200, ty: 392 },
+  { cx: 40, cy: 200, tx: 40, ty: 230 },
+];
+---
+<section id={id} class="relative bg-ink py-24 sm:py-28 overflow-hidden" data-compass>
+  <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-blue/15 blur-[120px] pointer-events-none"></div>
+  <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+    <SectionHeader eyebrow={eyebrow} title="Four poles. One fleet." tone="dark" />
+
+    <div class="mt-14 grid lg:grid-cols-12 gap-12 items-center">
+      <div class="rv lg:col-span-6 flex flex-col items-center">
+        <svg viewBox="-60 -6 520 412" class="w-full max-w-[480px]" fill="none" role="img" aria-label="Compass of the four research poles">
+          <defs>
+            <linearGradient id="ng" x1="200" y1="200" x2="200" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#1B2A55" stop-opacity=".2" /><stop offset=".6" stop-color="#3F66B0" /><stop offset="1" stop-color="#AEC6FF" />
+            </linearGradient>
+          </defs>
+          <circle cx="200" cy="200" r="185" stroke="#DDE3EC" stroke-opacity=".15" stroke-dasharray="3 3" />
+          <circle cx="200" cy="200" r="160" stroke="#DDE3EC" stroke-opacity=".25" />
+          <circle cx="200" cy="200" r="125" stroke="#3F66B0" stroke-opacity=".35" />
+          <circle cx="200" cy="200" r="85" stroke="#DDE3EC" stroke-opacity=".12" />
+          <path d="M200 15v370M15 200h370" stroke="#DDE3EC" stroke-opacity=".15" />
+          <path d="M70 70l260 260M330 70 70 330" stroke="#DDE3EC" stroke-opacity=".08" stroke-dasharray="2 4" />
+          <g data-needle>
+            <polygon points="200,40 207,200 200,212 193,200" fill="url(#ng)" />
+            <polygon points="200,360 205,200 200,188 195,200" fill="#1B2A55" fill-opacity=".7" />
+          </g>
+          <circle cx="200" cy="200" r="7" fill="#AEC6FF" /><circle cx="200" cy="200" r="2.5" fill="#0B1120" />
+          {poles.map((p, i) => (
+            <g class="pole" data-i={i}>
+              <circle class="pole-dot" cx={dots[i].cx} cy={dots[i].cy} r="12" />
+              <text x={dots[i].tx} y={dots[i].ty} text-anchor="middle" font-family="Space Grotesk Variable, Space Grotesk" font-size="12" font-weight="600">{p.data.name.toUpperCase()}</text>
+            </g>
+          ))}
+        </svg>
+        <div class="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Research poles">
+          {poles.map((p, i) => (
+            <button role="tab" id={`pole-tab-${p.id}`} aria-controls={`pole-panel-${p.id}`} aria-selected={i === 0 ? 'true' : 'false'} data-i={i} class="pole-tab px-4 h-10 rounded-none text-[14px] font-medium border transition">{p.data.name}</button>
+          ))}
+        </div>
+      </div>
+
+      <div class="lg:col-span-6">
+        <div style="--d:150ms" class="rv rounded-2xl bg-ink-2/80 border border-silver/10">
+          {poles.map((p, i) => {
+            const poleLeads = leads.filter((l) => l.data.pole === p.id);
+            return (
+              <div id={`pole-panel-${p.id}`} role="tabpanel" aria-labelledby={`pole-tab-${p.id}`} data-panel={i} hidden={i !== 0} class="p-8 lg:p-10">
+                <p class="eyebrow text-peri">Pole {String(p.data.number).padStart(2, '0')}</p>
+                <h3 class="mt-3 font-display text-3xl font-bold text-white tracking-tight">{p.data.name}</h3>
+                <p class="mt-4 text-[16px] text-silver/75 leading-relaxed">{p.data.description}</p>
+                <div class="mt-6 flex flex-wrap gap-2">
+                  {p.data.topics.map((t) => <span class="px-3 py-1 rounded-none font-mono text-[12px] text-silver border border-peri/30">{t.title}</span>)}
+                </div>
+                <div class="mt-8 pt-6 border-t border-silver/10">
+                  <p class="eyebrow text-muted">Pole leads</p>
+                  <ul class="mt-4 grid sm:grid-cols-2 gap-x-8 gap-y-5">
+                    {poleLeads.map((l) => (
+                      <li><p class="text-[16px] font-semibold text-white">{l.data.name}</p><p class="mt-1 font-mono text-[12px] text-peri-light">{l.data.role}</p></li>
+                    ))}
+                  </ul>
+                </div>
+                <a href={`/research/${p.id}`} class="mt-8 inline-flex items-center gap-2 text-[15px] font-medium text-peri-light hover:text-white transition-colors">
+                  Explore the pole <Icon name="arrow-right" />
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Compass: tabs and pole dots switch the panel and turn the needle (from home-v3)
+  document.querySelectorAll<HTMLElement>('[data-compass]').forEach((root) => {
+    const needle = root.querySelector('[data-needle]')!;
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('.pole-tab')];
+    const dots = [...root.querySelectorAll<SVGGElement>('.pole')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let angle = 0, anim = 0, current = 0;
+
+    const turn = (target: number) => {
+      const delta = ((target - angle) % 360 + 540) % 360 - 180; // shortest way round
+      const from = angle, t0 = performance.now(), dur = reduce ? 0 : 700;
+      cancelAnimationFrame(anim);
+      const step = (now: number) => {
+        const k = dur ? Math.min(1, (now - t0) / dur) : 1;
+        const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        angle = from + delta * e;
+        needle.setAttribute('transform', `rotate(${angle} 200 200)`);
+        if (k < 1) anim = requestAnimationFrame(step);
+      };
+      anim = requestAnimationFrame(step);
+    };
+
+    const select = (i: number, animate = true) => {
+      turn(i * 90);
+      panels.forEach((p, k) => (p.hidden = k !== i));
+      const panel = panels[i];
+      if (animate && i !== current && !reduce && panel.animate) {
+        [...panel.children].forEach((c, j) => c.animate(
+          [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 380, delay: j * 50, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
+      }
+      current = i;
+      tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+      dots.forEach((g, k) => {
+        const on = k === i, c = g.querySelector('circle')!, t = g.querySelector('text')!;
+        c.setAttribute('fill', on ? 'rgba(63,102,176,.35)' : '#121A2E');
+        c.setAttribute('stroke', on ? '#AEC6FF' : 'rgba(127,151,199,.45)');
+        t.setAttribute('fill', on ? '#AEC6FF' : '#8A94A8');
+      });
+    };
+
+    tabs.forEach((t) => t.addEventListener('click', () => select(Number(t.dataset.i))));
+    // Arrow keys move between tabs (WAI-ARIA tabs pattern)
+    tabs.forEach((t) => t.addEventListener('keydown', (e) => {
+      const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!dir) return;
+      e.preventDefault();
+      const next = (current + dir + tabs.length) % tabs.length;
+      select(next); tabs[next].focus();
+    }));
+    dots.forEach((g) => { g.style.cursor = 'pointer'; g.addEventListener('click', () => select(Number(g.dataset.i))); });
+    select(0, false);
+  });
+</script>

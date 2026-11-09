@@ -1,0 +1,43 @@
+---
+// Home — 1:1 port of design/prototypes/home-v3.html, fed by src/data and src/content.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import Directions from '../components/sections/Directions.astro';
+import StatBand from '../components/sections/StatBand.astro';
+import SixWays from '../components/sections/SixWays.astro';
+import Compass from '../components/sections/Compass.astro';
+import VoyageRoute from '../components/sections/VoyageRoute.astro';
+import Network from '../components/sections/Network.astro';
+import NextOnTheMap from '../components/sections/NextOnTheMap.astro';
+import CollaborateStrip from '../components/sections/CollaborateStrip.astro';
+import Masthead from '../components/sections/Masthead.astro';
+import FAQ from '../components/sections/FAQ.astro';
+import FinalCTA from '../components/sections/FinalCTA.astro';
+---
+<BaseLayout>
+  <Hero />
+
+  <!-- LOG 01 · Who we are (merged with vision) -->
+  <section id="about" class="bg-paper text-ink py-24 sm:py-32">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <div class="eyebrow text-blue flex items-center gap-3 rv">Log 01 · Who we are <span class="w-8 h-px bg-blue/40"></span></div>
+      <div class="mt-5 grid lg:grid-cols-12 gap-8 items-end">
+        <h2 style="--d:80ms" class="rv lg:col-span-7 font-display font-bold text-4xl sm:text-5xl tracking-tight leading-[1.08]">A student-led research community at ESTIN.</h2>
+        <p style="--d:180ms" class="rv lg:col-span-5 text-[17px] text-body leading-relaxed">Run by students, free and open to everyone. No experience required, only curiosity.</p>
+      </div>
+      <Directions />
+    </div>
+  </section>
+
+  <StatBand />
+  <SixWays id="training" />
+  <Compass id="research" />
+  <VoyageRoute />
+  <Network />
+  <NextOnTheMap />
+  <CollaborateStrip />
+  <Masthead />
+  <FAQ page="home" />
+  <FinalCTA />
+</BaseLayout>

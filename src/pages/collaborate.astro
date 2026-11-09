@@ -1,0 +1,89 @@
+---
+// Collaborate — for researchers, labs, companies and clubs. Run by External Relations & Partnerships (deck slide 12).
+import { getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import ActivityIcon from '../components/ui/ActivityIcon.astro';
+import MemberCard from '../components/cards/MemberCard.astro';
+import Icon from '../components/ui/Icon.astro';
+import { getDepartmentHeads, getResearchers, getPartners } from '../lib/content';
+import { site, contactUrl } from '../data/site';
+
+const dept = (await getEntry('departments', 'external-relations'))!;
+const contacts = await getDepartmentHeads('external-relations');
+const researchers = await getResearchers();
+const hasLab = (await getPartners()).length > 0;
+
+const ways = [
+  { icon: 'mic', title: 'Give a talk', text: 'Share your research with our crew, on campus or live online.', subject: 'Giving a talk at INSIGHT', topic: 'researcher' },
+  { icon: 'compass', title: 'Mentor a project team', text: 'Guide a student team in one of our four research poles.', subject: 'Mentoring an INSIGHT project team', topic: 'researcher' },
+  { icon: 'flask', title: 'Co-supervise a project', text: 'Help a project go from a first question to a paper.', subject: 'Co-supervising an INSIGHT project', topic: 'researcher' },
+  { icon: 'users', title: 'Partner or sponsor', text: 'Support the club as a laboratory, company or institution.', subject: 'Partnering with INSIGHT', topic: 'company' },
+  { icon: 'network', title: 'Co-organise an event', text: 'Run a research event together with your club or lab.', subject: 'Co-organising an event with INSIGHT', topic: 'club' },
+] as const;
+---
+<BaseLayout title="Collaborate" description="Work with INSIGHT, ESTIN's student-led research club: give a talk, mentor a team, co-supervise a project, partner or co-organise an event.">
+  <PageHeader
+    eyebrow="Collaborate"
+    title="Build bridges with the next generation of researchers."
+    lead="INSIGHT connects ESTIN students with researchers, laboratories and the scientific community. If you'd like to work with our crew, we'd love to hear from you."
+  >
+    <div class="hero-in mt-10 flex flex-wrap gap-4" style="--hd:.8s">
+      <a href={contactUrl('researcher')} class="btn btn-primary">Write to us</a>
+      <a href="/network" class="btn btn-secondary">See our network →</a>
+    </div>
+  </PageHeader>
+
+  <!-- LOG 01 · Ways to work with us -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 01 · Ways to work with us" title="Five ways to collaborate." />
+      <div class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-navy/10 rv-cells">
+        {ways.map((w, i) => (
+          <a href={contactUrl(w.topic, w.subject)} class="group p-8 bg-white hover:bg-paper transition-colors block">
+            <div class="flex items-start justify-between">
+              <span class="tile"><ActivityIcon name={w.icon} /></span>
+              <span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+            </div>
+            <h3 class="mt-8 font-display text-xl font-bold text-ink">{w.title}</h3>
+            <p class="mt-2 text-[15px] text-body leading-relaxed">{w.text}</p>
+            <span class="mt-5 inline-flex items-center gap-2 text-[14px] font-medium text-blue">Get in touch <Icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1" /></span>
+          </a>
+        ))}
+        <div class="p-8 bg-ink flex flex-col justify-between gap-8">
+          <div>
+            <p class="eyebrow text-peri">Already with us</p>
+            <p class="mt-4 font-display text-5xl font-bold text-white">{researchers.length}</p>
+            <p class="mt-1 text-[15px] text-silver/75">{researchers.length === 1 ? 'researcher' : 'researchers'} in our network{hasLab ? ', and a partner laboratory' : ''}.</p>
+          </div>
+          <a href="/network" class="btn btn-sm btn-secondary self-start">Meet them →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG 02 · Who you'll talk to -->
+  <section class="bg-white text-ink py-24 sm:py-28 border-t border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12 grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <SectionHeader eyebrow="Log 02 · Your contacts" title={dept.data.name} subtitle={dept.data.onBoardAs} />
+        <ul class="rv mt-8 space-y-2">
+          {dept.data.handles.map((h, i) => <li class="flex gap-4 text-[15px] text-body"><span class="font-mono text-[12px] text-muted pt-0.5">{String(i + 1).padStart(2, '0')}</span>{h}</li>)}
+        </ul>
+      </div>
+      <div class="lg:col-span-7 self-start">
+        <ul class="rounded-2xl overflow-hidden border border-navy/10 grid sm:grid-cols-2 gap-px bg-navy/10 rv-cells" role="list">
+          {contacts.map((m) => <MemberCard member={m} roleLabel="Head · External Relations" />)}
+        </ul>
+        <div class="rv mt-6 rounded-2xl bg-paper border border-navy/10 p-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="eyebrow text-blue">Email</p>
+            <a href={`mailto:${site.email}`} class="mt-1 block font-display text-2xl font-bold text-ink hover:text-blue transition-colors">{site.email}</a>
+          </div>
+          <a href={contactUrl('researcher')} class="btn btn-sm btn-secondary btn-on-light">Write to us →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

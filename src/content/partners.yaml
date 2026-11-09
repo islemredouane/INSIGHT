@@ -1,0 +1,9 @@
+# Partner laboratories. Only list a lab after it agrees.
+# TODO (External Relations): replace the placeholder with the real lab (name, institution, country, summary, url, logo).
+
+- id: partner-lab
+  name: "[Laboratory name]"
+  institution: "[University or institute]"
+  country: "[Country]"
+  summary: "[What we do together, in one line: e.g. co-supervised projects, internships, joint seminars]"
+  placeholder: true

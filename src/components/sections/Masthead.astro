@@ -1,0 +1,29 @@
+---
+// "Meet the crew" masthead of the Helm (home-v3).
+import { getCollection } from 'astro:content';
+import SectionHeader from '../ui/SectionHeader.astro';
+import MemberCard from '../cards/MemberCard.astro';
+import Icon from '../ui/Icon.astro';
+import { stats } from '../../data/club';
+
+interface Props { eyebrow?: string; showLink?: boolean; title?: string; subtitle?: string }
+const { eyebrow = 'Log 07 · The helm', showLink = true, title = 'Meet the crew.', subtitle = 'Every great voyage needs more than a captain.' } = Astro.props;
+const helm = (await getCollection('crew', (m) => m.data.group === 'helm')).sort((a, b) => a.data.order - b.data.order);
+const crewCount = stats.find((s) => s.label === 'Crew members')?.value;
+---
+<section id="crew" class="bg-paper text-ink py-24 sm:py-28">
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <SectionHeader eyebrow={eyebrow} title={title} subtitle={subtitle} />
+      {showLink && (
+        <a href="/crew" class="rv group inline-flex items-center gap-2 whitespace-nowrap shrink-0 text-[15px] font-medium text-blue hover:text-navy transition-colors">
+          Meet the full crew <span class="font-mono text-[13px] text-muted group-hover:text-navy">({crewCount})</span>
+          <Icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={2} />
+        </a>
+      )}
+    </div>
+    <ul class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-navy/10 rv-cells" role="list">
+      {helm.map((m) => <MemberCard member={m} />)}
+    </ul>
+  </div>
+</section>

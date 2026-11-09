@@ -1,0 +1,89 @@
+---
+// Full-width navbar (home-v3): transparent over the hero, solid ink + hairline once you scroll.
+import { mainNav, secondaryNav, site } from '../../data/site';
+import { isActive } from '../../lib/nav';
+const path = Astro.url.pathname;
+const collaborate = secondaryNav[0];
+---
+<header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent transition-colors duration-300">
+  <div class="max-w-[1240px] mx-auto h-[72px] px-6 md:px-12 flex items-center justify-between gap-3 sm:gap-6">
+    <a href="/" class="flex items-center gap-3 shrink-0" aria-label={`${site.name}, home`}>
+      <img src="/brand/insight-logo.png" alt="" width="54" height="32" class="h-8 w-auto logo-glow" />
+      <span class="flex flex-col leading-none">
+        <span class="font-display text-[18px] font-bold tracking-tight text-white">{site.name}</span>
+        <span class="hidden sm:block mt-1 text-[12px] text-muted">{site.shortDescription}</span>
+      </span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-6 xl:gap-9 h-full" aria-label="Main">
+      {mainNav.map((item) => (
+        <a href={item.href} class:list={['nav-link', { active: isActive(path, item.href) }]} aria-current={isActive(path, item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+    <div class="flex items-center gap-2">
+      <!-- Wrapper does the hiding: .btn sets its own display, which would override `hidden` -->
+      <span class="hidden lg:inline-flex">
+        <a href={collaborate.href} class:list={['btn btn-sm btn-ghost', { active: isActive(path, collaborate.href) }]} aria-current={isActive(path, collaborate.href) ? 'page' : undefined}>{collaborate.label}</a>
+      </span>
+      <!-- Under 360px only the menu button fits; Join stays the big button inside the menu -->
+      <span class="hidden min-[360px]:inline-flex">
+        <a href="/join" class="btn btn-sm btn-secondary">Join the crew</a>
+      </span>
+      <button id="menu-btn" class="menu-btn lg:hidden w-11 h-11 rounded-none border border-silver/20 text-silver hover:border-silver/50 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span class="mb-line" aria-hidden="true"></span><span class="mb-line" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Navbar state + mobile menu controller (from home-v3)
+  const root = document.documentElement;
+  const nav = document.getElementById('nav')!;
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 24 || root.classList.contains('menu-open'));
+  onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+
+  const btn = document.getElementById('menu-btn') as HTMLButtonElement;
+  const menu = document.getElementById('menu')!;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isOpen = () => root.classList.contains('menu-open');
+  const focusables = () => [btn, ...menu.querySelectorAll<HTMLElement>('a[href], button')];
+
+  function openMenu() {
+    root.classList.add('menu-open'); onScroll();
+    btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Close menu');
+    root.style.overflow = 'hidden'; // lock the page behind
+    setTimeout(() => menu.querySelector<HTMLElement>('.mm-link')?.focus({ preventScroll: true }), reduce ? 0 : 300);
+  }
+  function closeMenu(returnFocus = true) {
+    root.classList.remove('menu-open'); onScroll();
+    btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Open menu');
+    root.style.overflow = '';
+    if (returnFocus) btn.focus({ preventScroll: true });
+  }
+
+  btn.addEventListener('click', () => (isOpen() ? closeMenu() : openMenu()));
+  document.addEventListener('keydown', (e) => {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(); return; }
+    if (e.key === 'Tab') { // keep focus inside the menu
+      const f = focusables(), first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  // In-page links: close first, then glide; other links just close
+  menu.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => a.addEventListener('click', (e) => {
+    const href = a.getAttribute('href') || '';
+    if (href.startsWith('#')) {
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      closeMenu(false);
+      setTimeout(() => target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }), reduce ? 0 : 320);
+    } else {
+      closeMenu(false);
+    }
+  }));
+  addEventListener('resize', () => { if (isOpen() && innerWidth >= 1024) closeMenu(false); });
+</script>

@@ -1,0 +1,23 @@
+---
+// "LOG 0X · …" eyebrow + title + optional serif subtitle (home-v3 pattern), with reveal motion.
+interface Props {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  tone?: 'light' | 'dark';
+  as?: 'h1' | 'h2';
+  class?: string;
+  titleClass?: string;
+}
+const { eyebrow, title, subtitle, tone = 'light', as: Tag = 'h2', class: className, titleClass = '' } = Astro.props;
+const dark = tone === 'dark';
+---
+<div class={className}>
+  <div class:list={['eyebrow flex items-center gap-3 rv', dark ? 'text-peri' : 'text-blue']}>
+    {eyebrow} <span class:list={['w-8 h-px', dark ? 'bg-peri/30' : 'bg-blue/40']}></span>
+  </div>
+  <Tag style="--d:80ms" class:list={['rv mt-5 font-display font-bold text-4xl sm:text-5xl tracking-tight leading-[1.08]', dark && 'text-white', titleClass]}>{title}</Tag>
+  {subtitle && (
+    <p style="--d:160ms" class:list={['rv mt-3 font-serif italic text-xl sm:text-2xl', dark ? 'text-peri' : 'text-blue']}>{subtitle}</p>
+  )}
+</div>

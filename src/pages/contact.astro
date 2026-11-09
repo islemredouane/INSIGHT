@@ -1,0 +1,271 @@
+---
+// Contact — routes each visitor to the department that answers them (deck slides 9–13),
+// with a short form (Web3Forms, see src/data/contact.ts) and the direct channels.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import Icon from '../components/ui/Icon.astro';
+import { getDepartmentHeads } from '../lib/content';
+import { initials } from '../lib/format';
+import { site, registrations } from '../data/site';
+import { contactForm, contactTopics, mapUrl } from '../data/contact';
+
+const departments = await getCollection('departments');
+const panels = await Promise.all(
+  [...new Set(contactTopics.map((t) => t.department))].map(async (id) => ({
+    id,
+    dept: departments.find((d) => d.id === id)!,
+    heads: await getDepartmentHeads(id),
+  })),
+);
+const first = contactTopics[0];
+
+const shortcuts = [
+  { href: '/join', eyebrow: 'Students', title: registrations.open ? 'Registrations are open.' : 'Want to join?', text: registrations.open ? 'Apply on the Join page, it takes a few minutes.' : 'Registrations open soon. The Join page tells you how.' },
+  { href: '/collaborate', eyebrow: 'Researchers, labs, companies', title: 'Want to work with us?', text: 'Five ways to collaborate with our crew.' },
+  { href: '/events', eyebrow: 'Everyone', title: 'Looking for an event?', text: 'Talks, paper readings and workshops.' },
+];
+---
+<BaseLayout title="Contact" description={`Contact INSIGHT, ESTIN's student-led research club. Write to the right team; we reply within ${contactForm.replyTime}.`}>
+  <PageHeader
+    eyebrow="Contact"
+    title="Get in touch."
+    lead={`Questions, guest talks, collaborations: tell us who you are and the right team will answer. We reply within ${contactForm.replyTime}.`}
+  />
+
+  <section class="bg-paper text-ink py-20 sm:py-24">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12 grid lg:grid-cols-12 gap-10 lg:gap-12">
+
+      <!-- Form -->
+      <div class="lg:col-span-7">
+        <div class="rv rounded-2xl bg-white border border-navy/10 p-6 sm:p-10">
+          <form id="contact-form" novalidate data-key={contactForm.web3formsKey} data-endpoint={contactForm.endpoint} data-email={site.email} data-hints={JSON.stringify(Object.fromEntries(contactTopics.map((t) => [t.id, t.hint])))}>
+            <fieldset>
+              <legend class="field-label">01 · Who are you?</legend>
+              <div class="mt-4 flex flex-wrap gap-2">
+                {contactTopics.map((t) => (
+                  <label class="choice">
+                    <input type="radio" name="topic" value={t.id} checked={t.id === first.id} data-subject={t.subject} data-panel={t.department} data-label={t.label} />
+                    {t.label}
+                  </label>
+                ))}
+              </div>
+              <p id="topic-hint" class="mt-3 text-[14px] text-muted">{first.hint}</p>
+            </fieldset>
+
+            <div class="mt-10 pt-8 border-t border-navy/10">
+              <p class="field-label">02 · Your message</p>
+              <div class="mt-5 grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="cf-name" class="text-[14px] font-medium text-ink">Name</label>
+                  <input id="cf-name" name="name" type="text" class="field" autocomplete="name" required maxlength="120" />
+                </div>
+                <div>
+                  <label for="cf-email" class="text-[14px] font-medium text-ink">Email</label>
+                  <input id="cf-email" name="email" type="email" class="field" autocomplete="email" required maxlength="160" />
+                </div>
+              </div>
+              <div class="mt-5">
+                <label for="cf-subject" class="text-[14px] font-medium text-ink">Subject</label>
+                <input id="cf-subject" name="subject" type="text" class="field" value={first.subject} required maxlength="160" />
+              </div>
+              <div class="mt-5">
+                <label for="cf-message" class="text-[14px] font-medium text-ink">Message</label>
+                <textarea id="cf-message" name="message" class="field" required minlength="10" maxlength="5000"></textarea>
+              </div>
+              <!-- Spam trap: hidden from people, filled by bots -->
+              <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+              <p id="cf-error" class="mt-5 hidden text-[14px] text-signal" role="alert"></p>
+
+              <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-5">
+                <button type="submit" class="btn btn-primary shrink-0">
+                  <span data-label>Send message</span>
+                  <Icon name="arrow-right" />
+                </button>
+                <p class="text-[13px] text-muted leading-relaxed">We use your message only to answer you. <a href="/privacy" class="underline underline-offset-2 hover:text-blue">Privacy</a></p>
+              </div>
+            </div>
+          </form>
+
+          <!-- Sent -->
+          <div id="contact-sent" class="hidden" tabindex="-1">
+            <span class="tile"><Icon name="arrow-up-right" class="w-5 h-5" /></span>
+            <h2 class="mt-6 font-display text-3xl font-bold tracking-tight text-ink">Message received.</h2>
+            <p class="mt-3 text-[16px] text-body leading-relaxed">Thank you. <span data-team>The team</span> will reply within {contactForm.replyTime}, at the email you gave us.</p>
+            <button type="button" id="contact-again" class="mt-8 btn btn-sm btn-secondary btn-on-light">Send another message</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who answers + direct channels -->
+      <aside class="lg:col-span-5 space-y-6">
+        <div class="rv rounded-2xl bg-white border border-navy/10 overflow-hidden" aria-live="polite">
+          {panels.map((p) => (
+            <div data-team-panel={p.id} hidden={p.id !== first.department}>
+              <div class="p-6 sm:p-8">
+                <p class="eyebrow text-blue">Who will answer</p>
+                <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-ink">{p.dept.data.name}</h2>
+                <p class="mt-2 font-serif italic text-lg text-blue leading-snug">{p.dept.data.onBoardAs}</p>
+              </div>
+              <ul class="grid gap-px bg-navy/10 border-t border-navy/10" role="list">
+                {p.heads.map((m) => (
+                  <li class="person-row">
+                    <span class="person-avatar">{m.data.photo ? <img src={m.data.photo} alt="" loading="lazy" /> : initials(m.data.name)}</span>
+                    <span>
+                      <span class="block text-[15px] font-semibold text-ink">{m.data.name}</span>
+                      <span class="block font-mono text-[12px] text-muted">Head · {p.dept.data.name.split(' & ')[0]}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div class="rv rounded-2xl bg-ink text-silver p-6 sm:p-8">
+          <p class="eyebrow text-peri">Or reach us directly</p>
+          <ul class="mt-6 divide-y divide-white/10 border-y border-white/10">
+            <li class="py-4 flex flex-wrap items-center justify-between gap-3">
+              <span>
+                <span class="block font-mono text-[12px] uppercase tracking-[.12em] text-peri">Email</span>
+                <a href={`mailto:${site.email}`} class="mt-1 block text-[16px] font-medium text-white hover:text-peri-light transition-colors">{site.email}</a>
+              </span>
+              <button type="button" class="btn btn-sm btn-secondary" data-copy-email={site.email}><Icon name="copy" /><span>Copy</span></button>
+            </li>
+            <li class="py-4">
+              <span class="block font-mono text-[12px] uppercase tracking-[.12em] text-peri">Instagram</span>
+              <a href={site.instagram.url} target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-2 text-[16px] font-medium text-white hover:text-peri-light transition-colors">
+                <Icon name="instagram" /> {site.instagram.handle} <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            </li>
+            <li class="py-4">
+              <span class="block font-mono text-[12px] uppercase tracking-[.12em] text-peri">Find us</span>
+              <a href={mapUrl} target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-2 text-[16px] font-medium text-white hover:text-peri-light transition-colors">
+                {site.school.name}, {site.school.location} <Icon name="arrow-up-right" /> <span class="sr-only">(opens Google Maps in a new tab)</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Before you write -->
+  <section class="bg-white text-ink py-20 sm:py-24 border-t border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Before you write" title="Maybe the answer is already here." />
+      <div class="mt-12 rounded-2xl overflow-hidden border border-navy/10 grid md:grid-cols-3 gap-px bg-navy/10 rv-cells">
+        {shortcuts.map((s) => (
+          <a href={s.href} class="group p-8 bg-white hover:bg-paper transition-colors block">
+            <p class="font-mono text-[12px] text-muted">{s.eyebrow}</p>
+            <h3 class="mt-3 font-display text-xl font-bold text-ink group-hover:text-blue transition-colors">{s.title}</h3>
+            <p class="mt-2 text-[15px] text-body leading-relaxed">{s.text}</p>
+            <span class="mt-5 inline-flex items-center gap-2 text-[14px] font-medium text-blue">Go <Icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1" /></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const sent = document.getElementById('contact-sent')!;
+  const hint = document.getElementById('topic-hint')!;
+  const errorBox = document.getElementById('cf-error')!;
+  const subject = form.elements.namedItem('subject') as HTMLInputElement;
+  const button = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+  const buttonLabel = button.querySelector('[data-label]')!;
+  const radios = [...form.querySelectorAll<HTMLInputElement>('input[name="topic"]')];
+  const hints: Record<string, string> = JSON.parse(form.dataset.hints || '{}');
+  let subjectEdited = false;
+
+  const current = () => radios.find((r) => r.checked) ?? radios[0];
+
+  // Show the team that answers the chosen topic; keep the subject in step until the visitor edits it.
+  function selectTopic(r: HTMLInputElement) {
+    r.checked = true;
+    document.querySelectorAll<HTMLElement>('[data-team-panel]').forEach((p) => { p.hidden = p.dataset.teamPanel !== r.dataset.panel; });
+    hint.textContent = hints[r.value] ?? hint.textContent;
+    if (!subjectEdited) subject.value = r.dataset.subject ?? subject.value;
+  }
+  radios.forEach((r) => r.addEventListener('change', () => selectTopic(r)));
+  subject.addEventListener('input', () => { subjectEdited = true; });
+
+  // /contact?topic=researcher&subject=… (links from Collaborate, Join, Network)
+  const params = new URLSearchParams(location.search);
+  const fromUrl = radios.find((r) => r.value === params.get('topic'));
+  if (fromUrl) selectTopic(fromUrl);
+  if (params.get('subject')) { subject.value = params.get('subject')!.slice(0, 160); subjectEdited = true; }
+
+  function showError(text: string) {
+    errorBox.innerHTML = text;
+    errorBox.classList.remove('hidden');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.add('hidden');
+    form.classList.add('was-validated');
+    if (!form.checkValidity()) {
+      const invalid = form.querySelector<HTMLElement>(':invalid:not(fieldset)');
+      invalid?.focus();
+      showError('Please fill in every field (the message needs at least 10 characters).');
+      return;
+    }
+    const data = new FormData(form);
+    if (data.get('botcheck')) return;
+    const topic = current();
+    const fullSubject = `[INSIGHT website] ${topic.dataset.label}: ${data.get('subject')}`;
+    const { key, endpoint, email } = form.dataset;
+
+    // No form service yet: open the visitor's email app with everything filled in.
+    if (!key) {
+      const body = `${data.get('message')}\n\n${data.get('name')} (${data.get('email')})\n${topic.dataset.label}`;
+      location.href = `mailto:${email}?subject=${encodeURIComponent(fullSubject)}&body=${encodeURIComponent(body)}`;
+      showError(`Your email app should open with your message ready. If nothing happens, write to <a class="underline" href="mailto:${email}">${email}</a>.`);
+      return;
+    }
+
+    button.disabled = true;
+    buttonLabel.textContent = 'Sending…';
+    try {
+      const res = await fetch(endpoint!, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: key,
+          subject: fullSubject,
+          from_name: 'INSIGHT website',
+          name: data.get('name'),
+          email: data.get('email'),
+          topic: topic.dataset.label,
+          message: data.get('message'),
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.success) throw new Error(json.message || 'Send failed');
+      const team = document.querySelector<HTMLElement>(`[data-team-panel="${topic.dataset.panel}"] h2`)?.textContent;
+      sent.querySelector('[data-team]')!.textContent = team ? `The ${team} team` : 'The team';
+      form.classList.add('hidden');
+      sent.classList.remove('hidden');
+      sent.focus();
+    } catch {
+      showError(`Your message could not be sent. Please try again, or write to <a class="underline" href="mailto:${email}">${email}</a>.`);
+    } finally {
+      button.disabled = false;
+      buttonLabel.textContent = 'Send message';
+    }
+  });
+
+  document.getElementById('contact-again')?.addEventListener('click', () => {
+    form.reset();
+    form.classList.remove('was-validated', 'hidden');
+    subjectEdited = false;
+    selectTopic(radios[0]);
+    sent.classList.add('hidden');
+    (form.elements.namedItem('name') as HTMLInputElement).focus();
+  });
+</script>

@@ -1,0 +1,122 @@
+/* Components shared across pages (all from home-v3) */
+
+/* ---------- Buttons: square corners everywhere ----------
+   primary   = solid blue, the main action only ("Join the crew")
+   secondary = outline in periwinkle on dark (blue on light), fills blue on hover
+   text link = blue text + arrow (no box) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; height: 48px; padding: 0 1.75rem;
+       border: 1px solid transparent; border-radius: 0; font-family: var(--font-sans); font-size: 15px; font-weight: 500;
+       line-height: 1; white-space: nowrap; transition: background-color .2s, border-color .2s, color .2s; }
+.btn:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 3px; }
+.btn-sm { height: 44px; padding: 0 1.25rem; }
+.btn-lg { height: 56px; padding: 0 2.5rem; font-size: 16px; font-weight: 600; }
+.btn-primary { background: #3F66B0; color: #fff; }
+.btn-primary:hover { background: #345596; }
+.btn-secondary { border-color: #7F97C7; color: #7F97C7; background: transparent; }
+.btn-secondary:hover { background: #3F66B0; border-color: #3F66B0; color: #fff; }
+.btn-secondary.btn-on-light { border-color: #3F66B0; color: #3F66B0; }
+.btn-secondary.btn-on-light:hover { color: #fff; }
+/* Ghost: one step quieter than secondary (Collaborate beside "Join the crew" in the navbar) */
+.btn-ghost { border-color: rgba(221,227,236,.2); color: rgba(221,227,236,.85); background: transparent; }
+.btn-ghost:hover, .btn-ghost.active { border-color: rgba(221,227,236,.5); color: #fff; }
+@media (max-width: 639px) { .btn-sm { padding: 0 1rem; font-size: 14px; } .btn-lg { width: 100%; } }
+
+/* ---------- Icon tile (hairline grids on light) ---------- */
+.tile { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid rgba(63,102,176,.22); background: rgba(63,102,176,.06); color: #3F66B0; transition: background-color .2s, border-color .2s; }
+.group:hover .tile { border-color: rgba(63,102,176,.5); }
+.tile-on, .group:hover .tile-on { background: #3F66B0; border-color: #3F66B0; color: #fff; }
+
+/* ---------- Compass ---------- */
+.pole-dot { transition: all .3s; }
+.pole-tab { border-color: rgba(221,227,236,.15); color: rgba(221,227,236,.7); }
+.pole-tab:hover { color: #fff; border-color: rgba(221,227,236,.3); }
+.pole-tab[aria-selected="true"] { background: #3F66B0; border-color: #3F66B0; color: #fff; box-shadow: 0 0 15px rgba(63,102,176,.4); }
+.pole-tab:focus-visible { outline: 2px solid #AEC6FF; outline-offset: 3px; }
+
+/* ---------- Long text from Markdown (event recaps, posts) ---------- */
+.prose-insight { font-size: 17px; line-height: 1.75; color: #3A4458; }
+.prose-insight > * + * { margin-top: 1.1em; }
+.prose-insight strong { color: #0B1120; font-weight: 600; }
+.prose-insight a { color: #3F66B0; text-decoration: underline; text-underline-offset: 3px; }
+.prose-insight h2, .prose-insight h3 { font-family: var(--font-display); font-weight: 700; color: #0B1120; letter-spacing: -.01em; }
+.prose-insight h2 { font-size: 1.6rem; margin-top: 1.8em; }
+.prose-insight h3 { font-size: 1.25rem; margin-top: 1.5em; }
+.prose-insight ul { list-style: none; padding: 0; }
+.prose-insight ul li { padding-left: 1rem; border-left: 2px solid rgba(63,102,176,.4); }
+
+/* ---------- Footer links ---------- */
+.footer-link { color: rgba(221,227,236,.7); transition: color .2s; }
+.footer-link:hover { color: #fff; }
+
+/* ---------- Crew masthead (light) ---------- */
+.member { display: flex; gap: 1.25rem; align-items: center; padding: 1.5rem; background: #fff; transition: background-color .2s; }
+.member:hover { background: #F5F6F8; }
+.portrait { position: relative; flex: none; width: 104px; aspect-ratio: 4 / 5; overflow: hidden;
+            background: radial-gradient(circle, rgba(221,227,236,.18) 1px, transparent 1px) 0 0 / 12px 12px, linear-gradient(160deg, #3F66B0 0%, #1B2A55 55%, #0B1120 100%); }
+.portrait-initials { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 30px; font-weight: 700; letter-spacing: -.02em; color: rgba(221,227,236,.9); transition: transform .4s cubic-bezier(.2,.7,.2,1); }
+.portrait-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(.35); transition: transform .4s cubic-bezier(.2,.7,.2,1), filter .3s; }
+.member:hover .portrait-initials, .member:hover .portrait-img { transform: scale(1.06); }
+.member:hover .portrait-img { filter: none; }
+.portrait-tag { position: absolute; left: 6px; bottom: 5px; font-family: var(--font-mono); font-size: 10px; color: rgba(221,227,236,.6); }
+.wanted { position: absolute; top: 8px; right: -4px; transform: rotate(8deg) scale(.9); opacity: 0; padding: 2px 6px; background: #fff; border: 1px solid rgba(194,70,58,.5);
+          font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #C2463A; transition: opacity .2s, transform .2s; }
+.member:hover .wanted { opacity: 1; transform: rotate(8deg) scale(1); }
+.member-name { margin-top: .4rem; font-family: var(--font-display); font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; color: #0B1120; }
+.member-duty { margin-top: .35rem; font-size: 14px; line-height: 1.5; color: #3A4458; }
+@media (prefers-reduced-motion: reduce) { .portrait-initials, .portrait-img, .wanted { transition: none; } }
+
+/* ---------- Research network cards (dark) ---------- */
+.rcard { display: flex; flex-direction: column; background: #121A2E; transition: background-color .2s; }
+.rcard:hover { background: #162038; }
+.rportrait { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-bottom: 1px solid rgba(221,227,236,.08);
+             background: radial-gradient(circle, rgba(221,227,236,.14) 1px, transparent 1px) 0 0 / 14px 14px, linear-gradient(160deg, #2a4a8a 0%, #1B2A55 50%, #0B1120 100%); }
+.rportrait-initials { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 44px; font-weight: 700; letter-spacing: -.02em; color: rgba(221,227,236,.85); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+.rportrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(.3); transition: transform .5s cubic-bezier(.2,.7,.2,1), filter .3s; }
+.rcard:hover .rportrait-initials, .rcard:hover .rportrait img { transform: scale(1.04); }
+.rcard:hover .rportrait img { filter: none; }
+.rportrait-tag { position: absolute; left: 10px; bottom: 8px; font-family: var(--font-mono); font-size: 11px; color: rgba(221,227,236,.55); }
+.rbadge { position: absolute; left: 10px; top: 10px; padding: 3px 8px; background: #3F66B0; font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .04em; color: #fff; }
+.rbody { display: flex; flex-direction: column; flex: 1; padding: 1.25rem 1.25rem 1.5rem; }
+.rname { margin-top: .5rem; font-family: var(--font-display); font-size: 19px; font-weight: 700; line-height: 1.2; color: #fff; }
+.rtitle { margin-top: .25rem; font-size: 14px; line-height: 1.45; color: rgba(221,227,236,.7); }
+.rtags { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: 6px; }
+.rtags span { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border: 1px solid rgba(127,151,199,.3); font-family: var(--font-mono); font-size: 11px; color: #DDE3EC; }
+.rlink { margin-top: auto; padding-top: 1rem; font-size: 14px; font-weight: 500; color: #AEC6FF; transition: color .2s; align-self: flex-start; }
+.rlink:hover { color: #fff; }
+.rcard-invite { background: linear-gradient(160deg, rgba(63,102,176,.18), rgba(18,26,46,1) 60%); }
+.rcard-invite:hover { background: linear-gradient(160deg, rgba(63,102,176,.26), rgba(22,32,56,1) 60%); }
+@media (prefers-reduced-motion: reduce) { .rportrait-initials, .rportrait img { transition: none; } }
+/* Phones: compact row layout (small portrait left), so a list of researchers doesn't make a 4,000px scroll */
+@media (max-width: 639px) {
+  .rcard:not(.rcard-invite) { flex-direction: row; align-items: stretch; }
+  .rcard:not(.rcard-invite) .rportrait { width: 104px; flex: none; aspect-ratio: auto; min-height: 130px; border-bottom: 0; border-right: 1px solid rgba(221,227,236,.08); }
+  .rportrait-initials { font-size: 26px; }
+  .rportrait-tag { display: none; }
+  .rbadge { left: 6px; right: 6px; top: 6px; padding: 2px 5px; font-size: 9px; line-height: 1.3; white-space: normal; }
+  .rbody { padding: 1rem 1rem 1.1rem; }
+}
+
+/* ---------- Contact form (sharp controls, like the buttons) ---------- */
+.field-label { display: block; font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #3F66B0; }
+.field { display: block; width: 100%; margin-top: .5rem; border: 1px solid rgba(27,42,85,.2); border-radius: 0; background: #fff;
+         padding: .8rem 1rem; font-size: 16px; line-height: 1.5; color: #0B1120; transition: border-color .2s, box-shadow .2s; }
+.field::placeholder { color: #8A94A8; }
+.field:hover { border-color: rgba(27,42,85,.35); }
+.field:focus { outline: none; border-color: #3F66B0; box-shadow: 0 0 0 3px rgba(63,102,176,.18); }
+.field[aria-invalid="true"], .was-validated .field:invalid { border-color: #C2463A; }
+textarea.field { min-height: 168px; resize: vertical; }
+
+/* "Who are you?" choices: radio inputs styled as square tabs */
+.choice { position: relative; display: inline-flex; align-items: center; height: 44px; padding: 0 1.1rem; cursor: pointer;
+          border: 1px solid rgba(27,42,85,.2); color: #3A4458; font-size: 15px; font-weight: 500; white-space: nowrap;
+          transition: background-color .2s, border-color .2s, color .2s, box-shadow .2s; }
+.choice:hover { border-color: #3F66B0; color: #3F66B0; }
+.choice:has(input:checked) { background: #3F66B0; border-color: #3F66B0; color: #fff; box-shadow: 0 0 15px rgba(63,102,176,.3); }
+.choice:has(input:focus-visible) { outline: 2px solid #AEC6FF; outline-offset: 3px; }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+
+/* Who answers: compact person row */
+.person-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #fff; }
+.person-avatar { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+                 background: #1B2A55; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 14px; overflow: hidden; }
+.person-avatar img { width: 100%; height: 100%; object-fit: cover; }

@@ -1,0 +1,147 @@
+---
+// One event: meta, programme, recap (Markdown body), speakers, photos.
+import { getCollection, getEntries, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import ResearcherCard from '../../components/cards/ResearcherCard.astro';
+import FinalCTA from '../../components/sections/FinalCTA.astro';
+import { longDate, eventTypeLabel, todayUTC } from '../../lib/format';
+import { site, showPlaceholders } from '../../data/site';
+
+export async function getStaticPaths() {
+  const events = await getCollection('events');
+  return events.map((event) => ({ params: { slug: event.id }, props: { event } }));
+}
+interface Props { event: CollectionEntry<'events'> }
+const { event } = Astro.props;
+const e = event.data;
+const { Content } = await render(event);
+const speakers = e.speakers.length ? await getEntries(e.speakers.map((id) => ({ collection: 'researchers' as const, id }))) : [];
+const upcoming = e.date >= todayUTC();
+// The event, for search engines (Google event results).
+const eventSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: e.title,
+  description: e.summary,
+  startDate: e.date.toISOString().slice(0, 10),
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: { '@type': 'Place', name: e.location, address: site.school.location },
+  organizer: { '@type': 'Organization', name: site.fullName, url: Astro.site?.href },
+  ...(speakers.length ? { performer: speakers.map((r) => ({ '@type': 'Person', name: r.data.name, affiliation: r.data.institution })) } : {}),
+  ...(e.cover ? { image: new URL(e.cover, Astro.site).href } : {}),
+};
+const meta = [
+  { label: 'Date', value: longDate(e.date) },
+  { label: 'Place', value: e.location },
+  { label: 'Type', value: eventTypeLabel[e.type] },
+  ...(e.attendance ? [{ label: 'Attendance', value: `${e.attendance} people` }] : []),
+];
+---
+<BaseLayout title={e.title} description={e.summary}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
+  <!-- Header -->
+  <section class="relative overflow-hidden bg-ink">
+    <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
+    <div class="absolute -top-24 left-[10%] w-[560px] h-[460px] rounded-full bg-blue/12 blur-[130px] pointer-events-none"></div>
+    <div class="relative max-w-[1240px] mx-auto px-6 md:px-12 pt-40 pb-16">
+      <a href="/events" class="hero-in inline-flex items-center gap-2 text-[14px] text-silver/70 hover:text-white transition-colors" style="--hd:.05s">← All events</a>
+      <p class="hero-in mt-8 eyebrow text-peri flex items-center gap-2" style="--hd:.1s">
+        {upcoming && <span class="w-2 h-2 rounded-full bg-signal"></span>}
+        {upcoming ? 'Upcoming' : eventTypeLabel[e.type]} · {longDate(e.date)}
+      </p>
+      <h1 data-split="hero" class="mt-5 max-w-4xl font-display font-bold text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-[-0.03em]">{e.title}</h1>
+      <p style="--hd:.6s" class="hero-in mt-6 max-w-2xl text-[17px] sm:text-lg text-silver/75 leading-relaxed">{e.summary}</p>
+      <dl style={`--hd:.75s;--cols:${meta.length}`} class="hero-in mt-10 grid grid-cols-2 sm:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))] gap-px bg-silver/10 border border-silver/10 max-w-3xl">
+        {meta.map((m) => (
+          <div class="bg-ink p-4 max-sm:[&:last-child:nth-child(odd)]:col-span-2">
+            <dt class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">{m.label}</dt>
+            <dd class="mt-1 text-[15px] text-white">{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {upcoming && e.registrationUrl && <a href={e.registrationUrl} target="_blank" rel="noopener" class="hero-in mt-8 btn btn-primary" style="--hd:.85s">Register ↗</a>}
+    </div>
+  </section>
+
+  <!-- Cover -->
+  <section class="bg-paper pt-16">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <div class="rv aspect-[21/9] rounded-2xl overflow-hidden relative bg-gradient-to-br from-blue/80 to-navy">
+        {e.cover
+          ? <img src={e.cover} alt={e.title} class="absolute inset-0 w-full h-full object-cover" />
+          : <><div class="absolute inset-0 dots opacity-30"></div>{showPlaceholders && <span class="absolute left-5 bottom-4 font-mono text-[12px] text-silver/80">[{e.title.split(':')[0].replace(/\s\d{4}$/, '')} photo]</span>}</>}
+      </div>
+    </div>
+  </section>
+
+  <!-- Recap + programme -->
+  <section class="bg-paper text-ink py-20 sm:py-24">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12 grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-7">
+        <p class="rv eyebrow text-blue">{upcoming ? 'About this event' : 'The recap'}</p>
+        <div class="rv prose-insight mt-5"><Content /></div>
+      </div>
+      {e.programme.length > 0 && (
+        <aside class="lg:col-span-5">
+          <p class="rv eyebrow text-blue">Programme</p>
+          <ol class="rv-stagger mt-5 relative border-l-2 border-dashed border-navy/30 ml-4 space-y-5">
+            {e.programme.map((step, i) => (
+              <li class="relative pl-8">
+                <span class="absolute -left-[13px] top-0.5 flex w-6 h-6 rounded-full bg-white border-2 border-navy items-center justify-center font-mono text-[10px] font-semibold text-navy">{i + 1}</span>
+                {step.time && <p class="font-mono text-[12px] text-blue">{step.time}</p>}
+                <p class="font-display text-lg font-bold text-ink">{step.title}</p>
+                {step.text && <p class="mt-1 text-[14px] text-body leading-relaxed">{step.text}</p>}
+              </li>
+            ))}
+          </ol>
+        </aside>
+      )}
+    </div>
+  </section>
+
+  {speakers.length > 0 && (
+    <section class="relative bg-ink py-24 overflow-hidden">
+      <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+      <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+        <SectionHeader eyebrow={speakers.length > 1 ? 'Speakers' : 'Speaker'} title={speakers.length > 1 ? 'Our guests.' : 'Our guest.'} tone="dark" />
+        <div class="mt-12 space-y-10">
+          {speakers.map((r) => (
+            <div class="grid md:grid-cols-12 gap-8 items-start">
+              <ul class="md:col-span-4 max-w-sm rounded-2xl overflow-hidden border border-silver/10 grid gap-px bg-silver/10" role="list">
+                <ResearcherCard researcher={r} />
+              </ul>
+              <div class="rv md:col-span-8">
+                {r.data.bio && <p class="text-[17px] text-silver/80 leading-relaxed">{r.data.bio}</p>}
+                {r.data.highlights.length > 0 && (
+                  <ul class="mt-6 space-y-2.5">
+                    {r.data.highlights.map((h) => <li class="pl-4 border-l-2 border-peri/40 text-[15px] text-silver/70 leading-relaxed">{h}</li>)}
+                  </ul>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <a href="/network" class="rv mt-10 inline-flex text-[15px] font-medium text-peri-light hover:text-white">Meet the whole network →</a>
+      </div>
+    </section>
+  )}
+
+  <!-- Photos -->
+  <section class="bg-white text-ink py-24 border-t border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Photos" title="Gallery." class="mb-12" />
+      {e.gallery.length > 0 ? (
+        <ul class="rv-stagger grid grid-cols-2 md:grid-cols-3 gap-3" role="list">
+          {e.gallery.map((src) => <li class="aspect-[4/3] overflow-hidden rounded-2xl bg-paper"><img src={src} alt="" class="w-full h-full object-cover" loading="lazy" /></li>)}
+        </ul>
+      ) : (
+        <EmptyState label="Coming soon" title="Photos are on their way." text="The Communication & Media department is preparing the photos of this event." />
+      )}
+    </div>
+  </section>
+
+  <FinalCTA secondary={{ href: '/events', label: 'All events →' }} />
+</BaseLayout>

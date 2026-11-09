@@ -1,0 +1,102 @@
+---
+// Join — open or closed, switched by `registrations` in src/data/site.ts.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import ActivityIcon from '../components/ui/ActivityIcon.astro';
+import Icon from '../components/ui/Icon.astro';
+import FAQ from '../components/sections/FAQ.astro';
+import FinalCTA from '../components/sections/FinalCTA.astro';
+import { getPoles } from '../lib/content';
+import { registrations, site, contactUrl } from '../data/site';
+import { voyage, activities } from '../data/club';
+
+const poles = await getPoles();
+const open = registrations.open && registrations.applyUrl;
+const support = ['Communication & Media', 'Design', 'Events & Logistics', 'External Relations', 'Human Resources'];
+---
+<BaseLayout title="Join the crew" description="Join INSIGHT, ESTIN's student-led research club. Free, open to all ESTIN students, no experience required.">
+  <PageHeader
+    eyebrow={open ? `Registrations open · ${site.season}` : `Registrations · ${site.season}`}
+    title={open ? 'Join the crew.' : 'The next crew sets sail soon.'}
+    lead={open
+      ? 'Free and open to every ESTIN student. No experience required, only curiosity.'
+      : 'Registrations are not open right now. Follow us to know the moment they open, or write to us.'}
+  >
+    <div class="hero-in mt-10 flex flex-wrap gap-4" style="--hd:.8s">
+      {open
+        ? <a href={registrations.applyUrl} target="_blank" rel="noopener" class="btn btn-primary">Apply now ↗</a>
+        : <a href={site.instagram.url} target="_blank" rel="noopener" class="btn btn-primary"><Icon name="instagram" /> Follow {site.instagram.handle}</a>}
+      <a href={contactUrl('student', open ? 'Question about joining INSIGHT' : 'Tell me when INSIGHT registrations open')} class="btn btn-secondary">{open ? 'Ask a question' : 'Ask to be notified'}</a>
+    </div>
+    <p class="hero-in mt-5 font-mono text-[12px] text-muted" style="--hd:.9s">Free · open to all ESTIN students · no experience required</p>
+  </PageHeader>
+
+  <!-- LOG 01 · How it works -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 01 · How it works" title="Three steps aboard." />
+      <div class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid md:grid-cols-3 gap-px bg-navy/10 rv-cells">
+        {voyage.takePart.map((s, i) => (
+          <article class="p-8 bg-white">
+            <span class:list={['flex w-11 h-11 rounded-full border-2 items-center justify-center font-mono text-[13px] font-semibold', i === 0 ? 'bg-blue border-blue text-white' : 'border-navy text-navy']}>{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="mt-6 font-display text-xl font-bold text-ink">{s.title}</h3>
+            <p class="mt-2 text-[15px] text-body leading-relaxed">{s.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG 02 · Pick your pole -->
+  <section class="relative bg-ink py-24 sm:py-28 overflow-hidden">
+    <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
+    <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 02 · Pick your pole" title="Pick the ship that excites you." subtitle="You can explore all four poles during your first weeks." tone="dark" />
+      <ul class="mt-14 rounded-2xl overflow-hidden border border-silver/10 grid sm:grid-cols-2 lg:grid-cols-5 sm:max-lg:[&>li:last-child]:col-span-2 gap-px bg-silver/10 rv-cells" role="list">
+        {poles.map((p) => (
+          <li class="group bg-ink-2 hover:bg-[#162038] transition-colors">
+            <a href={`/research/${p.id}`} class="flex h-full flex-col p-7">
+              <span class="font-mono text-[12px] text-peri">Pole {String(p.data.number).padStart(2, '0')}</span>
+              <span class="mt-2 font-display text-xl font-bold text-white">{p.data.name}</span>
+              <span class="mt-2 text-[14px] text-silver/70 leading-relaxed flex-1">{p.data.short}</span>
+              <span class="mt-6 inline-flex items-center gap-2 text-[14px] font-medium text-peri-light group-hover:text-white">Learn more <Icon name="arrow-right" class="w-4 h-4" /></span>
+            </a>
+          </li>
+        ))}
+        <li class="rcard-invite flex flex-col p-7">
+          <span class="font-mono text-[12px] text-peri">Or</span>
+          <span class="mt-2 font-display text-xl font-bold text-white">Support departments</span>
+          <ul class="mt-3 space-y-1 text-[14px] text-silver/70">{support.map((s) => <li>{s}</li>)}</ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- LOG 03 · What you get -->
+  <section class="bg-white text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 03 · What you get" title="Six ways in." subtitle="From your first paper to your first publication." />
+      <div class="mt-14 rounded-2xl overflow-hidden border border-navy/10 grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-navy/10 rv-cells">
+        {activities.map((a) => (
+          <article class="group p-7 bg-white hover:bg-paper transition-colors flex gap-5">
+            <span class="tile shrink-0"><ActivityIcon name={a.icon} /></span>
+            <div>
+              <h3 class="font-display text-lg font-bold text-ink">{a.title}</h3>
+              <p class="mt-1 text-[15px] text-body leading-relaxed">{a.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <FAQ page="join" eyebrow="Log 04 · FAQ" bg="bg-paper" />
+
+  <FinalCTA
+    eyebrow={open ? 'Registrations open' : 'Stay close'}
+    title="Every great discovery begins with a question."
+    primary={open ? { href: registrations.applyUrl, label: 'Apply now' } : { href: site.instagram.url, label: `Follow ${site.instagram.handle}` }}
+    secondary={{ href: '/about', label: 'Learn about the club →' }}
+  />
+</BaseLayout>

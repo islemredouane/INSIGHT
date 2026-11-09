@@ -1,0 +1,32 @@
+---
+// Final call to action (home-v3): headline words rise in.
+import { closingLines } from '../../data/club';
+import { site } from '../../data/site';
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  line?: string;
+  primary?: { href: string; label: string };
+  secondary?: { href: string; label: string } | null;
+}
+const {
+  eyebrow = `Join the crew · ${site.season}`,
+  title = closingLines.discovery,
+  line = closingLines.setSail,
+  primary = { href: '/join', label: 'Join the crew' },
+  secondary = { href: '/research', label: 'Explore our research →' },
+} = Astro.props;
+---
+<section id="join" class="relative bg-ink py-28 overflow-hidden">
+  <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[480px] rounded-full bg-blue/20 blur-[140px] pointer-events-none"></div>
+  <div class="relative max-w-4xl mx-auto px-6 text-center">
+    <p class="rv eyebrow text-peri-light">{eyebrow}</p>
+    <h2 data-split class="mt-6 font-display font-bold text-white text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08]">{title}</h2>
+    <p style="--d:550ms" class="rv mt-6 font-serif italic text-xl sm:text-2xl text-peri">“{line}”</p>
+    <div style="--d:700ms" class="rv mt-10 flex flex-col sm:flex-row justify-center gap-4">
+      <a href={primary.href} class="btn btn-lg btn-primary">{primary.label}</a>
+      {secondary && <a href={secondary.href} class="btn btn-lg btn-secondary">{secondary.label}</a>}
+    </div>
+  </div>
+</section>

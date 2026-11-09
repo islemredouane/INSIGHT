@@ -1,0 +1,77 @@
+---
+// Research network — partner lab, researchers, featured researcher (Welcome Day deck, slides 22–24), talks.
+import { getCollection } from 'astro:content';
+import { getResearchers, getPartners } from '../lib/content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import Network from '../components/sections/Network.astro';
+import EventRow from '../components/cards/EventRow.astro';
+import CollaborateStrip from '../components/sections/CollaborateStrip.astro';
+
+const researchers = await getResearchers();
+const hasLab = (await getPartners()).length > 0;
+const featured = researchers.find((r) => !r.data.placeholder && r.data.research.length > 0);
+const talks = (await getCollection('events', (e) => e.data.speakers.length > 0)).sort((a, b) => +b.data.date - +a.data.date);
+---
+<BaseLayout title="Research network" description={`The researchers${hasLab ? ' and the laboratory' : ''} who work with INSIGHT, ESTIN's student-led research club.`}>
+  <PageHeader
+    eyebrow="Research network"
+    title="A network of researchers."
+    lead={`Researchers from around the world work with our crew${hasLab ? ', alongside our partner laboratory' : ''}. They give talks, share their work and open the door to real research.`}
+  />
+
+  <Network showHeader={false} />
+
+  {featured && (
+    <!-- LOG 02 · Featured researcher (deck slides 22–24) -->
+    <section class="bg-paper text-ink py-24 sm:py-28">
+      <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+        <SectionHeader eyebrow="Log 02 · Featured researcher" title={featured.data.name} subtitle={`${featured.data.title} · ${featured.data.institution}`} />
+        <div class="mt-14 grid lg:grid-cols-12 gap-10">
+          <div class="rv lg:col-span-5">
+            <p class="text-[17px] text-body leading-relaxed">{featured.data.bio}</p>
+            <ul class="mt-6 space-y-2.5">
+              {featured.data.highlights.map((h) => <li class="pl-4 border-l-2 border-blue/40 text-[15px] text-body leading-relaxed">{h}</li>)}
+            </ul>
+            {featured.data.links.profile && <a href={featured.data.links.profile} target="_blank" rel="noopener" class="mt-8 btn btn-sm btn-secondary btn-on-light">IBM Research profile ↗</a>}
+          </div>
+          <div class="lg:col-span-7">
+            <p class="rv eyebrow text-blue">Building trustworthy AI</p>
+            <div class="mt-5 rounded-2xl overflow-hidden border border-navy/10 grid sm:grid-cols-2 gap-px bg-navy/10 rv-cells">
+              {featured.data.research.map((area, i) => (
+                <article class="p-7 bg-white">
+                  <span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 class="mt-4 font-display text-lg font-bold text-ink">{area.title}</h3>
+                  <ul class="mt-3 space-y-2">
+                    {area.works.map((w) => <li class="text-[14px] text-body leading-relaxed">{w}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+        {featured.data.relevance.length > 0 && (
+          <div class="rv mt-10 rounded-2xl bg-ink p-8 lg:p-10">
+            <p class="eyebrow text-peri">Why his work matters to our crew</p>
+            <ul class="mt-6 grid md:grid-cols-3 gap-6">
+              {featured.data.relevance.map((r) => <li class="text-[16px] text-silver/85 leading-relaxed border-t border-silver/15 pt-4">{r}</li>)}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- LOG 03 · Talks -->
+  <section class="bg-white text-ink py-24 sm:py-28 border-t border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 03 · Guest talks" title="Talks with our crew." />
+      <div class="rv-stagger mt-14 divide-y divide-navy/10 border-y border-navy/10">
+        {talks.map((e) => <EventRow event={e} />)}
+      </div>
+    </div>
+  </section>
+
+  <CollaborateStrip title="Are you a researcher or a lab? Mentor a team, give a talk, or co-supervise a project." />
+</BaseLayout>

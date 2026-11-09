@@ -1,0 +1,46 @@
+---
+// Events — upcoming and past, from src/content/events.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import EventRow from '../../components/cards/EventRow.astro';
+import CollaborateStrip from '../../components/sections/CollaborateStrip.astro';
+import { getEventsSorted } from '../../lib/content';
+import { todayUTC } from '../../lib/format';
+import { site } from '../../data/site';
+
+const today = todayUTC();
+const events = await getEventsSorted();
+const upcoming = events.filter((e) => e.data.date >= today).reverse();
+const past = events.filter((e) => e.data.date < today);
+---
+<BaseLayout title="Events" description="INSIGHT events: talks, workshops, paper readings and more, at ESTIN.">
+  <PageHeader
+    eyebrow="Events"
+    title="Islands on the map."
+    lead="Talks with researchers, paper readings, workshops and research events. Every event is a stop on the voyage."
+  />
+
+  <!-- LOG 01 · Upcoming -->
+  <section class="bg-paper text-ink py-24 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 01 · Upcoming" title="Next on the map." class="mb-12" />
+      {upcoming.length > 0
+        ? <div class="rv-stagger divide-y divide-navy/10 border-y border-navy/10">{upcoming.map((e) => <EventRow event={e} upcoming />)}</div>
+        : <EmptyState label="Coming soon" title="Our next sessions are being planned." text={`Paper readings, workshops and talks are coming. Follow ${site.instagram.handle} to hear first.`} action={{ href: site.instagram.url, label: 'Follow on Instagram ↗' }} />}
+    </div>
+  </section>
+
+  <!-- LOG 02 · Past -->
+  <section class="bg-white text-ink py-24 sm:py-28 border-t border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Log 02 · Past events" title="Where we've been." />
+      <div class="rv-stagger mt-14 divide-y divide-navy/10 border-y border-navy/10">
+        {past.map((e) => <EventRow event={e} />)}
+      </div>
+    </div>
+  </section>
+
+  <CollaborateStrip title="Want to give a talk or co-organise an event with us?" />
+</BaseLayout>

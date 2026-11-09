@@ -1,0 +1,24 @@
+---
+// Vision quote + the 4 directions (home-v3 "Who we are" bottom half). Used on Home and About.
+import { vision } from '../../data/club';
+const numerals = ['I', 'II', 'III', 'IV'];
+interface Props { showQuote?: boolean; class?: string }
+const { showQuote = true, class: className = 'mt-20' } = Astro.props;
+---
+<div class={className}>
+  {showQuote && (
+    <>
+      <blockquote class="rv max-w-4xl mx-auto text-center font-serif italic text-navy text-3xl sm:text-4xl leading-snug">“{vision.quote}”</blockquote>
+      <p style="--d:120ms" class="rv mt-4 text-center eyebrow text-muted">Our vision</p>
+    </>
+  )}
+  <div class:list={['rv-stagger grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 pt-10 border-t border-navy/10', showQuote && 'mt-16']}>
+    {vision.directions.map((d, i) => (
+      <div>
+        <span class="font-mono text-xl font-semibold text-blue">{numerals[i]}</span>
+        <h3 class="mt-3 font-display text-xl font-bold">{d.title}</h3>
+        <p class="mt-2 text-[15px] text-body leading-relaxed">{d.text}</p>
+      </div>
+    ))}
+  </div>
+</div>

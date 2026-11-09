@@ -1,0 +1,59 @@
+# The 4 research poles. Leads are in crew.yaml (pole: <id>).
+# draft: true → description and topics are a reasonable first draft written for the site;
+#               TODO (pole leads): validate or rewrite, and add a reading list (5–10 papers each).
+
+- id: ai
+  number: 1
+  name: AI & Data Science
+  short: Machine learning, data and trustworthy AI.
+  description: We study how machines learn from data, and how to make them reliable, fair and safe.
+  draft: true
+  topics:
+    - title: "Machine learning"
+      text: "Models that learn from data, from classic methods to deep learning."
+    - title: "Trustworthy AI"
+      text: "Robustness, safety and explainability of AI systems."
+    - title: "Data science"
+      text: "Collecting, analysing and visualising data to answer real questions."
+
+- id: security
+  number: 2
+  name: Cybersecurity
+  short: Attacks, defences and secure systems.
+  description: We study how systems are attacked and how to defend them, from software to AI models.
+  draft: true
+  topics:
+    - title: "System & network security"
+      text: "Finding and fixing weaknesses in real systems."
+    - title: "Cryptography"
+      text: "The mathematics that keeps data and communication private."
+    - title: "Security of AI"
+      text: "Adversarial attacks, prompt injection and how to detect them."
+
+- id: software
+  number: 3
+  name: Software & Systems
+  short: How software is built, run and verified.
+  description: We study how reliable software and systems are designed, built, run and checked.
+  draft: true
+  topics:
+    - title: "Software engineering"
+      text: "Methods and tools to build software that lasts."
+    - title: "Distributed systems"
+      text: "Many machines working together, reliably."
+    - title: "Programming languages & verification"
+      text: "Making sure programs do what they should."
+
+- id: networks
+  number: 4
+  name: Networks & IoT
+  short: Connected devices and the networks between them.
+  description: We study how devices and networks communicate, from the internet's core to tiny sensors.
+  draft: true
+  topics:
+    - title: "Computer networks"
+      text: "Protocols, performance and the architecture of the internet."
+    - title: "Internet of Things"
+      text: "Sensors and embedded devices that talk to each other."
+    - title: "Edge & wireless"
+      text: "Computing close to the data, and the radio links that carry it."

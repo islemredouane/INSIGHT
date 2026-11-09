@@ -1,0 +1,23 @@
+# Frequently asked questions. pages: where each one shows (home, join).
+# TODO (Helm/HR): answer the two "[Answer from the board]" questions.
+
+- id: experience
+  question: Do I need research experience?
+  answer: No. We start from paper reading and guide you step by step to your first research project.
+  order: 1
+- id: free
+  question: Is membership free?
+  answer: Yes, free and open to all ESTIN students.
+  order: 2
+- id: years
+  question: Which year can join?
+  answer: "[Answer from the board]"
+  order: 3
+- id: pole
+  question: How do I pick a research pole?
+  answer: Explore the four poles during your first weeks, then join the one that excites you most.
+  order: 4
+- id: time
+  question: How much time does it take?
+  answer: "[Answer from the board]"
+  order: 5

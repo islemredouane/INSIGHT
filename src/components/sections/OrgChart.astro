@@ -1,0 +1,46 @@
+---
+// "How our ship is organised" (Welcome Day deck, slide 8): the Helm → 7 departments → 4 research poles.
+// Built from the design system's hairline boxes; department boxes link to the crew page.
+import { getCollection } from 'astro:content';
+const departments = (await getCollection('departments')).sort((a, b) => a.data.number - b.data.number);
+const poles = (await getCollection('poles')).sort((a, b) => a.data.number - b.data.number);
+const support = departments.filter((d) => !d.data.heart);
+const heart = departments.filter((d) => d.data.heart);
+---
+<div class="mt-14 flex flex-col items-center">
+  <!-- The Helm -->
+  <a href="/crew#helm" class="rv group w-full max-w-xl bg-ink p-7 text-center border border-ink hover:border-blue transition-colors">
+    <p class="eyebrow text-peri">The Helm</p>
+    <p class="mt-2 font-display text-2xl font-bold text-white">President · Vice-presidents</p>
+    <p class="mt-1 text-[15px] text-silver/70">Secretaries general · Treasurer</p>
+  </a>
+  <span class="w-px h-10 bg-navy/25" aria-hidden="true"></span>
+
+  <!-- 7 departments -->
+  <div class="rv w-full grid gap-px bg-navy/10 border border-navy/10 rounded-2xl overflow-hidden sm:grid-cols-2 lg:grid-cols-7 sm:max-lg:[&>a:nth-child(5)]:col-span-2">
+    {support.map((d) => (
+      <a href={`/crew#${d.id}`} class="group bg-white hover:bg-paper transition-colors p-5 text-center flex flex-col justify-center min-h-[104px]">
+        <span class="font-mono text-[12px] text-muted">{String(d.data.number).padStart(2, '0')}</span>
+        <span class="mt-2 font-display text-[16px] font-bold leading-tight text-ink group-hover:text-blue transition-colors">{d.data.name.replace(' & Partnerships', '')}</span>
+      </a>
+    ))}
+    {heart.map((d) => (
+      <a href={`/crew#${d.id}`} class="group bg-blue hover:bg-blue-hover transition-colors p-5 text-center flex flex-col justify-center min-h-[104px]">
+        <span class="font-mono text-[12px] text-white/70">{String(d.data.number).padStart(2, '0')}</span>
+        <span class="mt-2 font-display text-[16px] font-bold leading-tight text-white">{d.data.name}</span>
+      </a>
+    ))}
+  </div>
+  <p class="rv mt-4 w-full text-right eyebrow text-blue lg:pr-[7%]">The heart ↑</p>
+
+  <!-- 4 research poles, under Research Programs -->
+  <span class="w-px h-8 bg-blue/40" aria-hidden="true"></span>
+  <div class="rv w-full max-w-4xl grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {poles.map((p) => (
+      <a href={`/research/${p.id}`} class="group border border-dashed border-blue/40 hover:border-blue hover:bg-white transition-colors p-5 text-center">
+        <span class="font-mono text-[12px] text-blue">Pole {String(p.data.number).padStart(2, '0')}</span>
+        <span class="mt-1.5 block font-display text-[16px] font-bold text-ink">{p.data.name}</span>
+      </a>
+    ))}
+  </div>
+</div>

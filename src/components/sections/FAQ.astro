@@ -1,0 +1,30 @@
+---
+// FAQ accordion (home-v3) with Rasa-style smooth open/close (see scripts/motion.ts).
+import { getCollection } from 'astro:content';
+import SectionHeader from '../ui/SectionHeader.astro';
+import Icon from '../ui/Icon.astro';
+import { showPlaceholders } from '../../data/site';
+import { isFilled } from '../../lib/content';
+
+interface Props { page: 'home' | 'join'; eyebrow?: string; bg?: string }
+const { page, eyebrow = 'Log 08 · FAQ', bg = 'bg-white' } = Astro.props;
+const items = (await getCollection('faq', (f) => f.data.pages.includes(page) && (showPlaceholders || isFilled(f.data.answer)))).sort((a, b) => a.data.order - b.data.order);
+---
+<section class:list={[bg, 'text-ink py-24 sm:py-28']}>
+  <div class="max-w-[1240px] mx-auto px-6 md:px-12 grid lg:grid-cols-12 gap-12">
+    <div class="lg:col-span-4">
+      <SectionHeader eyebrow={eyebrow} title="Questions, answered." />
+    </div>
+    <div class="rv-stagger lg:col-span-8 divide-y divide-navy/15 border-y border-navy/15">
+      {items.map((f, i) => (
+        <details class="group py-6" data-smooth open={i === 0}>
+          <summary class="flex items-center justify-between gap-6 cursor-pointer list-none">
+            <span class="font-display text-xl font-bold group-hover:text-blue transition">{f.data.question}</span>
+            <Icon name="chevron-down" class="w-5 h-5 shrink-0 text-navy transition group-open:rotate-180" strokeWidth={2} />
+          </summary>
+          <p class="mt-4 text-[16px] text-body leading-relaxed">{f.data.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
