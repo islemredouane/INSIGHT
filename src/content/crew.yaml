@@ -52,9 +52,9 @@
 - { id: manadi-tasnime, name: Manadi Tasnime, role: Head, group: department, department: communication, photo: /crew/manadi-tasnime.jpg, photoPosition: "35% center", order: 10 }
 - { id: bouras-firas, name: Bouras Firas, role: Head, group: department, department: communication, photo: /crew/bouras-firas.jpg, photoPosition: top, order: 11 }
 - { id: rachedi-aya-meriem, name: Rachedi Aya Meriem, role: Head, group: department, department: communication, photo: /crew/rachedi-aya-meriem.png, order: 12 }
-- { id: djeddi-lila, name: Djeddi Lila, role: Head, group: department, department: design, order: 20 }
+- { id: djeddi-lila, name: Djeddi Lila, role: Head, group: department, department: design, photo: /crew/djeddi-lila.png, photoPosition: top, order: 20 }
 - { id: boursasa-lotfi-abdelmoumene, name: Boursasa Lotfi Abdelmoumene, role: Head, group: department, department: design, order: 21 }
-- { id: sadok-ikram, name: Sadok Ikram, role: Head, group: department, department: design, order: 22 }
+- { id: sadok-ikram, name: Sadok Ikram, role: Head, group: department, department: design, photo: /crew/sadok-ikram.jpg, photoPosition: "right center", order: 22 }
 - { id: richi-roufaida, name: Richi Roufaida, role: Head, group: department, department: events, order: 30 }
 - { id: belkaioua-nouha, name: Belkaioua Nouha, role: Head, group: department, department: events, photo: /crew/belkaioua-nouha.jpg, order: 31 }
 - { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, photo: /crew/diabi-lyna.jpg, photoPosition: top, order: 32 }
@@ -70,7 +70,7 @@
 - { id: ghedjati-maroua, name: Ghedjati Maroua, role: Pole lead, group: pole, pole: ai, order: 81 }
 - { id: kaouche-malek, name: Kaouche Malek, role: Pole lead, group: pole, pole: ai, photo: /crew/kaouche-malek.jpg, photoPosition: "center 30%", order: 82 }
 - { id: belaloui-taha-abderrahmane, name: Belaloui Taha Abderrahmane, role: Pole lead, group: pole, pole: security, photo: /crew/belaloui-taha-abderrahmane.jpg, photoPosition: top, order: 90 }
-- { id: laghrour-mohamed-dhia-eddine, name: Laghrour Mohamed Dhia Eddine, role: Pole lead, group: pole, pole: security, order: 91 }
+- { id: laghrour-mohamed-dhia-eddine, name: Laghrour Mohamed Dhia Eddine, role: Pole lead, group: pole, pole: security, photo: /crew/laghrour-mohamed-dhia-eddine.jpeg, photoPosition: top, order: 91 }
 - { id: koua-mohamed-anis, name: Koua Mohamed Anis, role: Pole lead, group: pole, pole: software, order: 100 }
-- { id: merzougui-abdellah-el-ghazali, name: Merzougui Abdellah El Ghazali, role: Pole lead, group: pole, pole: networks, order: 110 }
+- { id: merzougui-abdellah-el-ghazali, name: Merzougui Abdellah El Ghazali, role: Pole lead, group: pole, pole: networks, photo: /crew/merzougui-abdellah-el-ghazali.png, photoPosition: top, order: 110 }
 - { id: nacef-abdelmouheimene, name: Nacef Abdelmouheimene, role: Pole lead, group: pole, pole: networks, photo: /crew/nacef-abdelmouheimene.jpg, photoPosition: top, order: 111 }
