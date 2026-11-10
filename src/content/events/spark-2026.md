@@ -1,6 +1,6 @@
 ---
 title: "SPARK 2026: Research Foundations"
-date: 2026-11-25 # TODO (Training): real start date
+date: 2026-11-15
 type: training
 location: ESTIN, Amizour # TODO (Events): room
 summary: The start of every INSIGHT season. Five stages that take members from what research is to reading and writing papers, ending with a research competition.
