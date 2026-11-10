@@ -19,7 +19,8 @@ programme:
   - title: Game time
     text: The crew meets the new recruits.
 # attendance: TODO (Events) — real number only
-# cover / gallery: TODO (Communication & Media) — photos in public/events/welcome-day-2026/
+cover: /events/welcome-day-2026/cover.jpg
+# gallery: TODO (Communication & Media) — more photos in public/events/welcome-day-2026/
 ---
 
 On 4 November 2026, INSIGHT officially set sail at ESTIN. The crew presented the club: a student-led
