@@ -7,7 +7,7 @@ import Icon from '../ui/Icon.astro';
 import { stats } from '../../data/club';
 
 interface Props { eyebrow?: string; showLink?: boolean; title?: string; subtitle?: string }
-const { eyebrow = 'Log 07 · The helm', showLink = true, title = 'Meet the crew.', subtitle = 'Every great voyage needs more than a captain.' } = Astro.props;
+const { eyebrow = 'Log 07 · The helm', showLink = true, title = 'Meet the crew.', subtitle = 'Every great journey needs more than a captain.' } = Astro.props;
 const helm = (await getCollection('crew', (m) => m.data.group === 'helm')).sort((a, b) => a.data.order - b.data.order);
 const crewCount = stats.find((s) => s.label === 'Crew members')?.value;
 ---

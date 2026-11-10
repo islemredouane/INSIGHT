@@ -8,7 +8,7 @@ speakers: [pin-yu-chen]
 featured: true
 programme:
   - title: Welcome aboard
-    text: What INSIGHT is, our vision, what we do and the voyage ahead.
+    text: What INSIGHT is, our vision, what we do and the journey ahead.
   - title: Meet the crew
     text: The Helm and the seven departments.
   - title: Research & Training

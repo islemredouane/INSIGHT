@@ -26,8 +26,8 @@ export const activities = [
   { title: 'Guest talks', text: 'Meet researchers and ask them anything.', icon: 'mic' },
 ] as const;
 
-/** "Every research project is a voyage" */
-export const voyage = {
+/** "Every research project is a journey" */
+export const journey = {
   steps: [
     { title: 'Set sail', text: 'Start with a question' },
     { title: 'Read the records', text: 'Study what is known' },
@@ -52,10 +52,10 @@ export const trainingLevels = [
   { level: 'IV', rank: 'Captain', title: 'Technical workshops', text: 'Hands-on skills for your pole.' },
 ];
 
-/** "The shipyard and the voyage" */
+/** "The shipyard and the journey" */
 export const shipyard = {
   training: { label: 'Training', title: 'The shipyard', text: 'builds the skills' },
-  research: { label: 'Research', title: 'The voyage', text: 'puts them to work' },
+  research: { label: 'Research', title: 'The journey', text: 'puts them to work' },
   loop: ['Skills feed projects', 'Projects show what to learn next'],
   motto: 'Learn by doing. Do by learning.',
 };

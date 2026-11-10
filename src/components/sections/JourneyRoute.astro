@@ -1,9 +1,9 @@
 ---
-// "Every research project is a voyage" (home-v3): the route draws itself, stops pop in, the X lands last.
+// "Every research project is a journey" (home-v3): the route draws itself, stops pop in, the X lands last.
 import SectionHeader from '../ui/SectionHeader.astro';
-import { voyage } from '../../data/club';
+import { journey } from '../../data/club';
 interface Props { eyebrow?: string; cta?: { href: string; label: string } | null }
-const { eyebrow = 'Log 04 · How research works', cta = { href: '/join', label: 'Start your voyage →' } } = Astro.props;
+const { eyebrow = 'Log 04 · How research works', cta = { href: '/join', label: 'Start your journey →' } } = Astro.props;
 // Stop positions on the 1200×380 route (x%, y%), alternating up/down
 const pos = [[5, 34.2], [20, 68.4], [35, 34.2], [50, 68.4], [65, 34.2], [80, 68.4]];
 const path = 'M60 130 C150 130 150 260 240 260 S330 130 420 130 S510 260 600 260 S690 130 780 130 S870 260 960 260 S1060 170 1130 170';
@@ -11,7 +11,7 @@ const stop = 'flex w-11 h-11 rounded-full bg-white border-2 border-navy items-ce
 ---
 <section class="bg-paper text-ink py-24 sm:py-28 overflow-hidden">
   <div class="max-w-[1240px] mx-auto px-6 md:px-12">
-    <SectionHeader eyebrow={eyebrow} title="Every research project is a voyage." titleClass="max-w-2xl" />
+    <SectionHeader eyebrow={eyebrow} title="Every research project is a journey." titleClass="max-w-2xl" />
 
     <!-- Desktop: drawn route -->
     <div class="route hidden lg:block relative mt-16 h-[380px]">
@@ -21,7 +21,7 @@ const stop = 'flex w-11 h-11 rounded-full bg-white border-2 border-navy items-ce
         <path class="route-cover" d={path} stroke="#F5F6F8" stroke-width="14" pathLength="1" />
       </svg>
       <ol>
-        {voyage.steps.map((s, i) => (
+        {journey.steps.map((s, i) => (
           <li class="vstop absolute -translate-x-1/2 -translate-y-1/2" style={`--i:${i};left:${pos[i][0]}%;top:${pos[i][1]}%`}>
             <span class={stop}>{String(i + 1).padStart(2, '0')}</span>
             <div class:list={['absolute left-1/2 -translate-x-1/2 w-44 text-center', i % 2 === 0 ? 'bottom-full mb-4' : 'top-full mt-4']}>
@@ -33,8 +33,8 @@ const stop = 'flex w-11 h-11 rounded-full bg-white border-2 border-navy items-ce
         <li class="vstop absolute -translate-x-1/2 -translate-y-1/2" style="--i:6;left:94.2%;top:44.7%">
           <svg class="w-14 h-14" viewBox="0 0 56 56" aria-hidden="true"><path d="M12 12l32 32M44 12 12 44" stroke="#C2463A" stroke-width="7" stroke-linecap="round" /></svg>
           <div class="absolute bottom-full mb-3 right-0 w-56 text-right">
-            <p class="font-display text-2xl font-bold text-navy">{voyage.destination.title}</p>
-            <p class="text-[15px] text-body">{voyage.destination.text}</p>
+            <p class="font-display text-2xl font-bold text-navy">{journey.destination.title}</p>
+            <p class="text-[15px] text-body">{journey.destination.text}</p>
           </div>
         </li>
       </ol>
@@ -42,7 +42,7 @@ const stop = 'flex w-11 h-11 rounded-full bg-white border-2 border-navy items-ce
 
     <!-- Mobile / tablet: vertical route -->
     <ol class="rv-stagger lg:hidden mt-12 relative border-l-2 border-dashed border-navy/40 ml-5 space-y-8">
-      {voyage.steps.map((s, i) => (
+      {journey.steps.map((s, i) => (
         <li class="pl-8 relative">
           <span class:list={['absolute -left-[23px] top-0', stop]}>{String(i + 1).padStart(2, '0')}</span>
           <p class="font-display text-lg font-bold pt-2">{s.title}</p>
@@ -51,8 +51,8 @@ const stop = 'flex w-11 h-11 rounded-full bg-white border-2 border-navy items-ce
       ))}
       <li class="pl-8 relative">
         <svg class="absolute -left-[25px] top-0 w-12 h-12 bg-paper" viewBox="0 0 56 56" aria-hidden="true"><path d="M14 14l28 28M42 14 14 42" stroke="#C2463A" stroke-width="7" stroke-linecap="round" /></svg>
-        <p class="font-display text-2xl font-bold text-navy pt-2">{voyage.destination.title}</p>
-        <p class="text-[15px] text-body">{voyage.destination.text}</p>
+        <p class="font-display text-2xl font-bold text-navy pt-2">{journey.destination.title}</p>
+        <p class="text-[15px] text-body">{journey.destination.text}</p>
       </li>
     </ol>
 

@@ -27,7 +27,7 @@ html.js [data-split]:not(.split-done) { visibility: hidden; }
   /* Already scrolled past: appear at once, no animation off-screen */
   html.js .rv-instant, html.js .rv-instant > *, html.js .rv-instant > * > *, html.js .rv-instant .w > span, html.js .rv-instant .route-cover, html.js .rv-instant .vstop, html.js .rv-instant .vstop > * { transition: none !important; }
 
-  /* Voyage route draws itself, stops pop in, the X lands last */
+  /* Journey route draws itself, stops pop in, the X lands last */
   html.js .route .route-cover { stroke-dashoffset: 0; transition: stroke-dashoffset 2s cubic-bezier(.45,0,.25,1); }
   html.js .route.in .route-cover { stroke-dashoffset: -1; }
   html.js .route .vstop { opacity: 0; transition: opacity .5s ease; transition-delay: calc(var(--i) * 280ms + 150ms); }
