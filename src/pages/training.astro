@@ -22,7 +22,7 @@ const sessions = (await getEventsSorted())
   <PageHeader
     eyebrow="Training"
     title="Every captain started as a rookie."
-    lead="Before a long journey, a crew trains. The Training department runs our workshops and learning paths, paper reading and scientific discussions, and sessions on research methodology and academic writing."
+    lead="Before a long voyage, a crew trains. The Training department runs our workshops and learning paths, paper reading and scientific discussions, and sessions on research methodology and academic writing."
     chip={head && { label: 'Head of Training', value: head.data.name }}
   />
 
@@ -62,12 +62,12 @@ const sessions = (await getEventsSorted())
     </div>
   </section>
 
-  <!-- LOG 03 · The shipyard and the journey -->
+  <!-- LOG 03 · The shipyard and the voyage -->
   <section class="relative bg-ink py-24 sm:py-28 overflow-hidden">
     <div class="absolute inset-0 dots opacity-20 pointer-events-none"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[420px] rounded-full bg-blue/15 blur-[130px] pointer-events-none"></div>
     <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
-      <SectionHeader eyebrow="Log 03 · How it fits" title="The shipyard and the journey." tone="dark" />
+      <SectionHeader eyebrow="Log 03 · How it fits" title="The shipyard and the voyage." tone="dark" />
       <div class="rv mt-14 grid md:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
         {[shipyard.training, null, shipyard.research].map((side) => side ? (
           <div class="rounded-2xl border border-silver/10 bg-ink-2 p-8 lg:p-10">
