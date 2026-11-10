@@ -10,7 +10,7 @@ const m = member.data;
 <li class="member group">
   <div class="portrait">
     {m.photo
-      ? <img class="portrait-img" src={m.photo} alt={m.name} loading="lazy" />
+      ? <img class="portrait-img" src={m.photo} alt={m.name} loading="lazy" style={m.photoPosition ? `object-position:${m.photoPosition}` : undefined} />
       : <><span class="portrait-initials">{initials(m.name)}</span>{showPlaceholders && <span class="portrait-tag">[Photo]</span>}</>}
     <span class="wanted" aria-hidden="true">Wanted</span>
   </div>
