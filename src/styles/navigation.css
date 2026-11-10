@@ -8,7 +8,9 @@
 .nav-link.active::after { transform: scaleX(1); }
 
 /* ---------- Second row (xl): research poles + next event ---------- */
-#nav-sub { height: 44px; border-top: 1px solid rgba(221,227,236,.08); }
+#nav-sub { overflow: hidden; max-height: 44px; transition: max-height .35s ease; }
+#nav-sub > div { border-top: 1px solid rgba(221,227,236,.08); }
+#nav.sub-hidden #nav-sub { max-height: 0; }
 .sub-link { position: relative; display: flex; flex: none; white-space: nowrap; align-items: center; gap: .5rem; height: 100%; font-size: 13.5px; font-weight: 500; color: rgba(221,227,236,.62); transition: color .2s; }
 .sub-link:hover, .sub-link.active { color: #fff; }
 .sub-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #7F97C7; transition: color .2s; }
@@ -65,6 +67,7 @@ html.menu-open .mm-item { opacity: 1; transform: none; transition: opacity .55s 
   #menu, html.menu-open #menu { transition: none; }
   .mm-item, html.menu-open .mm-item { transition: none; transform: none; }
   .mb-line, .mm-label, .mm-arrow { transition: none; }
+  #nav-sub { transition: none; }
 }
 
 /* Small phones (360–399px): slimmer Join button so logo, Join and menu fit on one line */
