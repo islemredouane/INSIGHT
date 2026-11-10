@@ -9,7 +9,6 @@
 
 /* ---------- Second row (xl): research poles + next event ---------- */
 #nav-sub { overflow: hidden; max-height: 44px; background: rgba(0,0,0,.22); transition: max-height .35s ease; }
-#nav-sub > div { border-top: 1px solid rgba(221,227,236,.18); }
 #nav.sub-hidden #nav-sub { max-height: 0; }
 .sub-link { position: relative; display: flex; flex: none; white-space: nowrap; align-items: center; gap: .5rem; height: 100%; font-size: 13.5px; font-weight: 500; color: rgba(221,227,236,.62); transition: color .2s; }
 .sub-link:hover, .sub-link.active { color: #fff; }
