@@ -16,7 +16,7 @@
   group: helm
   duty: Runs meetings and strategy.
   photo: /crew/madaoui-sara.png
-  photoPosition: top
+  photoPosition: "center 70%"
   order: 2
 - id: redouane-mohamed-islem
   name: Redouane Mohamed Islem
@@ -38,6 +38,8 @@
   role: Secretary general
   group: helm
   duty: Keeps the club's records and documents.
+  photo: /crew/madoui-roufaida.jpg
+  photoPosition: top
   order: 5
 - id: ghasmoune-mohammed
   name: Ghasmoune Mohammed
@@ -48,7 +50,7 @@
 
 # ---------- Department heads ----------
 - { id: manadi-tasnime, name: Manadi Tasnime, role: Head, group: department, department: communication, photo: /crew/manadi-tasnime.jpg, photoPosition: "35% center", order: 10 }
-- { id: bouras-firas, name: Bouras Firas, role: Head, group: department, department: communication, order: 11 }
+- { id: bouras-firas, name: Bouras Firas, role: Head, group: department, department: communication, photo: /crew/bouras-firas.jpg, photoPosition: top, order: 11 }
 - { id: rachedi-aya-meriem, name: Rachedi Aya Meriem, role: Head, group: department, department: communication, photo: /crew/rachedi-aya-meriem.png, order: 12 }
 - { id: boursasa-lotfi-abdelmoumene, name: Boursasa Lotfi Abdelmoumene, role: Head, group: department, department: design, order: 20 }
 - { id: boubrioua-riham, name: Boubrioua Riham, role: Head, group: department, department: design, order: 21 }
@@ -56,7 +58,7 @@
 - { id: belkaioua-nouha, name: Belkaioua Nouha, role: Head, group: department, department: events, photo: /crew/belkaioua-nouha.jpg, order: 31 }
 - { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, photo: /crew/diabi-lyna.jpg, photoPosition: top, order: 32 }
 - { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, photo: /crew/bey-ahmed-khernache-mounir.png, photoPosition: top, order: 40 }
-- { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, order: 41 }
+- { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, photo: /crew/abadelia-mohammed-abdelghani.jpg, photoPosition: top, order: 41 }
 - { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, photo: /crew/belkerrouche-asma.jpg, photoPosition: top, order: 50 }
 - { id: hachemi-zakaria, name: Hachemi Zakaria, role: Head, group: department, department: hr, photo: /crew/hachemi-zakaria.jpg, photoPosition: "right top", order: 51 }
 - { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, order: 60 }
