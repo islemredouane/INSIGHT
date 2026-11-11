@@ -60,6 +60,7 @@
 - { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, photo: /crew/diabi-lyna.jpg, photoPosition: top, order: 32 }
 - { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, photo: /crew/bey-ahmed-khernache-mounir.png, photoPosition: top, order: 40 }
 - { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, photo: /crew/abadelia-mohammed-abdelghani.jpg, photoPosition: top, order: 41 }
+- { id: dou-abderraouf, name: Dou Abderraouf, role: Head, group: department, department: external-relations, order: 42 }
 - { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, photo: /crew/belkerrouche-asma.jpg, photoPosition: top, order: 50 }
 - { id: hachemi-zakaria, name: Hachemi Zakaria, role: Head, group: department, department: hr, photo: /crew/hachemi-zakaria.jpg, photoPosition: "right top", order: 51 }
 - { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, order: 60 }
