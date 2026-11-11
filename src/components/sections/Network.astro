@@ -25,7 +25,7 @@ const gridCols = cells >= 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : cells === 3 ? 's
   <div class="relative max-w-[1240px] mx-auto px-6 md:px-12">
     {showHeader && <SectionHeader eyebrow={eyebrow} title="A network of researchers." subtitle="Researchers from around the world who work with our crew." tone="dark" class="mb-14" />}
 
-    {partners.map((p) => <PartnerBand partner={p} />)}
+    {partners.map((p, i) => <PartnerBand partner={p} roundTop={i === 0} roundBottom={i === partners.length - 1} />)}
 
     <div class:list={[partners.length > 0 && 'mt-16', 'flex flex-col sm:flex-row sm:items-end justify-between gap-4 rv']}>
       <h3 class="font-display text-2xl font-bold text-white tracking-tight">Researchers</h3>
