@@ -46,6 +46,8 @@
   role: Treasurer
   group: helm
   duty: Manages the budget and funding.
+  photo: /crew/ghasmoune-mohammed.jpg
+  photoPosition: top
   order: 6
 
 # ---------- Department heads ----------
