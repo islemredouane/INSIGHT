@@ -14,4 +14,4 @@
   country: Algeria
   summary: ESTIN's student journal on technology, ideas and the people who build them. INSIGHT members publish their research papers in its pages.
   url: https://empreinte.estin.dz/
-  # logo: TODO (External Relations) — drop the logo file in public/labs/ and set this, e.g. /labs/empreinte.png
+  logo: /labs/empreinte.png
