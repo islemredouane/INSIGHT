@@ -65,7 +65,7 @@
 - { id: dou-abderraouf, name: Dou Abderraouf, role: Head, group: department, department: external-relations, order: 42 }
 - { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, photo: /crew/belkerrouche-asma.jpg, photoPosition: top, order: 50 }
 - { id: hachemi-zakaria, name: Hachemi Zakaria, role: Head, group: department, department: hr, photo: /crew/hachemi-zakaria.jpg, photoPosition: "right top", order: 51 }
-- { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, order: 60 }
+- { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, photo: /crew/allaoua-ait-abdelghani.jpg, order: 60 }
 - { id: sakhri-mohammed-firas, name: Sakhri Mohammed Firas, role: Head of Training, group: department, department: training, photo: /crew/sakhri-mohammed-firas.png, photoPosition: top, order: 70 }
 
 # ---------- Research pole leads ----------
@@ -74,6 +74,6 @@
 - { id: kaouche-malek, name: Kaouche Malek, role: Pole lead, group: pole, pole: ai, photo: /crew/kaouche-malek.jpg, photoPosition: "center 30%", order: 82 }
 - { id: belaloui-taha-abderrahmane, name: Belaloui Taha Abderrahmane, role: Pole lead, group: pole, pole: security, photo: /crew/belaloui-taha-abderrahmane.jpg, photoPosition: top, order: 90 }
 - { id: laghrour-mohamed-dhia-eddine, name: Laghrour Mohamed Dhia Eddine, role: Pole lead, group: pole, pole: security, photo: /crew/laghrour-mohamed-dhia-eddine.jpeg, photoPosition: top, order: 91 }
-- { id: koua-mohamed-anis, name: Koua Mohamed Anis, role: Pole lead, group: pole, pole: software, order: 100 }
+- { id: koua-mohamed-anis, name: Koua Mohamed Anis, role: Pole lead, group: pole, pole: software, photo: /crew/koua-mohamed-anis.jpg, order: 100 }
 - { id: merzougui-abdellah-el-ghazali, name: Merzougui Abdellah El Ghazali, role: Pole lead, group: pole, pole: networks, photo: /crew/merzougui-abdellah-el-ghazali.png, photoPosition: top, order: 110 }
 - { id: nacef-abdelmouheimene, name: Nacef Abdelmouheimene, role: Pole lead, group: pole, pole: networks, photo: /crew/nacef-abdelmouheimene.jpg, photoPosition: top, order: 111 }
