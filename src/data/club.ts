@@ -62,7 +62,7 @@ export const shipyard = {
 
 /** Key numbers. Only real figures (update when they change). */
 export const stats = [
-  { value: 28, label: 'Crew members' },
+  { value: 30, label: 'Crew members' },
   { value: 7, label: 'Departments' },
   { value: 4, label: 'Research poles' },
   { value: 1, label: 'Guest from IBM Research' },
