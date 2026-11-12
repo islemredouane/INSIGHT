@@ -11,6 +11,7 @@ export const site = {
     'INSIGHT is the student-led research club of ESTIN, Béjaïa. Read, question and contribute to science.',
   email: 'insight@estin.dz',
   instagram: { handle: '@insight.estin', url: 'https://www.instagram.com/insight.estin/' },
+  linkedin: { url: 'https://www.linkedin.com/company/insight0' },
   school: {
     name: 'ESTIN',
     fullName: "École Supérieure en Sciences et Technologies de l'Informatique et du Numérique",

@@ -40,10 +40,16 @@ const year = new Date().getFullYear();
           </span>
         </a>
         <p class="mt-5 max-w-xs text-[15px] text-silver/70 leading-relaxed">The student-led research club of ESTIN. We read, question and contribute to science.</p>
-        <a href={site.instagram.url} target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-2.5 h-10 px-3.5 border border-white/15 text-[14px] text-silver/80 hover:text-white hover:border-white/40 transition-colors" aria-label={`Instagram ${site.instagram.handle} (opens in a new tab)`}>
-          <Icon name="instagram" />
-          {site.instagram.handle}
-        </a>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href={site.instagram.url} target="_blank" rel="noopener" class="inline-flex items-center gap-2.5 h-10 px-3.5 border border-white/15 text-[14px] text-silver/80 hover:text-white hover:border-white/40 transition-colors" aria-label={`Instagram ${site.instagram.handle} (opens in a new tab)`}>
+            <Icon name="instagram" />
+            {site.instagram.handle}
+          </a>
+          <a href={site.linkedin.url} target="_blank" rel="noopener" class="inline-flex items-center gap-2.5 h-10 px-3.5 border border-white/15 text-[14px] text-silver/80 hover:text-white hover:border-white/40 transition-colors" aria-label="LinkedIn (opens in a new tab)">
+            <Icon name="linkedin" />
+            LinkedIn
+          </a>
+        </div>
       </div>
 
       <nav class="col-span-2 md:col-span-8 lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-8" aria-label="Footer">
