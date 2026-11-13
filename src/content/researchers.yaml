@@ -1,6 +1,6 @@
 # Researchers in the INSIGHT network.
 # Only list someone after they agree to it. placeholder: true → shown as "[…]" until real details arrive.
-# TODO (External Relations): replace the 6 placeholders (name, title, institution, country, fields, bio, links, photo).
+# TODO (External Relations): confirm each person's title, institution and bio with them, and add the profile links and photos still missing.
 
 - id: pin-yu-chen
   name: Dr. Pin-Yu Chen
@@ -36,9 +36,98 @@
     - AI agents read untrusted content. Prompt injection is a real threat.
     - Looking inside models gives defenders new tools.
 
-- { id: researcher-2, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 2 }
-- { id: researcher-3, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 3 }
-- { id: researcher-4, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 4 }
-- { id: researcher-5, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 5 }
-- { id: researcher-6, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 6 }
-- { id: researcher-7, name: "[Researcher name]", initials: "—", title: "[Title]", institution: "[Institution]", country: "[Country]", fields: ["[Field]", "[Field]"], placeholder: true, order: 7 }
+- id: hani-ragab-hassen
+  name: Prof. Hani Ragab Hassen
+  initials: HRH
+  title: Professor, Information Security
+  institution: Heriot-Watt University
+  country: UK
+  fields: [Information security, Malware detection, Machine learning]
+  bio: Professor at Heriot-Watt University who also works with ESTIN in Algeria. He coordinates research in information security, with a focus on AI. Before Heriot-Watt, he taught information and network security at the University of Kent and Robert Gordon University.
+  highlights:
+    - Professor in the School of Mathematical and Computer Sciences, Heriot-Watt University (promoted 2024)
+    - Research in malware detection, machine learning and access control
+    - Previously lecturer at the University of Kent
+  photo: /researchers/hani-ragab-hassen.jpg
+  links:
+    profile: https://www.hw.ac.uk/news/2024/promotion-celebrations-professors-hani-ragab-hassen-and-rabee-rustum
+  order: 2
+
+- id: islam-obaidat
+  name: Dr. Islam Obaidat
+  initials: IO
+  title: Assistant Professor, Computer Systems Technology
+  institution: North Carolina A&T State University
+  country: USA
+  fields: [IoT security, Intrusion detection, LLMs for cybersecurity]
+  bio: Assistant Professor of Computer Systems Technology at North Carolina A&T State University, in Greensboro. He works on the security of the Internet of Things, from botnets and firmware vulnerabilities to using large language models to detect network attacks.
+  highlights:
+    - Lightweight fine-tuning of LLMs for explainable intrusion detection in SDN (WiMob 2025)
+    - Few-shot retrieval-augmented LLMs for anomaly detection in network traffic (2026)
+  photo: /researchers/islam-obaidat.jpg
+  links:
+    profile: https://iobaidat.github.io/
+  order: 3
+
+- id: muhammad-khan
+  name: Prof. Muhammad Khan
+  initials: MK
+  title: Assistant Professor, Built Environment
+  institution: North Carolina A&T State University
+  country: USA
+  fields: [Construction safety, AI and computer vision, Robotics]
+  bio: Assistant Professor in the Department of Built Environment at North Carolina A&T State University. His research uses AI, sensors and computer vision to make construction sites safer, and covers construction robots, exoskeletons and workforce development.
+  highlights:
+    - Runs the Khan Construction Innovation Lab
+    - Research on workers' safety with sensors and computer vision
+  photo: /researchers/muhammad-khan.jpg
+  links:
+    profile: https://sites.google.com/tamu.edu/mkhan/home
+  order: 4
+
+- id: mohamed-camil-belhadjoudja
+  name: Dr. Mohamed Camil Belhadjoudja
+  initials: MCB
+  title: Researcher in Automatic Control
+  institution: Grenoble INP, GIPSA-lab
+  country: France
+  fields: [Control theory, PDE control, Intermittent control]
+  bio: Researcher in automatic control. He completed his PhD at GIPSA-lab (Grenoble INP, Université Grenoble Alpes) in 2025, on spatially and temporally intermittent control of partial differential equations.
+  highlights:
+    - PhD thesis, Grenoble INP, 2022 to 2025
+    - Published in IEEE Transactions on Automatic Control (2025)
+    - Global L1 exponential observer for the quasilinear diffusion equation (with Kirsten Morris, 2026)
+  photo: /researchers/mohamed-camil-belhadjoudja.jpg
+  links:
+    scholar: https://scholar.google.com/citations?user=zYW35hcAAAAJ
+  order: 5
+
+- id: nassim-bouarour
+  name: Nassim Bouarour
+  initials: NB
+  title: AI Research Scientist
+  institution: Lexsi Labs
+  country: France
+  fields: [Foundation models, Reinforcement learning, Data exploration]
+  bio: AI Research Scientist at Lexsi Labs, working on foundation models. He studied at Université Grenoble Alpes, where his research applied reinforcement learning to data exploration, and he is a graduate of ESI in Algiers.
+  highlights:
+    - Research on data exploration with reinforcement learning (DQN, SARSA, A2C/A3C), with Sihem Amer-Yahia
+    - Algerian graduate of ESI, now doing research in France
+  links:
+    profile: https://openreview.net/profile?id=~Nassim_Bouarour1
+  order: 6
+
+- id: ford-prior
+  name: Ford Prior
+  initials: FP
+  title: Senior Staff Engineer and Tech Evangelist, GEICO
+  institution: James Madison University
+  country: USA
+  fields: [Cloud computing, Artificial intelligence]
+  bio: Senior Staff Engineer and Tech Evangelist at GEICO in Richmond, Virginia, and a James Madison University alumnus. He speaks at industry conferences about cloud computing and AI.
+  highlights:
+    - Conference speaker on cloud computing and AI
+    - Talk "An AI War Room for Legacy Code"
+  links:
+    profile: https://www.linkedin.com/in/ford-prior
+  order: 7
