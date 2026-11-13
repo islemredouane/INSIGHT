@@ -69,7 +69,6 @@
 - { id: sakhri-mohammed-firas, name: Sakhri Mohammed Firas, role: Head of Training, group: department, department: training, photo: /crew/sakhri-mohammed-firas.png, photoPosition: top, order: 70 }
 
 # ---------- Research pole leads ----------
-- { id: ouattara-majide-rafiou, name: Ouattara Majide Rafiou, role: Pole lead, group: pole, pole: ai, order: 80 }
 - { id: ghedjati-maroua, name: Ghedjati Maroua, role: Pole lead, group: pole, pole: ai, order: 81 }
 - { id: kaouche-malek, name: Kaouche Malek, role: Pole lead, group: pole, pole: ai, photo: /crew/kaouche-malek.jpg, photoPosition: "center 30%", order: 82 }
 - { id: belaloui-taha-abderrahmane, name: Belaloui Taha Abderrahmane, role: Pole lead, group: pole, pole: security, photo: /crew/belaloui-taha-abderrahmane.jpg, photoPosition: top, order: 90 }
