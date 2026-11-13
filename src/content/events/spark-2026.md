@@ -5,6 +5,8 @@ type: training
 location: ESTIN, Amizour # TODO (Events): room
 summary: The start of every INSIGHT season. Five stages that take members from what research is to reading and writing papers, ending with a research competition.
 featured: true
+cover: /events/spark-2026/cover.webp
+coverFit: contain
 programme:
   - title: Introduction to scientific research
     text: What research is for, its basic concepts, how it works, and some common misconceptions.

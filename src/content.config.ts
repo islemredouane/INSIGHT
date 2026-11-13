@@ -100,6 +100,7 @@ const events = defineCollection({
     programme: z.array(z.object({ time: z.string().optional(), title: z.string(), text: z.string().optional() })).default([]),
     attendance: z.number().optional(),
     cover: z.string().optional(),
+    coverFit: z.enum(['cover', 'contain']).default('cover'), // contain = show a portrait poster whole, on a blurred copy of itself
     gallery: z.array(z.string()).default([]),
     registrationUrl: z.string().optional(),
     featured: z.boolean().default(false),
