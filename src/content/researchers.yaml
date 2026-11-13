@@ -89,14 +89,13 @@
 - id: mohamed-camil-belhadjoudja
   name: Dr. Mohamed Camil Belhadjoudja
   initials: MCB
-  title: Researcher in Automatic Control
-  institution: Grenoble INP, GIPSA-lab
-  country: France
+  title: Postdoctoral Fellow, Control Theory
+  institution: University of Waterloo
+  country: Canada
   fields: [Control theory, PDE control, Intermittent control]
-  bio: Researcher in automatic control. He completed his PhD at GIPSA-lab (Grenoble INP, Université Grenoble Alpes) in 2025, on spatially and temporally intermittent control of partial differential equations, and has been a postdoctoral fellow at the University of Waterloo, Canada, since 2026.
+  bio: Postdoctoral fellow in control theory at the University of Waterloo, Canada, since 2026. He completed his PhD at GIPSA-lab (Grenoble INP, Université Grenoble Alpes) in 2025, on spatially and temporally intermittent control of partial differential equations.
   highlights:
-    - PhD thesis, Grenoble INP, 2022 to 2025
-    - Postdoctoral fellow, University of Waterloo (since 2026)
+    - PhD thesis at GIPSA-lab, Grenoble INP, 2022 to 2025
     - Published in IEEE Transactions on Automatic Control (2025)
     - Global L1 exponential observer for the quasilinear diffusion equation (with Kirsten Morris, 2026)
   photo: /researchers/mohamed-camil-belhadjoudja.jpg
