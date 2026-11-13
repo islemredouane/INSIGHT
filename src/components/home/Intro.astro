@@ -1,0 +1,116 @@
+---
+// Home intro: the logo appears on a dark screen, its beam crosses the page, the screen opens along
+// the beam and the logo flies to its place in the hero. Plays only on a direct arrival (not when
+// coming from another page of the site), never with reduced motion, and any input skips it.
+---
+<div id="intro" aria-hidden="true">
+  <div class="intro-panel intro-top"></div>
+  <div class="intro-panel intro-bottom"></div>
+  <span class="intro-ray intro-ray-l"></span>
+  <span class="intro-ray intro-ray-r"></span>
+  <img id="intro-logo" class="logo-glow" src="/brand/insight-logo.webp" alt="" width="340" height="201" />
+</div>
+
+<script is:inline>
+  // Inline and right after the overlay, so the decision is made before the page is painted.
+  (function () {
+    var d = document.documentElement, el = document.getElementById('intro');
+    var done = function () {
+      d.classList.remove('intro', 'intro-hold', 'intro-on', 'intro-beam', 'intro-open', 'intro-fade');
+      if (el) el.remove();
+    };
+    try {
+      var nav = performance.getEntriesByType('navigation')[0];
+      var internal = document.referrer && new URL(document.referrer).origin === location.origin;
+      if (internal || (nav && nav.type === 'back_forward') || location.hash || matchMedia('(prefers-reduced-motion: reduce)').matches) return done();
+
+      var logo = document.getElementById('intro-logo'), timers = [], opened = false;
+      var at = function (ms, fn) { timers.push(setTimeout(fn, ms)); };
+      var skipEvents = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
+      var open = function () {
+        if (opened) return;
+        opened = true;
+        timers.forEach(clearTimeout);
+        skipEvents.forEach(function (e) { removeEventListener(e, open); });
+        // The logo flies to the hero logo when that one is fully on screen; otherwise it fades out.
+        var hero = document.getElementById('hero-logo'), fly = false;
+        if (hero && d.classList.contains('intro-on') && scrollY < 4) {
+          var a = logo.getBoundingClientRect(), b = hero.getBoundingClientRect();
+          if (b.width && b.top >= 0 && b.bottom <= innerHeight) {
+            fly = true;
+            hero.style.animation = 'none';
+            hero.style.opacity = '0';
+            logo.style.transform = 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(' + b.width / logo.offsetWidth + ')';
+          }
+        }
+        if (!fly) d.classList.add('intro-fade');
+        d.classList.remove('intro-hold');
+        d.classList.add('intro-open');
+        setTimeout(function () { if (fly) hero.style.opacity = '1'; done(); }, 950);
+      };
+
+      d.classList.add('intro', 'intro-hold');
+      setTimeout(done, 7000); // safety net: the page is never left covered
+      skipEvents.forEach(function (e) { addEventListener(e, open, { passive: true }); });
+
+      var started = false;
+      var start = function () {
+        if (started) return;
+        started = true;
+        d.classList.add('intro-on');
+        at(550, function () { d.classList.add('intro-beam'); });
+        at(1200, function () {
+          // Wait for the fonts (they move the hero logo), but never longer than 1.2 s more
+          if (document.fonts && document.fonts.status !== 'loaded') {
+            at(1200, open);
+            document.fonts.ready.then(open);
+          } else open();
+        });
+      };
+      if (logo.complete) start(); else { logo.addEventListener('load', start); logo.addEventListener('error', start); setTimeout(start, 700); }
+    } catch (e) { done(); }
+  })();
+</script>
+
+<style is:global>
+  #intro { display: none; }
+  html.intro { overflow: hidden; }
+  html.intro #intro { display: block; position: fixed; inset: 0; z-index: 200; --lw: 230px; }
+  @media (min-width: 640px) { html.intro #intro { --lw: 300px; } }
+  @media (min-width: 1024px) { html.intro #intro { --lw: 340px; } }
+  html.intro-open #intro { pointer-events: none; }
+
+  /* Two halves that part along the beam */
+  .intro-panel { position: absolute; left: 0; right: 0; background: #080E1D; transition: transform .9s cubic-bezier(.76,0,.24,1); will-change: transform; }
+  .intro-top { top: 0; height: calc(50% + 1px); }
+  .intro-bottom { top: 50%; bottom: 0; }
+  .intro-panel::after { content: ""; position: absolute; left: 0; right: 0; height: 1px; opacity: 0; transition: opacity .25s ease;
+    background: linear-gradient(90deg, rgba(174,198,255,0), rgba(174,198,255,.9) 25%, #fff 50%, rgba(174,198,255,.9) 75%, rgba(174,198,255,0));
+    box-shadow: 0 0 28px 3px rgba(174,198,255,.45); }
+  .intro-top::after { bottom: 0; }
+  .intro-bottom::after { top: 0; }
+  html.intro-open .intro-top { transform: translateY(-100%); }
+  html.intro-open .intro-bottom { transform: translateY(100%); }
+  html.intro-open .intro-panel::after { opacity: 1; }
+
+  /* The beam: leaves the logo's rays to the right, and its left tip to the left */
+  .intro-ray { position: absolute; top: 50%; height: 2px; margin-top: -1px; transform: scaleX(0); transition: transform .6s cubic-bezier(.7,0,.2,1), opacity .3s ease; }
+  .intro-ray-r { left: calc(50% + var(--lw) * .3); right: 0; transform-origin: left;
+    background: linear-gradient(90deg, #fff, rgba(174,198,255,.9) 35%, rgba(127,151,199,.3));
+    box-shadow: 0 0 18px 1px rgba(174,198,255,.5); }
+  .intro-ray-l { left: 0; right: calc(50% + var(--lw) * .31); transform-origin: right; transition-delay: .1s, 0s;
+    background: linear-gradient(270deg, rgba(174,198,255,.75), rgba(127,151,199,.15)); }
+  html.intro-beam .intro-ray { transform: scaleX(1); }
+  html.intro-open .intro-ray { opacity: 0; }
+
+  /* The logo: same size as the hero logo, shown smaller, so it lands sharp. Its rays sit on the centre line. */
+  #intro-logo { position: absolute; left: 50%; top: 50%; width: var(--lw); height: auto; translate: -50% -53%;
+    transform: scale(.56); opacity: 0; transition: opacity .7s ease, transform .6s cubic-bezier(.2,.7,.2,1); will-change: transform, opacity; }
+  html.intro-on #intro-logo { opacity: 1; transform: scale(.62); }
+  html.intro-open #intro-logo { transition: opacity .45s ease, transform .9s cubic-bezier(.76,0,.24,1); }
+  html.intro-fade #intro-logo { opacity: 0; transform: scale(.7); }
+
+  /* The hero waits behind the intro and starts when it opens */
+  html.js.intro-hold .hero-in, html.js.intro-hold #hero-logo, html.js.intro-hold #beam { animation-play-state: paused; }
+  html.js.intro-hold [data-split="hero"].in .w > span { transform: translateY(105%); }
+</style>

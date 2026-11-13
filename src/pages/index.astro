@@ -2,6 +2,7 @@
 // Home — 1:1 port of design/prototypes/home-v3.html, fed by src/data and src/content.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
+import Intro from '../components/home/Intro.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import Directions from '../components/sections/Directions.astro';
 import StatBand from '../components/sections/StatBand.astro';
@@ -16,6 +17,7 @@ import FAQ from '../components/sections/FAQ.astro';
 import FinalCTA from '../components/sections/FinalCTA.astro';
 ---
 <BaseLayout>
+  <Intro slot="body-start" />
   <Hero />
 
   <!-- LOG 01 · Who we are (merged with vision) -->
