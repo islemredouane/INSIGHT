@@ -1,5 +1,4 @@
 # Frequently asked questions. pages: where each one shows (home, join).
-# TODO (Helm/HR): answer the last "[Answer from the board]" question (how much time it takes).
 
 - id: experience
   question: Do I need research experience?
@@ -19,5 +18,5 @@
   order: 4
 - id: time
   question: How much time does it take?
-  answer: "[Answer from the board]"
+  answer: A few hours a week, enough to fit alongside your classes.
   order: 5
