@@ -1,5 +1,5 @@
 # Frequently asked questions. pages: where each one shows (home, join).
-# TODO (Helm/HR): answer the two "[Answer from the board]" questions.
+# TODO (Helm/HR): answer the last "[Answer from the board]" question (how much time it takes).
 
 - id: experience
   question: Do I need research experience?
@@ -11,7 +11,7 @@
   order: 2
 - id: years
   question: Which year can join?
-  answer: "[Answer from the board]"
+  answer: All years can join. Whatever your year at ESTIN, you are welcome.
   order: 3
 - id: pole
   question: How do I pick a research pole?
