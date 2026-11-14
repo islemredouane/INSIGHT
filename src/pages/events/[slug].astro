@@ -4,6 +4,7 @@ import { getCollection, getEntries, render, type CollectionEntry } from 'astro:c
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/ui/SectionHeader.astro';
 import EmptyState from '../../components/ui/EmptyState.astro';
+import EventGallery from '../../components/ui/EventGallery.astro';
 import ResearcherCard from '../../components/cards/ResearcherCard.astro';
 import FinalCTA from '../../components/sections/FinalCTA.astro';
 import { longDate, eventTypeLabel, todayUTC } from '../../lib/format';
@@ -132,18 +133,7 @@ const meta = [
   )}
 
   <!-- Photos -->
-  <section class="bg-white text-ink py-24 border-t border-navy/10">
-    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
-      <SectionHeader eyebrow="Photos" title="Gallery." class="mb-12" />
-      {e.gallery.length > 0 ? (
-        <ul class="rv-stagger grid grid-cols-2 md:grid-cols-3 gap-3" role="list">
-          {e.gallery.map((src) => <li class="aspect-[4/3] overflow-hidden rounded-2xl bg-paper"><img src={src} alt="" class="w-full h-full object-cover" loading="lazy" /></li>)}
-        </ul>
-      ) : (
-        <EmptyState label="Coming soon" title="Photos are on their way." text="The Communication & Media department is preparing the photos of this event." />
-      )}
-    </div>
-  </section>
+  <EventGallery images={e.gallery} eventTitle={e.title} />
 
   <FinalCTA secondary={{ href: '/events', label: 'All events →' }} />
 </BaseLayout>
