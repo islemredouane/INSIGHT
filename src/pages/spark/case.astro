@@ -49,7 +49,10 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
         <div class="mt-6 rounded-2xl bg-white border border-navy/10 p-6 sm:p-8">
           <label for="q1-text" class="field-label">Write your team's research question</label>
           <textarea id="q1-text" class="field mt-2" maxlength="300" rows="3" placeholder="Does...?"></textarea>
-          <p id="q1-saved" class="mt-1 text-[12px] text-muted"></p>
+          <div class="mt-3 flex items-center gap-3">
+            <button type="button" id="q1-save-btn" class="btn btn-sm btn-primary">Save</button>
+            <p id="q1-saved" class="save-status"></p>
+          </div>
 
           <p class="field-label mt-6">Checklist</p>
           <div class="mt-2 grid grid-cols-2 gap-2 text-[14px]">
@@ -106,7 +109,10 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
             <label for="useful-title" class="field-label">Paste the title of one useful result</label>
             <input id="useful-title" class="field mt-2" maxlength="300" />
           </div>
-          <p id="q2-saved" class="text-[12px] text-muted"></p>
+          <div class="flex items-center gap-3">
+            <button type="button" id="q2-save-btn" class="btn btn-sm btn-primary">Save</button>
+            <p id="q2-saved" class="save-status"></p>
+          </div>
         </div>
       </section>
 
@@ -172,6 +178,10 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
         <div class="mt-6">
           <label for="surprised" class="field-label">What surprised you today?</label>
           <textarea id="surprised" class="field mt-2" maxlength="500" rows="3"></textarea>
+          <div class="mt-3 flex items-center gap-3">
+            <button type="button" id="q5-save-btn" class="btn btn-sm btn-primary">Save</button>
+            <p id="q5-saved" class="save-status"></p>
+          </div>
         </div>
 
         <div class="mt-6 rounded-xl bg-ink text-white p-5">
@@ -229,6 +239,15 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     return (...a: Parameters<T>) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
   }
 
+  /** Visible save status next to a Save button: 'saving' | 'saved' | error text. */
+  function markStatus(id: string, state: 'saving' | 'saved' | string) {
+    const el = document.getElementById(id)!;
+    el.classList.remove('status-saving', 'status-saved', 'status-error');
+    if (state === 'saving') { el.textContent = 'Saving…'; el.classList.add('status-saving'); }
+    else if (state === 'saved') { el.textContent = '✓ Saved'; el.classList.add('status-saved'); }
+    else { el.textContent = state; el.classList.add('status-error'); }
+  }
+
   function renderLocks() {
     document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
       const n = Number(btn.dataset.step);
@@ -266,16 +285,19 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     const cl = caseFile?.step1?.checklist || [false, false, false, false];
     document.querySelectorAll<HTMLInputElement>('[data-checklist]').forEach((cb, i) => (cb.checked = !!cl[i]));
   }
-  const saveQ1 = debounce(async () => {
+  async function doSaveStep1() {
     const q = (document.getElementById('q1-text') as HTMLTextAreaElement).value;
     const cl = [...document.querySelectorAll<HTMLInputElement>('[data-checklist]')].map((cb) => cb.checked);
+    markStatus('q1-saved', 'saving');
     try {
       await saveStep1(code!, q, cl);
-      document.getElementById('q1-saved')!.textContent = 'Saved';
-    } catch (e) { document.getElementById('q1-saved')!.textContent = friendlyError(e); }
-  });
-  document.getElementById('q1-text')!.addEventListener('input', () => { document.getElementById('q1-saved')!.textContent = 'Saving…'; saveQ1(); });
+      markStatus('q1-saved', 'saved');
+    } catch (e) { markStatus('q1-saved', friendlyError(e)); }
+  }
+  const saveQ1 = debounce(doSaveStep1);
+  document.getElementById('q1-text')!.addEventListener('input', saveQ1);
   document.querySelectorAll('[data-checklist]').forEach((cb) => cb.addEventListener('change', saveQ1));
+  document.getElementById('q1-save-btn')!.addEventListener('click', doSaveStep1);
 
   function renderMission() {
     const box = document.getElementById('mission-box')!;
@@ -301,7 +323,8 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     const line = (document.getElementById('search-line') as HTMLInputElement).value;
     (document.getElementById('scholar-link') as HTMLAnchorElement).href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(line);
   }
-  const saveQ2 = debounce(async () => {
+  async function doSaveStep2() {
+    markStatus('q2-saved', 'saving');
     try {
       await saveStep2(code!, {
         wordsMusic: (document.querySelector('[data-kw="music"]') as HTMLInputElement).value,
@@ -311,12 +334,14 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
         searchLine: (document.getElementById('search-line') as HTMLInputElement).value,
         usefulTitle: (document.getElementById('useful-title') as HTMLInputElement).value,
       });
-      document.getElementById('q2-saved')!.textContent = 'Saved';
-    } catch (e) { document.getElementById('q2-saved')!.textContent = friendlyError(e); }
-  });
+      markStatus('q2-saved', 'saved');
+    } catch (e) { markStatus('q2-saved', friendlyError(e)); }
+  }
+  const saveQ2 = debounce(doSaveStep2);
   ['[data-kw="music"]', '[data-kw="studying"]', '[data-kw="silence"]', '[data-kw="remembering"]', '#search-line', '#useful-title'].forEach((sel) => {
-    document.querySelector(sel)!.addEventListener('input', () => { document.getElementById('q2-saved')!.textContent = 'Saving…'; updateScholarLink(); saveQ2(); });
+    document.querySelector(sel)!.addEventListener('input', () => { updateScholarLink(); saveQ2(); });
   });
+  document.getElementById('q2-save-btn')!.addEventListener('click', doSaveStep2);
 
   /* ---- Step 3: cards ---- */
   let activeCardId: string | null = null;
@@ -434,10 +459,16 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   function fillStep5() {
     (document.getElementById('surprised') as HTMLTextAreaElement).value = caseFile?.step5?.surprised_text || '';
   }
-  const saveQ5 = debounce(async () => {
-    try { await saveStep5(code!, (document.getElementById('surprised') as HTMLTextAreaElement).value); } catch {}
-  });
+  async function doSaveStep5() {
+    markStatus('q5-saved', 'saving');
+    try {
+      await saveStep5(code!, (document.getElementById('surprised') as HTMLTextAreaElement).value);
+      markStatus('q5-saved', 'saved');
+    } catch (e) { markStatus('q5-saved', friendlyError(e)); }
+  }
+  const saveQ5 = debounce(doSaveStep5);
   document.getElementById('surprised')!.addEventListener('input', saveQ5);
+  document.getElementById('q5-save-btn')!.addEventListener('click', doSaveStep5);
 
   function renderSummary() {
     const el = document.getElementById('summary')!;
@@ -491,4 +522,8 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   .card-tag { position: absolute; top: 6px; right: 6px; font-size: 10px; padding: 2px 6px; background: #3F66B0; color: #fff; border-radius: 4px; }
   .choice-btn { flex: 1; height: 40px; border: 1px solid rgba(27,42,85,.2); border-radius: 8px; font-size: 14px; color: #3A4458; }
   .choice-btn.chosen { background: #3F66B0; color: #fff; border-color: #3F66B0; }
+  .save-status { font-size: 13px; font-weight: 600; min-height: 1.2em; }
+  .save-status.status-saving { color: #8A94A8; font-weight: 400; }
+  .save-status.status-saved { color: #3F66B0; }
+  .save-status.status-error { color: #C2463A; }
 </style>
