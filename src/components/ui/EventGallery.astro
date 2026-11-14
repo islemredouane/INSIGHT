@@ -72,39 +72,7 @@ function getBentoSpan(index: number, total: number) {
       </div>
 
       {images.length > 0 && (
-        <div class="rv flex flex-wrap items-center gap-3">
-          <!-- View Switcher (Bento vs Masonry) -->
-          <div class="inline-flex items-center p-1 rounded-xl bg-silver/30 border border-silver/40 backdrop-blur-md">
-            <button
-              type="button"
-              id="view-bento-btn"
-              class="view-toggle-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all bg-white text-ink shadow-sm"
-              aria-label="Switch to Bento Grid layout"
-            >
-              <svg class="w-3.5 h-3.5 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                <rect x="3" y="14" width="7" height="7" rx="1.5" />
-              </svg>
-              <span>Bento</span>
-            </button>
-            <button
-              type="button"
-              id="view-masonry-btn"
-              class="view-toggle-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all text-body hover:text-ink"
-              aria-label="Switch to Masonry Wall layout"
-            >
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="11" rx="1.5" />
-                <rect x="14" y="3" width="7" height="6" rx="1.5" />
-                <rect x="3" y="16" width="7" height="5" rx="1.5" />
-                <rect x="14" y="11" width="7" height="10" rx="1.5" />
-              </svg>
-              <span>Masonry</span>
-            </button>
-          </div>
-
+        <div class="rv flex items-center gap-3">
           <!-- Total Count Badge -->
           <span class="inline-flex items-center px-3.5 py-1.5 rounded-xl font-mono text-[12px] font-semibold tracking-wider text-blue bg-blue/8 border border-blue/20">
             {images.length} CAPTURES
@@ -114,7 +82,7 @@ function getBentoSpan(index: number, total: number) {
           <button
             type="button"
             id="start-slideshow-btn"
-            class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[13px] font-medium bg-ink text-white hover:bg-navy transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue"
+            class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[13px] font-medium bg-ink text-white hover:bg-navy transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue cursor-pointer"
           >
             <svg class="w-3.5 h-3.5 text-peri-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="5 3 19 12 5 21 5 3" />
@@ -154,7 +122,7 @@ function getBentoSpan(index: number, total: number) {
               <img
                 src={src}
                 alt={caption}
-                class="gallery-img w-full h-full object-cover transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105"
+                class="gallery-img w-full h-full object-cover object-[center_top] transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
@@ -314,53 +282,7 @@ function getBentoSpan(index: number, total: number) {
 
     // View Switcher logic (Bento vs Masonry)
     const container = document.getElementById('gallery-container');
-    const bentoBtn = document.getElementById('view-bento-btn');
-    const masonryBtn = document.getElementById('view-masonry-btn');
     const triggers = document.querySelectorAll('.gallery-trigger');
-
-    function setBentoView() {
-      if (!container || !bentoBtn || !masonryBtn) return;
-      container.className = 'rv-stagger gallery-bento grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:auto-rows-[270px] sm:auto-rows-[240px] [grid-auto-flow:dense] transition-all duration-300';
-      triggers.forEach((trigger) => {
-        const bentoSpan = trigger.getAttribute('data-bento-span') || '';
-        trigger.className = `gallery-trigger group relative w-full overflow-hidden rounded-2xl bg-white border border-silver/60 hover:border-blue/50 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 cursor-pointer shadow-[0_4px_16px_rgba(11,17,32,0.04)] ${bentoSpan}`;
-        const img = trigger.querySelector('.gallery-img');
-        if (img) img.className = 'gallery-img w-full h-full object-cover transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105';
-      });
-
-      bentoBtn.classList.add('active', 'bg-white', 'text-ink', 'shadow-sm');
-      bentoBtn.classList.remove('text-body');
-      const bentoSvg = bentoBtn.querySelector('svg');
-      if (bentoSvg) bentoSvg.classList.add('text-blue');
-
-      masonryBtn.classList.remove('active', 'bg-white', 'text-ink', 'shadow-sm');
-      masonryBtn.classList.add('text-body');
-      const masonrySvg = masonryBtn.querySelector('svg');
-      if (masonrySvg) masonrySvg.classList.remove('text-blue');
-    }
-
-    function setMasonryView() {
-      if (!container || !bentoBtn || !masonryBtn) return;
-      container.className = 'rv-stagger gallery-masonry columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5 block transition-all duration-300';
-      triggers.forEach((trigger) => {
-        trigger.className = 'gallery-trigger group relative w-full break-inside-avoid mb-5 overflow-hidden rounded-2xl bg-white border border-silver/60 hover:border-blue/50 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 cursor-pointer shadow-[0_4px_16px_rgba(11,17,32,0.04)] block';
-        const img = trigger.querySelector('.gallery-img');
-        if (img) img.className = 'gallery-img w-full h-auto object-cover transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105 block';
-      });
-
-      masonryBtn.classList.add('active', 'bg-white', 'text-ink', 'shadow-sm');
-      masonryBtn.classList.remove('text-body');
-      const masonrySvg = masonryBtn.querySelector('svg');
-      if (masonrySvg) masonrySvg.classList.add('text-blue');
-
-      bentoBtn.classList.remove('active', 'bg-white', 'text-ink', 'shadow-sm');
-      bentoBtn.classList.add('text-body');
-      const bentoSvg = bentoBtn.querySelector('svg');
-      if (bentoSvg) bentoSvg.classList.remove('text-blue');
-    }
-
-    if (bentoBtn) bentoBtn.addEventListener('click', setBentoView);
-    if (masonryBtn) masonryBtn.addEventListener('click', setMasonryView);
 
     // Lightbox Logic
     const lightbox = document.getElementById('gallery-lightbox');
