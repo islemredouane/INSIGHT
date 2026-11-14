@@ -10,7 +10,7 @@ import Icon from '../../components/ui/Icon.astro';
 
   <section class="bg-paper text-ink py-16 sm:py-20">
     <div class="max-w-xl mx-auto px-6">
-      <div id="already-in" class="hidden rv rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 mb-6 text-center">
+      <div id="already-in" class="hidden rv  bg-white border border-navy/10 p-6 sm:p-8 mb-6 text-center">
         <p class="text-[15px] text-body">You're already signed in as <strong id="already-name"></strong>.</p>
         <div class="mt-5 flex flex-wrap justify-center gap-3">
           <a href="/spark/case" class="btn btn-sm btn-primary">Continue to the game →</a>
@@ -18,7 +18,7 @@ import Icon from '../../components/ui/Icon.astro';
         </div>
       </div>
 
-      <div id="join-forms" class="rv rounded-2xl bg-white border border-navy/10 p-6 sm:p-8">
+      <div id="join-forms" class="rv  bg-white border border-navy/10 p-6 sm:p-8">
         <div class="flex gap-2" role="tablist">
           <button type="button" id="tab-new" class="choice" aria-selected="true">New team</button>
           <button type="button" id="tab-code" class="choice" aria-selected="false">I have a team code</button>
@@ -49,7 +49,7 @@ import Icon from '../../components/ui/Icon.astro';
         </form>
       </div>
 
-      <div id="code-reveal" class="hidden rv rounded-2xl bg-ink text-white p-6 sm:p-8 mt-6 text-center">
+      <div id="code-reveal" class="hidden rv  bg-ink text-white p-6 sm:p-8 mt-6 text-center">
         <p class="eyebrow text-peri">Your team code</p>
         <p id="revealed-code" class="mt-3 font-display text-5xl font-bold tracking-[0.15em]"></p>
         <p class="mt-4 text-[14px] text-silver/70">Write this code down — you'll need it next session.</p>

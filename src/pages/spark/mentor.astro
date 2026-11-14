@@ -14,7 +14,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <section class="bg-paper text-ink py-10 min-h-[60vh]">
     <div class="max-w-[1100px] mx-auto px-5">
 
-      <form id="login-form" class="max-w-sm mx-auto rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 mt-10">
+      <form id="login-form" class="max-w-sm mx-auto  bg-white border border-navy/10 p-6 sm:p-8 mt-10">
         <label for="mentor-password" class="field-label">Mentor password</label>
         <input id="mentor-password" class="field mt-2" type="password" required />
         <p id="login-error" class="hidden mt-2 text-[14px] text-signal"></p>
@@ -22,14 +22,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       </form>
 
       <div id="panel" class="hidden">
-        <div class="rounded-2xl bg-white border border-navy/10 p-5 flex flex-wrap items-center gap-4">
+        <div class="bg-white border border-navy/10 p-5 flex flex-wrap items-center gap-4">
           <p class="font-semibold">Current step for everyone: <span id="current-step">Step 0 · Story</span></p>
           <button type="button" id="unlock-next" class="btn btn-sm btn-primary">Unlock next step</button>
           <button type="button" id="reveal-mission" class="btn btn-sm btn-secondary btn-on-light">Reveal mission question</button>
           <div class="flex gap-1 ml-auto" id="jump-steps"></div>
         </div>
 
-        <div class="mt-6 overflow-x-auto rounded-2xl bg-white border border-navy/10">
+        <div class="mt-6 overflow-x-auto  bg-white border border-navy/10">
           <table class="w-full text-[13px]">
             <thead class="bg-paper text-left">
               <tr>
@@ -42,18 +42,18 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </div>
 
         <div class="mt-6 grid sm:grid-cols-2 gap-4">
-          <div class="rounded-2xl bg-white border border-navy/10 p-5">
+          <div class="bg-white border border-navy/10 p-5">
             <p class="font-semibold">Mentor notes</p>
             <p class="text-[12px] text-muted mb-2">Only visible here — never sent to team pages.</p>
             <ul id="notes-list" class="text-[13px] space-y-1"></ul>
           </div>
-          <div class="rounded-2xl bg-white border border-navy/10 p-5 space-y-3">
+          <div class="bg-white border border-navy/10 p-5 space-y-3">
             <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export all answers (CSV)</button>
             <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session — admin</button>
           </div>
         </div>
 
-        <div id="team-detail" class="hidden mt-6 rounded-2xl bg-white border border-navy/10 p-6"></div>
+        <div id="team-detail" class="hidden mt-6  bg-white border border-navy/10 p-6"></div>
       </div>
     </div>
   </section>
