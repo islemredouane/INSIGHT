@@ -24,6 +24,15 @@ const others = (await getPoles()).filter((o) => o.id !== pole.id);
 const events = (await getEventsSorted()).filter((e) => e.data.poles.includes(pole.id));
 ---
 <BaseLayout title={p.name} description={`${p.name}, research pole ${number} of INSIGHT: ${p.short}`}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Research Poles', item: new URL('/research', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: p.name, item: new URL(`/research/${pole.id}`, Astro.site).href },
+    ],
+  })} />
   <PageHeader
     eyebrow={`Research pole ${number}`}
     title={p.name}

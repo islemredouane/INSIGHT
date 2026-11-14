@@ -17,6 +17,19 @@ const poles = await getPoles();
 const leads = await getPoleLeads();
 ---
 <BaseLayout title="Crew" description={`The INSIGHT crew ${site.season}: the Helm, seven departments and four research poles.`}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'INSIGHT Crew & Leadership',
+    description: `The INSIGHT crew ${site.season}: the Helm, seven departments and four research poles.`,
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
+        { '@type': 'ListItem', position: 2, name: 'Crew', item: new URL('/crew', Astro.site).href },
+      ],
+    },
+  })} />
   <PageHeader
     eyebrow={`The crew · ${site.season}`}
     title="Every great voyage needs more than a captain."

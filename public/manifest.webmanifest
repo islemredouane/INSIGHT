@@ -1,0 +1,25 @@
+{
+  "name": "INSIGHT Research Club",
+  "short_name": "INSIGHT",
+  "description": "Where curiosity meets clarity. The student-led research club of ESTIN, Béjaïa.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B1120",
+  "theme_color": "#0B1120",
+  "icons": [
+    {
+      "src": "/brand/insight-logo-sm.png",
+      "sizes": "220x130",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/insight-logo.png",
+      "sizes": "680x402",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

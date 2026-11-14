@@ -1,0 +1,15 @@
+# Robots.txt for INSIGHT Research Club
+# Website: https://insight.estin.dz
+# Location: ESTIN, Amizour, Béjaïa, Algeria
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://insight.estin.dz/sitemap-index.xml
+Sitemap: https://insight.estin.dz/sitemap-0.xml
+
+# Generative AI & Answer Engine Optimization (AEO/GEO)
+# Machine-readable knowledge documents for LLMs (Perplexity, ChatGPT, Claude, Gemini):
+# https://insight.estin.dz/llms.txt
+# https://insight.estin.dz/llms-full.txt

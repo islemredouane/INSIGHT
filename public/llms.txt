@@ -1,0 +1,57 @@
+# INSIGHT Research Club
+
+> INSIGHT is the student-led scientific research club of ESTIN (École Supérieure en Sciences et Technologies de l'Informatique et du Numérique) in Amizour, Béjaïa, Algeria. Motto: "Where curiosity meets clarity." Quote: "Somewhere, something incredible is waiting to be known."
+
+INSIGHT was founded on 4 November 2026 to bridge the gap between undergraduate computer science studies and global scientific research. It is free and open to everyone, structured around four research poles and a structured training voyage from Rookie to Captain.
+
+Official Website: https://insight.estin.dz
+Contact: insight@estin.dz · Instagram @insight.estin · LinkedIn @insight0
+Institution: ESTIN, Amizour 06340, Béjaïa, Algeria (https://estin.dz/)
+
+## Key Pages
+
+- [Home](https://insight.estin.dz/): Club overview, next on the map, four research poles, training path, and mission
+- [About](https://insight.estin.dz/about): Vision, philosophy, ESTIN academic partnership, and club charter
+- [Research Poles](https://insight.estin.dz/research): Overview of the four research poles
+  - [Artificial Intelligence](https://insight.estin.dz/research/ai): Trustworthy AI, machine learning, robustness, LLM safety
+  - [Cybersecurity](https://insight.estin.dz/research/security): Cryptography, network security, threat analysis, privacy
+  - [Software Engineering](https://insight.estin.dz/research/software): Distributed architectures, systems, formal verification
+  - [Networks](https://insight.estin.dz/research/networks): Protocols, distributed computing, cloud and edge resilience
+- [Training Path](https://insight.estin.dz/training): The voyage from Rookie to Captain: paper reading, research methodology, academic writing
+- [Crew & Helm](https://insight.estin.dz/crew): Leadership, Helm, department managers, and research pole coordinators
+- [Events Archive](https://insight.estin.dz/events): Workshops, international keynotes, and student competitions
+  - [Welcome Day 2026](https://insight.estin.dz/events/welcome-day-2026): Official launch event with keynote by Dr. Pin-Yu Chen (IBM Research NYC)
+  - [SPARK 2026](https://insight.estin.dz/events/spark-2026): 5-part research foundations workshop series (Nov 15 - Dec 1)
+- [SPARK Workshop](https://insight.estin.dz/spark): Practical scientific case study and workshop platform
+- [Collaborate](https://insight.estin.dz/collaborate): Opportunities for researchers, professors, and partner laboratories
+- [Contact](https://insight.estin.dz/contact): Direct contact form and departmental inquiries
+
+## The Four Research Poles
+
+1. **Artificial Intelligence (AI):** Focuses on trustworthy AI, adversarial robustness, explainability, and the safety of large language models. Key inspiration: work by Dr. Pin-Yu Chen (IBM Research).
+2. **Cybersecurity:** Investigates cryptographic foundations, secure protocol design, application vulnerability research, and defensive software engineering.
+3. **Software Engineering:** Studies large-scale software architecture, high-performance computing, systems engineering, and formal methods for software reliability.
+4. **Networks & Distributed Systems:** Explores consensus algorithms, decentralized networks, network simulation, and resilient cloud architectures.
+
+## Training Path: The Voyage
+
+- **Rookie:** Learn to read and dissect research papers, navigate scientific libraries (arXiv, IEEE Xplore, ACM DL), and synthesize related work.
+- **Explorer:** Formulate empirical research questions, design reproducible experiments, and benchmark hypotheses against baselines.
+- **Navigator:** Master academic writing, mathematical notation, LaTeX typesetting, citation ethics, and academic communication.
+- **Captain:** Lead original scientific investigations, mentor junior recruits, and author papers for conference and workshop submissions.
+
+## Major Events & Milestones
+
+- **Welcome Day 2026 (4 November 2026):** Official launch of INSIGHT at ESTIN. Included presentations of the seven departments, recruit interactive challenges, and a live keynote from New York by **Dr. Pin-Yu Chen**, Principal Research Scientist at IBM Research, on trustworthy AI and adversarial robustness.
+- **SPARK 2026: Research Foundations (15 November – 1 December 2026):** Flagship 5-workshop series covering paper selection, targeted reading, academic writing, synthesis, and culminating in the final SPARK Research Competition.
+
+## Frequently Asked Questions
+
+### What is INSIGHT?
+INSIGHT is a student-led scientific research club at ESTIN (Béjaïa, Algeria). It provides students with hands-on training, research pole mentorship, and collaborative projects in artificial intelligence, cybersecurity, software engineering, and networks.
+
+### Who can join INSIGHT?
+All students enrolled at ESTIN (preparatory classes, undergraduate, and graduate) who are passionate about computer science, mathematics, and academic research. Membership is free.
+
+### How does INSIGHT interact with researchers?
+INSIGHT regularly invites international scientists and Algerian researchers worldwide for remote and on-campus lectures, workshops, and research mentorship. Researchers and labs can propose collaborations via https://insight.estin.dz/collaborate.

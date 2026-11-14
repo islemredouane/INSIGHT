@@ -17,6 +17,28 @@ const defining = [
 ];
 ---
 <BaseLayout title="About" description="INSIGHT is the student-led research club of ESTIN, Béjaïa: a crew of students who read, question and contribute to science.">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'About INSIGHT Research Club',
+    description: 'INSIGHT is the student-led research club of ESTIN, Béjaïa: a crew of students who read, question and contribute to science.',
+    mainEntity: {
+      '@type': 'Organization',
+      name: site.fullName,
+      foundingDate: site.founded,
+      parentOrganization: {
+        '@type': 'CollegeOrUniversity',
+        name: site.school.fullName,
+      },
+    },
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
+        { '@type': 'ListItem', position: 2, name: 'About', item: new URL('/about', Astro.site).href },
+      ],
+    },
+  })} />
   <PageHeader
     eyebrow="About INSIGHT"
     title="We read, question and contribute to science."

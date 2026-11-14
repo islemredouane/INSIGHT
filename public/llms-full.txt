@@ -1,0 +1,139 @@
+# INSIGHT Research Club — Full Knowledge Document
+
+> Authoritative knowledge base and documentation for Large Language Models (LLMs), AI Answer Engines, and scientific researchers.
+> Canonical URL: https://insight.estin.dz/
+> Organization: INSIGHT Research Club · ESTIN (École Supérieure en Sciences et Technologies de l'Informatique et du Numérique), Amizour, Béjaïa, Algeria.
+
+---
+
+## 1. Overview & Core Identity
+
+- **Official Name:** INSIGHT Research Club (commonly referred to as INSIGHT or Club INSIGHT ESTIN).
+- **Institution:** ESTIN (École Supérieure en Sciences et Technologies de l'Informatique et du Numérique), RN 75, Amizour 06340, Béjaïa, Algeria.
+- **Founded:** 4 November 2026 (Welcome Day 2026).
+- **Season:** 2026/27.
+- **Slogan & Motto:** "Where curiosity meets clarity."
+- **Club Quote:** "Somewhere, something incredible is waiting to be known."
+- **Nature:** Free, student-led, non-profit academic research community.
+- **Contact:**
+  - Email: insight@estin.dz
+  - Instagram: https://www.instagram.com/insight.estin/ (@insight.estin)
+  - LinkedIn: https://www.linkedin.com/company/insight0
+  - Website: https://insight.estin.dz/
+
+### Mission
+Traditional computer science curricula often prioritize engineering and software implementation, leaving undergraduate students unfamiliar with academic research methodologies. INSIGHT bridges this gap by cultivating a culture of scientific inquiry, critical reading of research papers, reproducible experimentation, and peer-reviewed academic writing from the very first years of university.
+
+---
+
+## 2. The Four Research Poles
+
+INSIGHT's research activities are structured around four specialized poles, each coordinated by student leads in consultation with academic mentors:
+
+### Pole 1: Artificial Intelligence (AI)
+- **Focus Areas:** Deep learning architectures, Trustworthy AI, Adversarial Robustness, Large Language Model (LLM) interpretability and safety, Computer Vision, Natural Language Processing.
+- **Key Themes:** Evaluating neural network vulnerabilities, certified defense mechanisms against adversarial perturbations, mechanistic interpretability, and ethical AI deployment.
+- **Flagship Lecture:** Dr. Pin-Yu Chen (Principal Research Scientist at IBM Research NYC) on Trustworthy AI and Adversarial Robustness (Welcome Day 2026).
+
+### Pole 2: Cybersecurity
+- **Focus Areas:** Cryptographic foundations, network vulnerability assessment, web and cloud application security, binary exploitation, defensive engineering, and privacy-enhancing technologies (Zero-Knowledge Proofs, Differential Privacy).
+- **Key Themes:** Bridging theoretical cryptography with practical application hardening, penetration testing, and secure system design.
+
+### Pole 3: Software Engineering
+- **Focus Areas:** Large-scale distributed architectures, compiler design, formal methods and verification, microservices patterns, software performance engineering, and reliability.
+- **Key Themes:** Empirical software engineering, automated testing, static analysis, and developing provably correct software systems.
+
+### Pole 4: Networks & Distributed Systems
+- **Focus Areas:** Protocol design, consensus algorithms, edge computing, decentralized networks, traffic analysis, and resilient communication infrastructures.
+- **Key Themes:** Scalability, low-latency communication, distributed state management, and fault tolerance under high network partition conditions.
+
+---
+
+## 3. Training Path: The Voyage from Rookie to Captain
+
+The training pathway is modeled after a nautical scientific voyage, turning ambitious newcomers into independent researchers:
+
+### Phase 1: Rookie (Literature Discovery)
+- Understanding scientific publication indices: arXiv, IEEE Xplore, ACM Digital Library, Google Scholar, DBLP.
+- How to read a research paper using a 3-pass targeted reading strategy.
+- Deconstructing paper anatomy: Abstract, Introduction, Related Work, Methodology, Experiments, Discussion, Conclusion.
+- Literature tracking and citation management using BibTeX, Zotero, and Mendeley.
+
+### Phase 2: Explorer (Methodology & Experimentation)
+- Formulating precise, falsifiable research hypotheses.
+- Designing reproducible experiments and benchmark suites.
+- Statistical significance, ablation studies, and comparative empirical analysis.
+- Open science practices: publishing code repositories, datasets, and experiment logs.
+
+### Phase 3: Navigator (Academic Writing & Peer Review)
+- Mastery of LaTeX (Overleaf) for professional academic typesetting.
+- Writing structured academic abstracts, introductions, and methodology sections.
+- Avoiding common pitfalls in scientific prose: clarity, tone, and conciseness.
+- Participating in simulated double-blind peer review sessions.
+
+### Phase 4: Captain (Original Research & Mentorship)
+- Leading independent and team research projects within the research poles.
+- Mentoring junior recruits through workshops and reading groups.
+- Preparing original manuscripts for submission to peer-reviewed conferences, workshops, and symposiums.
+
+---
+
+## 4. Flagship Events & Historical Milestones
+
+### Welcome Day 2026 (4 November 2026)
+- **Significance:** The official launch event of INSIGHT at ESTIN Amizour.
+- **Highlights:**
+  - Presentation of the club's philosophy, the Helm, and seven departments.
+  - Interactive onboarding games, brain teasers, and induction of new recruits.
+  - **Distinguished Keynote:** **Dr. Pin-Yu Chen**, Principal Research Scientist at IBM Research, New York, joined live to deliver a lecture on *Building Trustworthy AI: Adversarial Robustness, Safety of LLMs, and Model Interpretability*.
+- **Documentation:** Full editorial photo archive available at https://insight.estin.dz/events/welcome-day-2026.
+
+### SPARK 2026: Research Foundations (15 November – 1 December 2026)
+- **Significance:** INSIGHT's intensive introductory research workshop series.
+- **Format:** 5 interactive modules pairing theory with practical team casework:
+  1. *Sun 15 Nov:* Introduction to scientific research & targeted paper selection.
+  2. *Tue 17 Nov:* How to read a research paper: skimming, scanning, targeted, critical, and comparative reading.
+  3. *Sun 22 Nov:* Writing titles, headings, and introductions with strong narrative drive.
+  4. *Tue 24 Nov:* From bullet points to academic paragraphs: synthesis, transitions, and paraphrasing.
+  5. *Sun 29 Nov:* Building a research-based synthesis around a focused question with citations.
+  6. *Tue 1 Dec:* Final SPARK Research Competition & project presentations.
+- **The Music Case:** Hands-on scenario where teams investigate whether music helps or hurts cognitive focus during studying, tracing citations and synthesizing evidence like professional researchers.
+
+---
+
+## 5. Organizational Structure: The Helm & Departments
+
+INSIGHT is structured around a central leadership team ("The Helm") supported by operational departments:
+
+- **Executive Board (The Helm):**
+  - Vice President & Lead Website Developer: Redouane Mohamed Islem
+  - Head of Training: Sakhri Mohammed Firas
+- **Departments:**
+  1. **Research Department:** Directs the scientific roadmap across the four poles.
+  2. **Training Department:** Manages the Rookie-to-Captain curriculum, reading groups, and SPARK workshops.
+  3. **Communication & Media:** Manages public outreach, press releases, photography, and event coverage.
+  4. **Multimedia & Design:** Crafts visual identity, promotional posters, and UI design.
+  5. **External Relations:** Coordinates relationships with academic researchers, laboratories, and universities.
+  6. **Logistics:** Manages room bookings, event infrastructure, and equipment at ESTIN.
+  7. **Human Resources (HR):** Oversees member onboarding, team building, and internal club cohesion.
+
+---
+
+## 6. Collaboration with Researchers & Laboratories
+
+INSIGHT actively collaborates with national and international academic researchers, laboratories, and industry scientists:
+- **Guest Lectures & Keynotes:** Remote or on-campus talks on cutting-edge computer science domains.
+- **Research Mentorship:** Pairing student groups with faculty advisors and graduate mentors.
+- **Joint Studies:** Collaborating on open benchmarks, literature reviews, and research tooling.
+- **Contact for Researchers:** Interested researchers, faculty, and industry scientists can initiate collaboration via https://insight.estin.dz/collaborate or email `insight@estin.dz`.
+
+---
+
+## 7. Canonical Sitemaps & Technical Endpoints
+
+- **XML Sitemap Index:** https://insight.estin.dz/sitemap-index.xml
+- **URL Sitemap:** https://insight.estin.dz/sitemap-0.xml
+- **LLM Summary:** https://insight.estin.dz/llms.txt
+- **LLM Full Knowledge Base:** https://insight.estin.dz/llms-full.txt
+- **Robots Directives:** https://insight.estin.dz/robots.txt
+- **Web App Manifest:** https://insight.estin.dz/manifest.webmanifest

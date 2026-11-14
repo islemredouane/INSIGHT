@@ -18,23 +18,94 @@ interface Props {
   image?: string;
   noindex?: boolean;
 }
-const { title, description = site.description, image = '/brand/insight-logo.png', noindex = false } = Astro.props;
+const { title, description = site.description, image = '/brand/og-default.jpg', noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · ${site.fullName}` : `${site.fullName} · ${site.school.name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site);
-// Who we are, for search engines: a club of ESTIN, with its contact and Instagram.
-const organization = {
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insight.estin.dz';
+const logoUrl = new URL('/brand/insight-logo.png', Astro.site).href;
+
+// Enterprise Schema.org Graph for Google Rich Snippets & AI Answer Engines (Perplexity, ChatGPT, Claude, Gemini)
+const schemaGraph = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: site.fullName,
-  alternateName: site.name,
-  url: Astro.site?.href,
-  logo: new URL('/brand/insight-logo.png', Astro.site).href,
-  description: site.description,
-  email: site.email,
-  foundingDate: site.founded,
-  sameAs: [site.instagram.url, site.linkedin.url],
-  parentOrganization: { '@type': 'CollegeOrUniversity', name: site.school.fullName, alternateName: site.school.name, url: site.school.url },
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: `${siteUrl}/`,
+      name: site.fullName,
+      alternateName: [site.name, 'INSIGHT ESTIN'],
+      description: site.description,
+      inLanguage: 'en',
+      publisher: {
+        '@id': `${siteUrl}/#organization`,
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: site.fullName,
+      alternateName: [site.name, 'Club INSIGHT ESTIN', 'INSIGHT Research Club ESTIN'],
+      url: `${siteUrl}/`,
+      logo: {
+        '@type': 'ImageObject',
+        url: logoUrl,
+        width: 680,
+        height: 402,
+      },
+      image: ogImage.href,
+      description: site.description,
+      slogan: site.tagline,
+      email: site.email,
+      foundingDate: site.founded,
+      knowsAbout: [
+        'Artificial Intelligence',
+        'Trustworthy AI',
+        'Adversarial Robustness',
+        'Cybersecurity',
+        'Software Engineering',
+        'Computer Networks',
+        'Distributed Systems',
+        'Scientific Research Methodology',
+        'Academic Writing',
+      ],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Amizour',
+        addressRegion: 'Béjaïa',
+        postalCode: '06340',
+        addressCountry: 'DZ',
+      },
+      parentOrganization: {
+        '@type': 'CollegeOrUniversity',
+        name: site.school.fullName,
+        alternateName: site.school.name,
+        url: site.school.url,
+      },
+      sameAs: [site.instagram.url, site.linkedin.url],
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical.href}#webpage`,
+      url: canonical.href,
+      name: fullTitle,
+      description,
+      inLanguage: 'en',
+      isPartOf: {
+        '@id': `${siteUrl}/#website`,
+      },
+      about: {
+        '@id': `${siteUrl}/#organization`,
+      },
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        url: ogImage.href,
+        width: 1200,
+        height: 630,
+      },
+    },
+  ],
 };
 ---
 <!doctype html>
@@ -47,21 +118,58 @@ const organization = {
       // `reveal-all` shows everything after 4 s, so a page is never left blank.
       (function (d) { d.classList.add('js'); setTimeout(function () { if (!d.classList.contains('motion-ready')) d.classList.add('reveal-all'); }, 4000); })(document.documentElement);
     </script>
-    <title>{fullTitle}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {(noindex || reviewMode) && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#0B1120" />
-    <link rel="icon" type="image/png" href="/brand/insight-logo-sm.png" />
 
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
+    <meta name="description" content={description} />
+    <meta name="author" content={site.fullName} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Robots & Crawler Directives (AEO / SEO) -->
+    {noindex || reviewMode ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    )}
+
+    <!-- Mobile & PWA -->
+    <meta name="theme-color" content="#0B1120" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="INSIGHT" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="/brand/insight-logo-sm.png" />
+    <link rel="apple-touch-icon" href="/brand/insight-logo-sm.png" />
+
+    <!-- Open Graph / Facebook / LinkedIn / Discord -->
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={site.fullName} />
+    <meta property="og:url" content={canonical} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
+
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+    <meta name="twitter:url" content={canonical} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={fullTitle} />
+
+    <!-- Structured Data (Schema.org Graph for SEO & AEO) -->
+    <script type="application/ld+json" set:html={JSON.stringify(schemaGraph)} />
+
+    <!-- AI & Answer Engine Discovery (AEO / GEO) -->
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Summary" />
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="Full LLM Documentation" />
+
     <slot name="head" />
   </head>
   <body id="top" class="bg-ink text-silver font-sans text-[16px] antialiased selection:bg-blue selection:text-white">
