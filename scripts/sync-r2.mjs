@@ -113,7 +113,7 @@ async function main() {
   console.log(`   Endpoint: https://${accountId}.r2.cloudflarestorage.com`);
   console.log(`   Public CDN: ${publicCdnUrl}\n`);
 
-  const mediaDirs = ['events', 'crew', 'researchers', 'labs', 'brand'];
+  const mediaDirs = ['events', 'crew', 'researchers', 'labs', 'brand', 'og'];
   const publicDir = path.join(rootDir, 'public');
   let files = [];
 
