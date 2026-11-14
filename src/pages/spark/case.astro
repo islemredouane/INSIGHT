@@ -1,0 +1,494 @@
+---
+// SPARK · The Music Case — the Session 1 game (Steps 0-5).
+// No scores, no timers, no right/wrong colours anywhere on this page.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { sparkCards, sparkStory, sparkQuestionExamples, sparkKeywordIdeas, sparkHomework } from '../../data/spark';
+
+const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
+---
+<BaseLayout title="The Music Case · SPARK" description="SPARK 2026 Session 1: find the papers." noindex>
+  <section class="bg-ink text-white pt-[104px] pb-8 border-b border-white/10">
+    <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="eyebrow text-peri">SPARK 2026 · The Music Case</p>
+        <p id="team-label" class="mt-1 font-display text-xl font-bold">—</p>
+      </div>
+      <a href="/spark/join" id="switch-link" class="text-[13px] text-silver/70 hover:text-white transition-colors">Not your team?</a>
+    </div>
+  </section>
+
+  <nav id="progress" class="sticky top-[72px] z-20 bg-white border-b border-navy/10 overflow-x-auto" aria-label="Game progress">
+    <div class="max-w-[1100px] mx-auto px-5 flex gap-1 py-3 min-w-max">
+      {steps.map((label, i) => (
+        <button type="button" class="step-tab" data-step={i}>
+          <span class="step-num">{i}</span>
+          <span>{label}</span>
+        </button>
+      ))}
+    </div>
+  </nav>
+
+  <div id="waiting" class="hidden bg-paper py-24 text-center px-6">
+    <p class="font-display text-2xl font-bold text-ink">Loading your team...</p>
+  </div>
+
+  <main id="game" class="hidden bg-paper text-ink py-12 sm:py-16">
+    <div class="max-w-[720px] mx-auto px-5">
+
+      <!-- Step 0 · The case -->
+      <section data-panel="0" class="panel">
+        <h1 class="font-display text-3xl font-bold tracking-tight">The Music Case — Part 1: Find the papers</h1>
+        <div class="mt-6 rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 prose-insight whitespace-pre-line">{sparkStory}</div>
+        <button type="button" id="start-investigation" class="btn btn-primary mt-6">Start the investigation →</button>
+      </section>
+
+      <!-- Step 1 · Question Lab -->
+      <section data-panel="1" class="panel hidden">
+        <h1 class="font-display text-3xl font-bold tracking-tight">Step 1 · Question Lab</h1>
+        <div class="mt-6 rounded-2xl bg-white border border-navy/10 p-6 sm:p-8">
+          <label for="q1-text" class="field-label">Write your team's research question</label>
+          <textarea id="q1-text" class="field mt-2" maxlength="300" rows="3" placeholder="Does...?"></textarea>
+          <p id="q1-saved" class="mt-1 text-[12px] text-muted"></p>
+
+          <p class="field-label mt-6">Checklist</p>
+          <div class="mt-2 grid grid-cols-2 gap-2 text-[14px]">
+            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="0" /> Who?</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="1" /> What?</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="2" /> Compared to what?</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="3" /> Measured how?</label>
+          </div>
+
+          <div class="mt-6 space-y-2">
+            {sparkQuestionExamples.map((ex) => (
+              <details class="text-[14px]">
+                <summary class="cursor-pointer text-blue">{ex.label}: {ex.text}</summary>
+                <p class="mt-1 text-muted pl-4">{ex.hint}</p>
+              </details>
+            ))}
+          </div>
+
+          <div id="mission-box" class="hidden mt-6 rounded-xl bg-ink text-white p-5">
+            <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">Official mission question</p>
+            <p id="mission-text" class="mt-2 text-[16px]"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2 · Keyword Builder -->
+      <section data-panel="2" class="panel hidden">
+        <h1 class="font-display text-3xl font-bold tracking-tight">Step 2 · Keyword Builder</h1>
+        <div class="mt-6 rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 space-y-4">
+          {(['music', 'studying', 'silence', 'remembering'] as const).map((k) => (
+            <div class="grid grid-cols-[110px_1fr] gap-3 items-center">
+              <span class="font-mono text-[12px] uppercase text-muted">{k}</span>
+              <input class="field" data-kw={k} placeholder="other words, comma-separated" />
+            </div>
+          ))}
+          <details class="text-[13px] text-muted">
+            <summary class="cursor-pointer text-blue">Show ideas</summary>
+            <ul class="mt-2 space-y-1 pl-4">
+              {Object.entries(sparkKeywordIdeas).map(([k, v]) => <li><strong>{k}:</strong> {v}</li>)}
+            </ul>
+          </details>
+          <details class="text-[13px] text-muted">
+            <summary class="cursor-pointer text-blue">How search works</summary>
+            <p class="mt-2">Quotes keep words together: "background music". OR gives choices: reading OR studying. A space means all the words must appear.</p>
+          </details>
+
+          <div>
+            <label for="search-line" class="field-label">Build my search</label>
+            <input id="search-line" class="field mt-2" maxlength="200" placeholder={'"background music" reading OR studying'} />
+          </div>
+          <a id="scholar-link" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-secondary btn-on-light inline-block">Test on Google Scholar ↗</a>
+
+          <div>
+            <label for="useful-title" class="field-label">Paste the title of one useful result</label>
+            <input id="useful-title" class="field mt-2" maxlength="300" />
+          </div>
+          <p id="q2-saved" class="text-[12px] text-muted"></p>
+        </div>
+      </section>
+
+      <!-- Step 3 · The Paper Cards -->
+      <section data-panel="3" class="panel hidden">
+        <h1 class="font-display text-3xl font-bold tracking-tight">Step 3 · The Paper Cards</h1>
+        <p id="cards-progress" class="mt-2 text-[14px] text-muted">0 of 8 sorted</p>
+        <div id="cards-grid" class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {sparkCards.map((c) => (
+            <button type="button" class="card-tile" data-card={c.id}>
+              <span class="block font-semibold text-[13px] leading-tight">{c.title}</span>
+              <span class="block mt-1 text-[11px] text-muted">{c.authors.split(',')[0]} · {c.year}</span>
+              <span class="card-tag hidden"></span>
+            </button>
+          ))}
+        </div>
+
+        <p class="field-label mt-8">Our case board</p>
+        <div class="mt-3 grid sm:grid-cols-3 gap-3">
+          <div><p class="text-[12px] font-mono uppercase text-muted">Keep</p><ul id="board-keep" class="mt-2 space-y-2 text-[13px]"></ul></div>
+          <div><p class="text-[12px] font-mono uppercase text-muted">Maybe</p><ul id="board-maybe" class="mt-2 space-y-2 text-[13px]"></ul></div>
+          <div><p class="text-[12px] font-mono uppercase text-muted">Not for us</p><ul id="board-not" class="mt-2 space-y-2 text-[13px]"></ul></div>
+        </div>
+      </section>
+
+      <!-- Step 4 · Follow the Trail -->
+      <section data-panel="4" class="panel hidden">
+        <h1 class="font-display text-3xl font-bold tracking-tight">Step 4 · Follow the Trail</h1>
+        <div class="mt-6 rounded-2xl bg-white border border-navy/10 p-6 sm:p-8">
+          <div id="trail-locked" class="text-[15px] text-body">This step opens when the mentor unlocks it.</div>
+          <div id="trail-open" class="hidden">
+            <div class="rounded-xl bg-ink text-white p-5">
+              <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">The clue</p>
+              <p id="trail-clue" class="mt-2 text-[15px]"></p>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <a href="https://scholar.google.com" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Open Google Scholar ↗</a>
+              <button type="button" id="need-hint" class="btn btn-sm btn-secondary btn-on-light">Need a hint?</button>
+            </div>
+            <ul id="hints-list" class="mt-4 space-y-2 text-[14px]"></ul>
+
+            <div class="mt-6">
+              <label for="trail-answer" class="field-label">Paste the title of the paper you found</label>
+              <div class="mt-2 flex gap-2">
+                <input id="trail-answer" class="field" maxlength="300" />
+                <button type="button" id="trail-check" class="btn btn-sm btn-primary shrink-0">Check</button>
+              </div>
+            </div>
+            <p id="trail-not-yet" class="hidden mt-3 text-[14px] text-body">Not this one yet. Check the clue again, or open a hint.</p>
+            <div id="trail-found" class="hidden mt-5 rounded-xl bg-blue/10 border border-blue/30 p-5">
+              <p class="font-semibold text-blue">★ You found the key paper of the case!</p>
+              <p id="key-card-text" class="mt-2 text-[14px] text-body"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 5 · Case File -->
+      <section data-panel="5" class="panel hidden">
+        <h1 class="font-display text-3xl font-bold tracking-tight">Step 5 · Case File</h1>
+        <div id="summary" class="mt-6 rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 text-[14px] leading-relaxed space-y-3"></div>
+
+        <div class="mt-6">
+          <label for="surprised" class="field-label">What surprised you today?</label>
+          <textarea id="surprised" class="field mt-2" maxlength="500" rows="3"></textarea>
+        </div>
+
+        <div class="mt-6 rounded-xl bg-ink text-white p-5">
+          <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">Homework</p>
+          <p class="mt-2 text-[14px]">{sparkHomework}</p>
+        </div>
+
+        <p class="mt-8 font-display text-xl font-bold text-ink">Case File #1 complete. See you in Session 2.</p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Card modal -->
+  <div id="card-modal" class="hidden fixed inset-0 z-50 bg-ink/70 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8">
+      <button type="button" id="modal-close" class="float-right text-muted hover:text-ink"><Icon name="x" /></button>
+      <p id="modal-title" class="font-display text-xl font-bold"></p>
+      <p id="modal-meta" class="mt-1 text-[13px] text-muted"></p>
+      <p id="modal-summary" class="mt-4 text-[14px] leading-relaxed text-body"></p>
+      <a id="modal-link" href="#" target="_blank" rel="noopener" class="mt-4 inline-block text-[14px] text-blue">See the real paper ↗</a>
+      <div class="mt-5 flex gap-2">
+        <button type="button" class="choice-btn" data-choice="keep">Keep</button>
+        <button type="button" class="choice-btn" data-choice="maybe">Maybe</button>
+        <button type="button" class="choice-btn" data-choice="not_for_us">Not for us</button>
+      </div>
+      <div id="modal-reason-wrap" class="hidden mt-4">
+        <label for="modal-reason" class="field-label">Why? (one line)</label>
+        <input id="modal-reason" class="field mt-2" maxlength="200" />
+        <button type="button" id="modal-save" class="btn btn-sm btn-primary mt-3">Save</button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import {
+    getStoredTeamCode, getTeam, saveStep1, saveStep2, chooseCard, getTrail, openHint, checkTrail, saveStep5,
+    watchSessionState, friendlyError, type TeamCaseFile, type SessionState,
+  } from '../../lib/spark/api';
+  import { sparkCardById } from '../../data/spark';
+
+  const code = getStoredTeamCode();
+  if (!code) location.href = '/spark/join';
+
+  const waitingEl = document.getElementById('waiting')!;
+  const gameEl = document.getElementById('game')!;
+  let caseFile: TeamCaseFile | null = null;
+  let sessionState: SessionState = { unlocked_step: 0, mission_revealed: false };
+  let view = 0;
+  let loaded1 = false, loaded2 = false, loaded5 = false, trailLoaded = false;
+
+  function debounce<T extends (...a: any[]) => void>(fn: T, ms = 900) {
+    let t: ReturnType<typeof setTimeout>;
+    return (...a: Parameters<T>) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+  }
+
+  function renderLocks() {
+    document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
+      const n = Number(btn.dataset.step);
+      const locked = n > sessionState.unlocked_step;
+      btn.classList.toggle('locked', locked);
+      btn.classList.toggle('active', n === view);
+      btn.disabled = locked;
+    });
+  }
+
+  function showPanel(n: number) {
+    if (n > sessionState.unlocked_step) return;
+    view = n;
+    document.querySelectorAll<HTMLElement>('.panel').forEach((p) => p.classList.toggle('hidden', Number(p.dataset.panel) !== n));
+    renderLocks();
+    if (n === 1 && !loaded1) { loaded1 = true; fillStep1(); }
+    if (n === 2 && !loaded2) { loaded2 = true; fillStep2(); }
+    if (n === 4) loadTrail();
+    if (n === 5) { renderSummary(); if (!loaded5) { loaded5 = true; fillStep5(); } }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
+    btn.addEventListener('click', () => showPanel(Number(btn.dataset.step)));
+  });
+
+  document.getElementById('start-investigation')!.addEventListener('click', () => {
+    if (sessionState.unlocked_step >= 1) showPanel(1);
+    else showPanel(1); // locked view still switches the active tab target; renderLocks keeps it disabled visually
+  });
+
+  /* ---- Step 1 ---- */
+  function fillStep1() {
+    const t = (document.getElementById('q1-text') as HTMLTextAreaElement);
+    t.value = caseFile?.step1?.question_text || '';
+    const cl = caseFile?.step1?.checklist || [false, false, false, false];
+    document.querySelectorAll<HTMLInputElement>('[data-checklist]').forEach((cb, i) => (cb.checked = !!cl[i]));
+  }
+  const saveQ1 = debounce(async () => {
+    const q = (document.getElementById('q1-text') as HTMLTextAreaElement).value;
+    const cl = [...document.querySelectorAll<HTMLInputElement>('[data-checklist]')].map((cb) => cb.checked);
+    try {
+      await saveStep1(code!, q, cl);
+      document.getElementById('q1-saved')!.textContent = 'Saved';
+    } catch (e) { document.getElementById('q1-saved')!.textContent = friendlyError(e); }
+  });
+  document.getElementById('q1-text')!.addEventListener('input', () => { document.getElementById('q1-saved')!.textContent = 'Saving…'; saveQ1(); });
+  document.querySelectorAll('[data-checklist]').forEach((cb) => cb.addEventListener('change', saveQ1));
+
+  function renderMission() {
+    const box = document.getElementById('mission-box')!;
+    const text = document.getElementById('mission-text')!;
+    if (sessionState.mission_revealed && caseFile?.mission_question) {
+      text.textContent = caseFile.mission_question;
+      box.classList.remove('hidden');
+    } else box.classList.add('hidden');
+  }
+
+  /* ---- Step 2 ---- */
+  function fillStep2() {
+    const s = caseFile?.step2;
+    (document.querySelector('[data-kw="music"]') as HTMLInputElement).value = s?.words_music || '';
+    (document.querySelector('[data-kw="studying"]') as HTMLInputElement).value = s?.words_studying || '';
+    (document.querySelector('[data-kw="silence"]') as HTMLInputElement).value = s?.words_silence || '';
+    (document.querySelector('[data-kw="remembering"]') as HTMLInputElement).value = s?.words_remembering || '';
+    (document.getElementById('search-line') as HTMLInputElement).value = s?.search_line || '';
+    (document.getElementById('useful-title') as HTMLInputElement).value = s?.useful_title || '';
+    updateScholarLink();
+  }
+  function updateScholarLink() {
+    const line = (document.getElementById('search-line') as HTMLInputElement).value;
+    (document.getElementById('scholar-link') as HTMLAnchorElement).href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(line);
+  }
+  const saveQ2 = debounce(async () => {
+    try {
+      await saveStep2(code!, {
+        wordsMusic: (document.querySelector('[data-kw="music"]') as HTMLInputElement).value,
+        wordsStudying: (document.querySelector('[data-kw="studying"]') as HTMLInputElement).value,
+        wordsSilence: (document.querySelector('[data-kw="silence"]') as HTMLInputElement).value,
+        wordsRemembering: (document.querySelector('[data-kw="remembering"]') as HTMLInputElement).value,
+        searchLine: (document.getElementById('search-line') as HTMLInputElement).value,
+        usefulTitle: (document.getElementById('useful-title') as HTMLInputElement).value,
+      });
+      document.getElementById('q2-saved')!.textContent = 'Saved';
+    } catch (e) { document.getElementById('q2-saved')!.textContent = friendlyError(e); }
+  });
+  ['[data-kw="music"]', '[data-kw="studying"]', '[data-kw="silence"]', '[data-kw="remembering"]', '#search-line', '#useful-title'].forEach((sel) => {
+    document.querySelector(sel)!.addEventListener('input', () => { document.getElementById('q2-saved')!.textContent = 'Saving…'; updateScholarLink(); saveQ2(); });
+  });
+
+  /* ---- Step 3: cards ---- */
+  let activeCardId: string | null = null;
+  function renderCards() {
+    const cards = caseFile?.cards || {};
+    let n = 0;
+    document.querySelectorAll<HTMLButtonElement>('.card-tile').forEach((tile) => {
+      const id = tile.dataset.card!;
+      const tag = tile.querySelector('.card-tag') as HTMLElement;
+      const entry = cards[id];
+      if (entry) { n++; tag.textContent = entry.choice === 'not_for_us' ? 'Not for us' : entry.choice[0].toUpperCase() + entry.choice.slice(1); tag.classList.remove('hidden'); }
+      else tag.classList.add('hidden');
+    });
+    document.getElementById('cards-progress')!.textContent = `${n} of 8 sorted`;
+
+    const board: Record<string, HTMLElement> = {
+      keep: document.getElementById('board-keep')!, maybe: document.getElementById('board-maybe')!, not_for_us: document.getElementById('board-not')!,
+    };
+    Object.values(board).forEach((el) => (el.innerHTML = ''));
+    for (const [id, entry] of Object.entries(cards)) {
+      const li = document.createElement('li');
+      li.className = 'cursor-pointer hover:text-blue';
+      li.textContent = `${sparkCardById[id as keyof typeof sparkCardById]?.title.split(':')[0] || id} — ${entry.reason}`;
+      li.addEventListener('click', () => openModal(id));
+      board[entry.choice]?.appendChild(li);
+    }
+  }
+  function openModal(id: string) {
+    activeCardId = id;
+    const c = sparkCardById[id as keyof typeof sparkCardById];
+    document.getElementById('modal-title')!.textContent = c.title;
+    document.getElementById('modal-meta')!.textContent = `${c.authors} · ${c.year} · ${c.journal}`;
+    document.getElementById('modal-summary')!.textContent = c.summary;
+    (document.getElementById('modal-link') as HTMLAnchorElement).href = c.officialLink;
+    const existing = caseFile?.cards?.[id];
+    document.querySelectorAll('.choice-btn').forEach((b) => b.classList.toggle('chosen', b.getAttribute('data-choice') === existing?.choice));
+    const reasonWrap = document.getElementById('modal-reason-wrap')!;
+    const reasonInput = document.getElementById('modal-reason') as HTMLInputElement;
+    if (existing) { reasonWrap.classList.remove('hidden'); reasonInput.value = existing.reason; } else { reasonWrap.classList.add('hidden'); reasonInput.value = ''; }
+    document.getElementById('card-modal')!.classList.remove('hidden');
+  }
+  document.querySelectorAll<HTMLButtonElement>('.card-tile').forEach((tile) => tile.addEventListener('click', () => openModal(tile.dataset.card!)));
+  document.getElementById('modal-close')!.addEventListener('click', () => document.getElementById('card-modal')!.classList.add('hidden'));
+  document.querySelectorAll<HTMLButtonElement>('.choice-btn').forEach((btn) => btn.addEventListener('click', () => {
+    document.querySelectorAll('.choice-btn').forEach((b) => b.classList.toggle('chosen', b === btn));
+    document.getElementById('modal-reason-wrap')!.classList.remove('hidden');
+    (document.getElementById('modal-reason') as HTMLInputElement).focus();
+  }));
+  document.getElementById('modal-save')!.addEventListener('click', async () => {
+    const choice = document.querySelector('.choice-btn.chosen')?.getAttribute('data-choice');
+    const reason = (document.getElementById('modal-reason') as HTMLInputElement).value.trim();
+    if (!activeCardId || !choice || !reason) return;
+    try {
+      await chooseCard(code!, activeCardId, choice, reason);
+      if (!caseFile!.cards) caseFile!.cards = {};
+      caseFile!.cards[activeCardId] = { choice, reason };
+      renderCards();
+      document.getElementById('card-modal')!.classList.add('hidden');
+    } catch (e) { alert(friendlyError(e)); }
+  });
+
+  /* ---- Step 4: trail ---- */
+  async function loadTrail() {
+    if (sessionState.unlocked_step < 4) {
+      document.getElementById('trail-locked')!.classList.remove('hidden');
+      document.getElementById('trail-open')!.classList.add('hidden');
+      return;
+    }
+    document.getElementById('trail-locked')!.classList.add('hidden');
+    document.getElementById('trail-open')!.classList.remove('hidden');
+    if (trailLoaded) return;
+    trailLoaded = true;
+    try {
+      const info = await getTrail(code!);
+      if (info.locked) return;
+      document.getElementById('trail-clue')!.textContent = info.clue || '';
+      const list = document.getElementById('hints-list')!;
+      (info.hints || []).forEach((h, i) => addHintLine(list, i + 1, h));
+      if (info.found && caseFile?.key_card) showFound(caseFile.key_card);
+    } catch (e) { document.getElementById('trail-clue')!.textContent = friendlyError(e); }
+  }
+  function addHintLine(list: HTMLElement, n: number, text: string) {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>Hint ${n}:</strong> `;
+    li.append(text);
+    list.appendChild(li);
+  }
+  document.getElementById('need-hint')!.addEventListener('click', async () => {
+    try {
+      const { hint, hints_opened } = await openHint(code!);
+      addHintLine(document.getElementById('hints-list')!, hints_opened, hint);
+      if (hints_opened >= 4) (document.getElementById('need-hint') as HTMLButtonElement).disabled = true;
+    } catch (e) { alert(friendlyError(e)); }
+  });
+  document.getElementById('trail-check')!.addEventListener('click', async () => {
+    const title = (document.getElementById('trail-answer') as HTMLInputElement).value.trim();
+    if (!title) return;
+    document.getElementById('trail-not-yet')!.classList.add('hidden');
+    try {
+      const result = await checkTrail(code!, title);
+      if (result.found && result.key_card) {
+        if (caseFile) { caseFile.key_card = result.key_card; if (caseFile.step4) caseFile.step4.found = true; }
+        showFound(result.key_card);
+      } else {
+        document.getElementById('trail-not-yet')!.classList.remove('hidden');
+      }
+    } catch (e) { alert(friendlyError(e)); }
+  });
+  function showFound(key: NonNullable<TeamCaseFile['key_card']>) {
+    document.getElementById('key-card-text')!.textContent = `${key.title} — ${key.authors} (${key.year}). ${key.summary}`;
+    document.getElementById('trail-found')!.classList.remove('hidden');
+  }
+
+  /* ---- Step 5 ---- */
+  function fillStep5() {
+    (document.getElementById('surprised') as HTMLTextAreaElement).value = caseFile?.step5?.surprised_text || '';
+  }
+  const saveQ5 = debounce(async () => {
+    try { await saveStep5(code!, (document.getElementById('surprised') as HTMLTextAreaElement).value); } catch {}
+  });
+  document.getElementById('surprised')!.addEventListener('input', saveQ5);
+
+  function renderSummary() {
+    const el = document.getElementById('summary')!;
+    const parts: string[] = [];
+    parts.push(`<p><strong>Your question:</strong> ${caseFile?.step1?.question_text || '—'}</p>`);
+    if (caseFile?.mission_question) parts.push(`<p><strong>Mission question:</strong> ${caseFile.mission_question}</p>`);
+    if (caseFile?.step2?.search_line) parts.push(`<p><strong>Search line:</strong> ${caseFile.step2.search_line}</p>`);
+    const cards = caseFile?.cards || {};
+    const kept = Object.entries(cards).filter(([, v]) => v.choice === 'keep').map(([id, v]) => `${sparkCardById[id as keyof typeof sparkCardById]?.title} — ${v.reason}`);
+    if (kept.length) parts.push(`<p><strong>Kept papers:</strong></p><ul class="list-disc pl-5">${kept.map((k) => `<li>${k}</li>`).join('')}</ul>`);
+    if (caseFile?.key_card) parts.push(`<p><strong>Key paper:</strong> ${caseFile.key_card.title} (${caseFile.key_card.year})</p>`);
+    el.innerHTML = parts.join('');
+  }
+
+  /* ---- Boot ---- */
+  async function boot() {
+    try {
+      caseFile = await getTeam(code!);
+      if (!caseFile) { location.href = '/spark/join'; return; }
+      document.getElementById('team-label')!.textContent = `${caseFile.team.name} (${caseFile.team.code})`;
+      sessionState = caseFile.state;
+      waitingEl.classList.add('hidden');
+      gameEl.classList.remove('hidden');
+      renderLocks();
+      renderMission();
+      renderCards();
+      showPanel(Math.min(view, sessionState.unlocked_step));
+      watchSessionState(async (s) => {
+        const missionJustRevealed = s.mission_revealed && !sessionState.mission_revealed;
+        sessionState = s;
+        renderLocks();
+        if (missionJustRevealed) { caseFile = await getTeam(code!); renderMission(); }
+        if (view > s.unlocked_step) showPanel(s.unlocked_step);
+        if (view === 4) loadTrail();
+      });
+    } catch (e) {
+      waitingEl.innerHTML = `<p class="text-signal">${friendlyError(e)}</p>`;
+    }
+  }
+  waitingEl.classList.remove('hidden');
+  boot();
+</script>
+
+<style>
+  .step-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 14px; font-size: 12px; color: #8A94A8; white-space: nowrap; border-bottom: 2px solid transparent; }
+  .step-tab .step-num { width: 20px; height: 20px; border-radius: 999px; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  .step-tab.active { color: #3F66B0; border-color: #3F66B0; }
+  .step-tab.locked { opacity: .4; cursor: not-allowed; }
+  .card-tile { position: relative; text-align: left; border: 1px solid rgba(27,42,85,.15); background: #fff; padding: 10px; border-radius: 10px; transition: border-color .2s; }
+  .card-tile:hover { border-color: #3F66B0; }
+  .card-tag { position: absolute; top: 6px; right: 6px; font-size: 10px; padding: 2px 6px; background: #3F66B0; color: #fff; border-radius: 4px; }
+  .choice-btn { flex: 1; height: 40px; border: 1px solid rgba(27,42,85,.2); border-radius: 8px; font-size: 14px; color: #3A4458; }
+  .choice-btn.chosen { background: #3F66B0; color: #fff; border-color: #3F66B0; }
+</style>

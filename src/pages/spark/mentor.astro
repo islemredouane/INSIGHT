@@ -1,0 +1,178 @@
+---
+// SPARK · The Music Case — mentor panel. Password-gated; the mentor password
+// unlocks steps and watches teams, the admin password also resets the session.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Mentor panel · SPARK" description="SPARK 2026 mentor panel." noindex>
+  <section class="bg-ink text-white pt-[104px] pb-10">
+    <div class="max-w-[1100px] mx-auto px-5">
+      <p class="eyebrow text-peri">SPARK 2026 · The Music Case</p>
+      <h1 class="mt-1 font-display text-2xl font-bold">Mentor panel</h1>
+    </div>
+  </section>
+
+  <section class="bg-paper text-ink py-10 min-h-[60vh]">
+    <div class="max-w-[1100px] mx-auto px-5">
+
+      <form id="login-form" class="max-w-sm mx-auto rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 mt-10">
+        <label for="mentor-password" class="field-label">Mentor password</label>
+        <input id="mentor-password" class="field mt-2" type="password" required />
+        <p id="login-error" class="hidden mt-2 text-[14px] text-signal"></p>
+        <button type="submit" class="btn btn-primary w-full mt-4">Log in</button>
+      </form>
+
+      <div id="panel" class="hidden">
+        <div class="rounded-2xl bg-white border border-navy/10 p-5 flex flex-wrap items-center gap-4">
+          <p class="font-semibold">Current step for everyone: <span id="current-step">Step 0 · Story</span></p>
+          <button type="button" id="unlock-next" class="btn btn-sm btn-primary">Unlock next step</button>
+          <button type="button" id="reveal-mission" class="btn btn-sm btn-secondary btn-on-light">Reveal mission question</button>
+          <div class="flex gap-1 ml-auto" id="jump-steps"></div>
+        </div>
+
+        <div class="mt-6 overflow-x-auto rounded-2xl bg-white border border-navy/10">
+          <table class="w-full text-[13px]">
+            <thead class="bg-paper text-left">
+              <tr>
+                <th class="p-3">Team</th><th class="p-3">Members</th><th class="p-3">Cards</th>
+                <th class="p-3">Key paper</th><th class="p-3">Hints</th><th class="p-3">Last activity</th>
+              </tr>
+            </thead>
+            <tbody id="teams-body"></tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 grid sm:grid-cols-2 gap-4">
+          <div class="rounded-2xl bg-white border border-navy/10 p-5">
+            <p class="font-semibold">Mentor notes</p>
+            <p class="text-[12px] text-muted mb-2">Only visible here — never sent to team pages.</p>
+            <ul id="notes-list" class="text-[13px] space-y-1"></ul>
+          </div>
+          <div class="rounded-2xl bg-white border border-navy/10 p-5 space-y-3">
+            <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export all answers (CSV)</button>
+            <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session — admin</button>
+          </div>
+        </div>
+
+        <div id="team-detail" class="hidden mt-6 rounded-2xl bg-white border border-navy/10 p-6"></div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import {
+    mentorLogin, mentorOverview, mentorSetStep, mentorRevealMission, mentorCaseFile, mentorNotes, mentorExport,
+    adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError, type MentorOverview, type MentorSession,
+  } from '../../lib/spark/api';
+  import { sparkCardById } from '../../data/spark';
+
+  const stepLabels = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
+  const loginForm = document.getElementById('login-form') as HTMLFormElement;
+  const panel = document.getElementById('panel')!;
+  let mentor: MentorSession | null = getStoredMentor();
+
+  const jumpWrap = document.getElementById('jump-steps')!;
+  stepLabels.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn btn-sm btn-secondary btn-on-light'; b.textContent = String(i);
+    b.addEventListener('click', () => setStep(i));
+    jumpWrap.appendChild(b);
+  });
+
+  async function init() {
+    if (!mentor) return;
+    loginForm.classList.add('hidden');
+    panel.classList.remove('hidden');
+    if (mentor.role === 'admin') document.getElementById('admin-reset')!.classList.remove('hidden');
+    await refresh();
+    setInterval(refresh, 5000);
+    const notes = await mentorNotes(mentor.token).catch(() => []);
+    const list = document.getElementById('notes-list')!;
+    list.innerHTML = notes.map((n) => `<li><strong>${n.card}</strong> — ${n.fit}: ${n.why}</li>`).join('');
+  }
+
+  async function refresh() {
+    if (!mentor) return;
+    let data: MentorOverview;
+    try { data = await mentorOverview(mentor.token); }
+    catch (e) { alert(friendlyError(e)); clearMentor(); mentor = null; location.reload(); return; }
+    document.getElementById('current-step')!.textContent = `Step ${data.state.unlocked_step} · ${stepLabels[data.state.unlocked_step]}`;
+    (document.getElementById('reveal-mission') as HTMLButtonElement).classList.toggle('btn-primary', data.state.mission_revealed);
+    const body = document.getElementById('teams-body')!;
+    body.innerHTML = data.teams.map((t) => `
+      <tr class="border-t border-navy/10 cursor-pointer hover:bg-paper" data-team="${t.id}">
+        <td class="p-3 font-medium">${t.name} <span class="text-muted font-mono text-[11px]">${t.code}</span></td>
+        <td class="p-3">${t.members.join(', ')}</td>
+        <td class="p-3">${t.cards_sorted} / 8</td>
+        <td class="p-3">${t.key_paper_found ? 'Yes' : '—'}</td>
+        <td class="p-3">${t.hints_opened}</td>
+        <td class="p-3 text-muted">${new Date(t.last_activity).toLocaleTimeString()}</td>
+      </tr>`).join('');
+    body.querySelectorAll<HTMLElement>('tr').forEach((row) => row.addEventListener('click', () => openTeam(row.dataset.team!)));
+  }
+
+  async function openTeam(teamId: string) {
+    if (!mentor) return;
+    try {
+      const cf = await mentorCaseFile(mentor.token, teamId);
+      const detail = document.getElementById('team-detail')!;
+      const cards = Object.entries(cf.cards || {}).map(([id, v]) => `${sparkCardById[id as keyof typeof sparkCardById]?.title || id}: ${v.choice} — ${v.reason}`);
+      detail.innerHTML = `
+        <p class="font-display text-xl font-bold">${cf.team.name} (${cf.team.code})</p>
+        <p class="mt-2 text-[14px]"><strong>Question:</strong> ${cf.step1?.question_text || '—'}</p>
+        <p class="mt-2 text-[14px]"><strong>Search line:</strong> ${cf.step2?.search_line || '—'}</p>
+        <div class="mt-2 text-[14px]"><strong>Cards:</strong><ul class="list-disc pl-5">${cards.map((c) => `<li>${c}</li>`).join('') || '<li>None yet</li>'}</ul></div>
+        <p class="mt-2 text-[14px]"><strong>Key paper found:</strong> ${cf.step4?.found ? 'Yes' : 'Not yet'} · hints opened: ${cf.step4?.hints_opened ?? 0}</p>
+        <p class="mt-2 text-[14px]"><strong>What surprised them:</strong> ${cf.step5?.surprised_text || '—'}</p>`;
+      detail.classList.remove('hidden');
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (e) { alert(friendlyError(e)); }
+  }
+
+  async function setStep(n: number) {
+    if (!mentor) return;
+    try { await mentorSetStep(mentor.token, n); await refresh(); } catch (e) { alert(friendlyError(e)); }
+  }
+  document.getElementById('unlock-next')!.addEventListener('click', async () => {
+    const current = document.getElementById('current-step')!.textContent?.match(/Step (\d)/);
+    const n = Math.min(5, Number(current?.[1] ?? 0) + 1);
+    await setStep(n);
+  });
+  document.getElementById('reveal-mission')!.addEventListener('click', async () => {
+    if (!mentor) return;
+    const btn = document.getElementById('reveal-mission') as HTMLButtonElement;
+    const next = !btn.classList.contains('btn-primary');
+    try { await mentorRevealMission(mentor.token, next); await refresh(); } catch (e) { alert(friendlyError(e)); }
+  });
+  document.getElementById('export-csv')!.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      const rows = await mentorExport(mentor.token);
+      if (!rows.length) return alert('No teams yet.');
+      const headers = Object.keys(rows[0]);
+      const csv = [headers.join(','), ...rows.map((r) => headers.map((h) => `"${String((r as any)[h] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'spark-session-1.csv'; a.click();
+    } catch (e) { alert(friendlyError(e)); }
+  });
+  document.getElementById('admin-reset')!.addEventListener('click', async () => {
+    if (!mentor) return;
+    if (!confirm('Reset the whole session? This deletes every team and their answers.')) return;
+    try { await adminReset(mentor.token); await refresh(); } catch (e) { alert(friendlyError(e)); }
+  });
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = (document.getElementById('mentor-password') as HTMLInputElement).value;
+    const err = document.getElementById('login-error')!;
+    err.classList.add('hidden');
+    try {
+      mentor = await mentorLogin(pw);
+      storeMentor(mentor);
+      await init();
+    } catch (ex) { err.textContent = friendlyError(ex); err.classList.remove('hidden'); }
+  });
+
+  init();
+</script>

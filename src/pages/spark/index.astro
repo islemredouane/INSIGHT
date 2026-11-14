@@ -1,0 +1,22 @@
+---
+// SPARK · The Music Case — public landing page for the Session 1 game.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+---
+<BaseLayout title="The Music Case · SPARK" description="SPARK 2026 Session 1: The Music Case. Teams investigate whether music helps or hurts studying.">
+  <PageHeader
+    eyebrow="SPARK 2026 · Session 1"
+    title="The Music Case."
+    lead={'Does listening to music while studying help or hurt? Your team investigates like real researchers, across all 5 sessions of SPARK.'}
+  />
+  <section class="bg-paper text-ink py-16 sm:py-20">
+    <div class="max-w-2xl mx-auto px-6 text-center">
+      <p class="text-[16px] text-body leading-relaxed">
+        In teams of 4, you'll write a research question, build a search, sort 8 real papers,
+        follow a trail of citations to find a hidden key paper, and build your team's case file —
+        which carries over to every session.
+      </p>
+      <a href="/spark/join" class="btn btn-primary mt-8">Join your team →</a>
+    </div>
+  </section>
+</BaseLayout>

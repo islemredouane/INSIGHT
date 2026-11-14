@@ -1,0 +1,159 @@
+---
+// SPARK · The Music Case — team sign-in. Creates a team (gets a 6-char code) or
+// signs back in with an existing code. No individual accounts: one code per team.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import Icon from '../../components/ui/Icon.astro';
+---
+<BaseLayout title="Join · SPARK" description="Join your team for SPARK 2026: The Music Case." noindex>
+  <PageHeader eyebrow="SPARK 2026 · The Music Case" title="Join your team." lead="One code per team of 4. No email, no password — just write the code down." />
+
+  <section class="bg-paper text-ink py-16 sm:py-20">
+    <div class="max-w-xl mx-auto px-6">
+      <div id="already-in" class="hidden rv rounded-2xl bg-white border border-navy/10 p-6 sm:p-8 mb-6 text-center">
+        <p class="text-[15px] text-body">You're already signed in as <strong id="already-name"></strong>.</p>
+        <div class="mt-5 flex flex-wrap justify-center gap-3">
+          <a href="/spark/case" class="btn btn-sm btn-primary">Continue to the game →</a>
+          <button type="button" id="switch-team" class="btn btn-sm btn-secondary btn-on-light">Not your team</button>
+        </div>
+      </div>
+
+      <div id="join-forms" class="rv rounded-2xl bg-white border border-navy/10 p-6 sm:p-8">
+        <div class="flex gap-2" role="tablist">
+          <button type="button" id="tab-new" class="choice" aria-selected="true">New team</button>
+          <button type="button" id="tab-code" class="choice" aria-selected="false">I have a team code</button>
+        </div>
+
+        <form id="form-new" class="mt-6 space-y-5">
+          <div>
+            <label for="team-name" class="field-label">Team name</label>
+            <input id="team-name" class="field" type="text" maxlength="30" required placeholder="e.g. Les Chercheurs" />
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div><label for="m1" class="field-label">Member 1</label><input id="m1" class="field" type="text" maxlength="40" required /></div>
+            <div><label for="m2" class="field-label">Member 2</label><input id="m2" class="field" type="text" maxlength="40" required /></div>
+            <div><label for="m3" class="field-label">Member 3 (optional)</label><input id="m3" class="field" type="text" maxlength="40" /></div>
+            <div><label for="m4" class="field-label">Member 4 (optional)</label><input id="m4" class="field" type="text" maxlength="40" /></div>
+          </div>
+          <p id="new-error" class="hidden text-[14px] text-signal" role="alert"></p>
+          <button type="submit" class="btn btn-primary w-full sm:w-auto"><span data-label>Create team</span></button>
+        </form>
+
+        <form id="form-code" class="hidden mt-6 space-y-5">
+          <div>
+            <label for="team-code" class="field-label">Team code</label>
+            <input id="team-code" class="field uppercase tracking-[0.2em] text-center text-xl font-mono" type="text" maxlength="6" required placeholder="K7P2QX" />
+          </div>
+          <p id="code-error" class="hidden text-[14px] text-signal" role="alert"></p>
+          <button type="submit" class="btn btn-primary w-full sm:w-auto"><span data-label>Continue</span></button>
+        </form>
+      </div>
+
+      <div id="code-reveal" class="hidden rv rounded-2xl bg-ink text-white p-6 sm:p-8 mt-6 text-center">
+        <p class="eyebrow text-peri">Your team code</p>
+        <p id="revealed-code" class="mt-3 font-display text-5xl font-bold tracking-[0.15em]"></p>
+        <p class="mt-4 text-[14px] text-silver/70">Write this code down — you'll need it next session.</p>
+        <div class="mt-5 flex flex-wrap justify-center gap-3">
+          <button type="button" id="copy-code" class="btn btn-sm btn-secondary"><Icon name="copy" /><span>Copy</span></button>
+          <a href="/spark/case" class="btn btn-sm btn-primary">Start the investigation →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { createTeam, getStoredTeamCode, storeTeamCode, clearTeamCode, getTeam, friendlyError } from '../../lib/spark/api';
+
+  const already = document.getElementById('already-in')!;
+  const alreadyName = document.getElementById('already-name')!;
+  const forms = document.getElementById('join-forms')!;
+  const switchBtn = document.getElementById('switch-team')!;
+
+  const existing = getStoredTeamCode();
+  if (existing) {
+    getTeam(existing).then((t) => {
+      if (t) {
+        alreadyName.textContent = `${t.team.name} (${t.team.code})`;
+        already.classList.remove('hidden');
+        forms.classList.add('hidden');
+      }
+    }).catch(() => {});
+  }
+  switchBtn.addEventListener('click', () => {
+    clearTeamCode();
+    already.classList.add('hidden');
+    forms.classList.remove('hidden');
+  });
+
+  const tabNew = document.getElementById('tab-new') as HTMLButtonElement;
+  const tabCode = document.getElementById('tab-code') as HTMLButtonElement;
+  const formNew = document.getElementById('form-new') as HTMLFormElement;
+  const formCode = document.getElementById('form-code') as HTMLFormElement;
+  function selectTab(which: 'new' | 'code') {
+    const isNew = which === 'new';
+    tabNew.setAttribute('aria-selected', String(isNew));
+    tabCode.setAttribute('aria-selected', String(!isNew));
+    tabNew.classList.toggle('active', isNew);
+    tabCode.classList.toggle('active', !isNew);
+    formNew.classList.toggle('hidden', !isNew);
+    formCode.classList.toggle('hidden', isNew);
+  }
+  // Reuse the .choice checked style without a real radio: toggle a matching look via aria-selected
+  tabNew.addEventListener('click', () => selectTab('new'));
+  tabCode.addEventListener('click', () => selectTab('code'));
+  selectTab('new');
+
+  const newError = document.getElementById('new-error')!;
+  formNew.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    newError.classList.add('hidden');
+    const name = (document.getElementById('team-name') as HTMLInputElement).value.trim();
+    const members = ['m1', 'm2', 'm3', 'm4']
+      .map((id) => (document.getElementById(id) as HTMLInputElement).value.trim())
+      .filter(Boolean);
+    const btn = formNew.querySelector('button[type="submit"]') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const code = await createTeam(name, members);
+      storeTeamCode(code);
+      forms.classList.add('hidden');
+      document.getElementById('revealed-code')!.textContent = code;
+      document.getElementById('code-reveal')!.classList.remove('hidden');
+    } catch (err) {
+      newError.textContent = friendlyError(err);
+      newError.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  const codeError = document.getElementById('code-error')!;
+  formCode.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    codeError.classList.add('hidden');
+    const code = (document.getElementById('team-code') as HTMLInputElement).value.trim().toUpperCase();
+    const btn = formCode.querySelector('button[type="submit"]') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const team = await getTeam(code);
+      if (!team) throw new Error("That code doesn't match a team. Check it and try again.");
+      storeTeamCode(code);
+      location.href = '/spark/case';
+    } catch (err) {
+      codeError.textContent = friendlyError(err);
+      codeError.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('copy-code')?.addEventListener('click', async () => {
+    const code = document.getElementById('revealed-code')!.textContent || '';
+    try { await navigator.clipboard.writeText(code); } catch {}
+  });
+</script>
+
+<style>
+  #tab-new.active, #tab-code.active { background: #3F66B0; border-color: #3F66B0; color: #fff; }
+</style>
