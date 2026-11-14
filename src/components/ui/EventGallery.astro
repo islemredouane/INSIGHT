@@ -4,6 +4,7 @@
 // pixel-locked baseline row alignment, and full interactive lightbox modal.
 import SectionHeader from './SectionHeader.astro';
 import EmptyState from './EmptyState.astro';
+import { assetUrl } from '../../lib/assets';
 
 interface Props {
   images: string[];
@@ -149,7 +150,7 @@ function getBentoSpan(index: number, total: number) {
             >
               <!-- Image element -->
               <img
-                src={src}
+                src={assetUrl(src)}
                 alt={caption}
                 class="gallery-img w-full h-full object-cover transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105"
                 style={`object-position: ${getImagePosition(src)};`}
@@ -258,7 +259,7 @@ function getBentoSpan(index: number, total: number) {
         <div class="relative max-w-full max-h-full flex flex-col items-center justify-center" id="lightbox-image-container">
           <img
             id="lightbox-image"
-            src={images[0]}
+            src={assetUrl(images[0])}
             alt={`${eventTitle} fullscreen photo`}
             class="max-h-[68vh] sm:max-h-[72vh] max-w-[92vw] sm:max-w-[85vw] object-contain rounded-xl shadow-2xl transition-all duration-300 select-none cursor-grab"
             draggable="false"
@@ -298,7 +299,7 @@ function getBentoSpan(index: number, total: number) {
               aria-label={`Jump to photo ${idx + 1}`}
             >
               <img
-                src={src}
+                src={assetUrl(src)}
                 alt=""
                 class="w-full h-full object-cover pointer-events-none"
                 style={`object-position: ${getImagePosition(src)};`}
