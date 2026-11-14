@@ -22,8 +22,32 @@ const number = String(p.number).padStart(2, '0');
 const leads = await getPoleLeads(pole.id);
 const others = (await getPoles()).filter((o) => o.id !== pole.id);
 const events = (await getEventsSorted()).filter((e) => e.data.poles.includes(pole.id));
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insight.estin.dz';
+
+const poleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ResearchProject',
+  name: `${p.name} Research Pole`,
+  alternateName: [`Pole ${number}: ${p.name}`, p.short],
+  description: p.description,
+  url: `${siteUrl}/research/${pole.id}/`,
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'INSIGHT Research Club',
+    url: `${siteUrl}/`,
+  },
+  keywords: p.topics.map((t) => t.title),
+  ...(leads.length > 0 ? {
+    member: leads.map((l) => ({
+      '@type': 'Person',
+      name: l.data.name,
+      jobTitle: `Pole Lead · ${p.name}`,
+    })),
+  } : {}),
+};
 ---
-<BaseLayout title={p.name} description={`${p.name}, research pole ${number} of INSIGHT: ${p.short}`}>
+<BaseLayout title={p.name} description={`${p.name}, research pole ${number} of INSIGHT: ${p.short}`} schemaExtra={[poleSchema]}>
   <PageHeader
     eyebrow={`Research pole ${number}`}
     title={p.name}

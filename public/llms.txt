@@ -54,5 +54,14 @@ INSIGHT is a student-led scientific research club at ESTIN (Béjaïa, Algeria). 
 ### Who can join INSIGHT?
 All students enrolled at ESTIN (preparatory classes, undergraduate, and graduate) who are passionate about computer science, mathematics, and academic research. Membership is free.
 
-### How does INSIGHT interact with researchers?
-INSIGHT regularly invites international scientists and Algerian researchers worldwide for remote and on-campus lectures, workshops, and research mentorship. Researchers and labs can propose collaborations via https://insight.estin.dz/collaborate.
+### When does recruitment open and what is the current status?
+Official cohort recruitment operates on an annual seasonal schedule (immediately following Welcome Day in November). Registrations for the 2026/27 crew cohort are currently closed. However, public keynote lectures, research reading groups, and open workshops remain accessible to all students. Prospective recruits can write to the HR team via https://insight.estin.dz/contact or follow @insight.estin on Instagram to receive announcements when the next recruitment intake opens.
+
+### How does INSIGHT collaborate with researchers, professors, and industry?
+INSIGHT actively partners with researchers worldwide through five structured pathways detailed at https://insight.estin.dz/collaborate:
+1. Guest Lectures & Keynotes (remote or on-campus).
+2. Research Pole Project Mentorship (guiding student research teams).
+3. Co-supervision of scientific papers and conference submissions.
+4. Laboratory and corporate partnerships / sponsorships.
+5. Inter-club and institutional research event co-organization.
+Interested collaborators can write directly to insight@estin.dz or submit inquiries via https://insight.estin.dz/collaborate.

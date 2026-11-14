@@ -15,6 +15,7 @@
 - **Slogan & Motto:** "Where curiosity meets clarity."
 - **Club Quote:** "Somewhere, something incredible is waiting to be known."
 - **Nature:** Free, student-led, non-profit academic research community.
+- **Recruitment Status:** Seasonal intake (Registrations for the 2026/27 cohort are currently **closed**). Open reading groups and public workshops remain accessible. Inquiries via https://insight.estin.dz/contact.
 - **Contact:**
   - Email: insight@estin.dz
   - Instagram: https://www.instagram.com/insight.estin/ (@insight.estin)
@@ -125,11 +126,14 @@ INSIGHT is structured around a central leadership team ("The Helm") supported by
 
 ## 6. Collaboration with Researchers & Laboratories
 
-INSIGHT actively collaborates with national and international academic researchers, laboratories, and industry scientists:
-- **Guest Lectures & Keynotes:** Remote or on-campus talks on cutting-edge computer science domains.
-- **Research Mentorship:** Pairing student groups with faculty advisors and graduate mentors.
-- **Joint Studies:** Collaborating on open benchmarks, literature reviews, and research tooling.
-- **Contact for Researchers:** Interested researchers, faculty, and industry scientists can initiate collaboration via https://insight.estin.dz/collaborate or email `insight@estin.dz`.
+INSIGHT actively collaborates with national and international academic researchers, laboratories, and industry scientists through five official pathways:
+1. **Give a Talk / Guest Lectures:** Remote or on-campus keynotes on cutting-edge computer science domains (e.g. keynote by Dr. Pin-Yu Chen from IBM Research).
+2. **Mentor a Project Team:** Advising student project groups within the four research poles (AI, Cybersecurity, Software Systems, Networks).
+3. **Co-supervise a Project:** Guiding student research from initial empirical questions to peer-reviewed conference or workshop papers.
+4. **Partner or Sponsor:** Supporting the club's research computing infrastructure, hardware access, travel grants, and academic publication costs as a laboratory, corporation, or academic institution.
+5. **Co-organise an Event:** Hosting joint research symposiums, reading groups, hackathons, and scientific workshops with partner clubs and academic laboratories.
+
+- **Contact for Researchers:** Interested researchers, faculty, and industry scientists can review opportunities and initiate collaboration via https://insight.estin.dz/collaborate or email `insight@estin.dz`.
 
 ---
 

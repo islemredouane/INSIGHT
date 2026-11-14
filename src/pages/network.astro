@@ -13,8 +13,44 @@ const researchers = await getResearchers();
 const hasLab = (await getPartners()).length > 0;
 const featured = researchers.find((r) => !r.data.placeholder && r.data.research.length > 0);
 const talks = (await getCollection('events', (e) => e.data.speakers.length > 0)).sort((a, b) => +b.data.date - +a.data.date);
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insight.estin.dz';
+
+const networkSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'INSIGHT Global Research Network',
+  description: `The international researchers${hasLab ? ' and partner laboratories' : ''} collaborating with INSIGHT Research Club at ESTIN.`,
+  url: `${siteUrl}/network/`,
+  mainEntity: {
+    '@type': 'ItemList',
+    name: 'Collaborating Researchers & Scientists',
+    numberOfItems: researchers.length,
+    itemListElement: researchers.map((r, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'Person',
+        name: r.data.name,
+        jobTitle: r.data.title,
+        worksFor: {
+          '@type': 'Organization',
+          name: r.data.institution,
+          address: {
+            '@type': 'PostalAddress',
+            addressCountry: r.data.country,
+          },
+        },
+        knowsAbout: r.data.fields,
+        ...(r.data.links?.profile || r.data.links?.scholar ? {
+          sameAs: [r.data.links.profile, r.data.links.scholar].filter(Boolean),
+        } : {}),
+      },
+    })),
+  },
+};
 ---
-<BaseLayout title="Research network" description={`The researchers${hasLab ? ' and the laboratory' : ''} who work with INSIGHT, ESTIN's student-led research club.`}>
+<BaseLayout title="Research network" description={`The researchers${hasLab ? ' and the laboratory' : ''} who work with INSIGHT, ESTIN's student-led research club.`} schemaExtra={[networkSchema]}>
   <PageHeader
     eyebrow="Research network"
     title="A network of researchers."

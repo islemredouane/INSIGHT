@@ -22,8 +22,41 @@ const ways = [
   { icon: 'users', title: 'Partner or sponsor', text: 'Support the club as a laboratory, company or institution.', subject: 'Partnering with INSIGHT', topic: 'company' },
   { icon: 'network', title: 'Co-organise an event', text: 'Run a research event together with your club or lab.', subject: 'Co-organising an event with INSIGHT', topic: 'club' },
 ] as const;
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insight.estin.dz';
+
+const collaborateSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Collaborate with INSIGHT Research Club',
+  description: "Opportunities for researchers, professors, partner laboratories and industry to collaborate with INSIGHT at ESTIN.",
+  url: `${siteUrl}/collaborate/`,
+  mainEntity: {
+    '@type': 'Service',
+    name: 'INSIGHT Academic & Research Collaboration Program',
+    provider: {
+      '@type': 'Organization',
+      name: 'INSIGHT Research Club',
+      url: `${siteUrl}/`,
+    },
+    serviceType: 'Academic Research Partnership',
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Collaboration Pathways',
+      itemListElement: ways.map((w, idx) => ({
+        '@type': 'Offer',
+        position: idx + 1,
+        itemOffered: {
+          '@type': 'Service',
+          name: w.title,
+          description: w.text,
+        },
+      })),
+    },
+  },
+};
 ---
-<BaseLayout title="Collaborate" description="Work with INSIGHT, ESTIN's student-led research club: give a talk, mentor a team, co-supervise a project, partner or co-organise an event.">
+<BaseLayout title="Collaborate" description="Work with INSIGHT, ESTIN's student-led research club: give a talk, mentor a team, co-supervise a project, partner or co-organise an event." schemaExtra={[collaborateSchema]}>
   <PageHeader
     eyebrow="Collaborate"
     title="Build bridges with the next generation of researchers."

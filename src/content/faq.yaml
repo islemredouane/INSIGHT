@@ -20,3 +20,16 @@
   question: How much time does it take?
   answer: A few hours a week, enough to fit alongside your classes.
   order: 5
+- id: recruitment
+  question: When does recruitment open for INSIGHT?
+  answer: Recruitment opens once a year following our annual Welcome Day. Outside of official registration periods, students are welcome to attend open reading groups, workshops, and keynotes. Write to our HR team on the contact page to receive announcements for the next season.
+  pages:
+    - home
+    - join
+  order: 6
+- id: collaborate
+  question: How can researchers, professors, or companies collaborate with INSIGHT?
+  answer: We partner with scientists and laboratories worldwide through guest lectures, student project mentorship, co-supervision, and event co-organization. Explore our five collaboration paths on our Collaborate page or reach out directly to our External Relations team.
+  pages:
+    - home
+  order: 7

@@ -16,8 +16,41 @@ const dept = (await getEntry('departments', 'research'))!;
 const [head] = await getDepartmentHeads('research');
 const poles = await getPoles();
 const leads = await getPoleLeads();
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insight.estin.dz';
+
+const researchSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'INSIGHT Scientific Research Poles',
+  description: "INSIGHT's research programs: four specialized research poles, student project teams, and academic research pathways.",
+  url: `${siteUrl}/research/`,
+  mainEntity: {
+    '@type': 'ItemList',
+    name: 'Research Poles',
+    numberOfItems: poles.length,
+    itemListElement: poles.map((p, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: p.data.name,
+      url: `${siteUrl}/research/${p.id}/`,
+      item: {
+        '@type': 'ResearchProject',
+        name: `${p.data.name} Research Pole`,
+        description: p.data.description,
+        url: `${siteUrl}/research/${p.id}/`,
+        parentOrganization: {
+          '@type': 'Organization',
+          name: 'INSIGHT Research Club',
+          url: `${siteUrl}/`,
+        },
+        keywords: p.data.topics.map((t) => t.title),
+      },
+    })),
+  },
+};
 ---
-<BaseLayout title="Research" description="INSIGHT's research programs: four research poles, project teams, and the voyage from a first question to a first paper.">
+<BaseLayout title="Research" description="INSIGHT's research programs: four research poles, project teams, and the voyage from a first question to a first paper." schemaExtra={[researchSchema]}>
   <PageHeader
     eyebrow="Research programs"
     title="Where questions become discoveries."
