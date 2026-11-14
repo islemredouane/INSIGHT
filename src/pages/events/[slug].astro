@@ -70,7 +70,7 @@ const meta = [
   <!-- Cover -->
   <section class="bg-paper pt-16">
     <div class="max-w-[1240px] mx-auto px-6 md:px-12">
-      <div class="rv aspect-[21/9] rounded-2xl overflow-hidden relative bg-gradient-to-br from-blue/80 to-navy">
+      <div class="rv aspect-[16/10] sm:aspect-[21/9] rounded-2xl overflow-hidden relative bg-gradient-to-br from-blue/80 to-navy">
         {e.cover
           ? e.coverFit === 'contain'
             ? <><img src={e.cover} alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover blur-2xl scale-125 brightness-75" /><img src={e.cover} alt={e.title} class="absolute inset-0 w-full h-full object-contain" /></>
