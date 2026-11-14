@@ -11,6 +11,11 @@ import Footer from '../components/layout/Footer.astro';
 import { site, reviewMode } from '../data/site';
 import { assetUrl } from '../lib/assets';
 
+interface BreadcrumbItem {
+  name: string;
+  url?: string;
+}
+
 interface Props {
   /** Page title; the site name is appended (the home page passes nothing). */
   title?: string;
@@ -18,8 +23,17 @@ interface Props {
   /** Absolute or root-relative path to a 1200×630 share image. */
   image?: string;
   noindex?: boolean;
+  breadcrumbs?: BreadcrumbItem[] | false;
+  schemaExtra?: Record<string, any>[];
 }
-const { title, description = site.description, image = '/brand/og-default.jpg', noindex = false } = Astro.props;
+const {
+  title,
+  description = site.description,
+  image = '/brand/og-default.jpg',
+  noindex = false,
+  breadcrumbs,
+  schemaExtra = [],
+} = Astro.props;
 const fullTitle = title ? `${title} · ${site.fullName}` : `${site.fullName} · ${site.school.name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const resolvedImage = assetUrl(image);
@@ -29,8 +43,70 @@ const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insi
 const resolvedLogo = assetUrl('/brand/insight-logo.png');
 const logoUrl = resolvedLogo.startsWith('http') ? resolvedLogo : new URL('/brand/insight-logo.png', Astro.site).href;
 
+// Dynamic BreadcrumbList for hierarchical Google SERP Rich Snippets & AI Answer Engine extraction
+const pathname = Astro.url.pathname.replace(/\/+$/, '');
+const segments = pathname.split('/').filter(Boolean);
+
+let breadcrumbElements: { '@type': string; position: number; name: string; item: string }[] = [];
+
+if (breadcrumbs !== false && segments.length > 0) {
+  if (Array.isArray(breadcrumbs) && breadcrumbs.length > 0) {
+    breadcrumbElements = breadcrumbs.map((b, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: b.name,
+      item: b.url ? (b.url.startsWith('http') ? b.url : `${siteUrl}${b.url}`) : canonical.href,
+    }));
+  } else {
+    breadcrumbElements.push({
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: `${siteUrl}/`,
+    });
+
+    const segmentTitles: Record<string, string> = {
+      about: 'About',
+      collaborate: 'Collaborate',
+      contact: 'Contact',
+      crew: 'Crew & Helm',
+      events: 'Events',
+      join: 'Join',
+      network: 'Research Network',
+      privacy: 'Privacy Policy',
+      research: 'Research Poles',
+      ai: 'Artificial Intelligence',
+      security: 'Cybersecurity',
+      software: 'Software Engineering',
+      networks: 'Networks & Systems',
+      spark: 'SPARK 2026',
+      training: 'Training Path',
+      case: 'The Music Case',
+      mentor: 'Mentor Panel',
+    };
+
+    let accum = '';
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      accum += `/${seg}`;
+      const isLast = i === segments.length - 1;
+      let label = segmentTitles[seg] || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
+      if (isLast && title) {
+        label = title.split('·')[0].trim();
+      }
+
+      breadcrumbElements.push({
+        '@type': 'ListItem',
+        position: i + 2,
+        name: label,
+        item: `${siteUrl}${accum}/`,
+      });
+    }
+  }
+}
+
 // Enterprise Schema.org Graph for Google Rich Snippets & AI Answer Engines (Perplexity, ChatGPT, Claude, Gemini)
-const schemaGraph = {
+const schemaGraph: Record<string, any> = {
   '@context': 'https://schema.org',
   '@graph': [
     {
@@ -101,6 +177,13 @@ const schemaGraph = {
       about: {
         '@id': `${siteUrl}/#organization`,
       },
+      ...(breadcrumbElements.length > 0
+        ? {
+            breadcrumb: {
+              '@id': `${canonical.href}#breadcrumb`,
+            },
+          }
+        : {}),
       primaryImageOfPage: {
         '@type': 'ImageObject',
         url: ogImage.href,
@@ -108,6 +191,16 @@ const schemaGraph = {
         height: 630,
       },
     },
+    ...(breadcrumbElements.length > 0
+      ? [
+          {
+            '@type': 'BreadcrumbList',
+            '@id': `${canonical.href}#breadcrumb`,
+            itemListElement: breadcrumbElements,
+          },
+        ]
+      : []),
+    ...schemaExtra,
   ],
 };
 ---
@@ -158,7 +251,7 @@ const schemaGraph = {
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={ogImage.href} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={fullTitle} />
@@ -168,7 +261,7 @@ const schemaGraph = {
     <meta name="twitter:url" content={canonical} />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image" content={ogImage.href} />
     <meta name="twitter:image:alt" content={fullTitle} />
 
     <!-- Structured Data (Schema.org Graph for SEO & AEO) -->

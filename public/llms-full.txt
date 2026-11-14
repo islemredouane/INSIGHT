@@ -97,7 +97,11 @@ The training pathway is modeled after a nautical scientific voyage, turning ambi
   4. *Tue 24 Nov:* From bullet points to academic paragraphs: synthesis, transitions, and paraphrasing.
   5. *Sun 29 Nov:* Building a research-based synthesis around a focused question with citations.
   6. *Tue 1 Dec:* Final SPARK Research Competition & project presentations.
-- **The Music Case:** Hands-on scenario where teams investigate whether music helps or hurts cognitive focus during studying, tracing citations and synthesizing evidence like professional researchers.
+- **The Music Case (Session 1):** Interactive case study hosted at https://insight.estin.dz/spark. Student teams of 4 investigate: *"Does listening to music while studying help or hurt?"*
+  - *Methodology:* Teams break down their research question across 4 empirical dimensions: Who? (target demographic) · What are you testing? (independent variable, e.g. lyrical vs instrumental music) · Compared to what? (control condition, e.g. silence) · Measured how? (dependent variable, e.g. reading comprehension test score).
+  - *Literature Sorting:* Teams build targeted academic search strings, evaluate 8 real papers (sorting into Keep, Maybe, and Not for us with scientific rationale), and trace backward citation trails.
+  - *Milestone Discovery:* Teams follow citations to uncover the definitive key paper: Perham, N., & Currie, H. (2014). *Does listening to preferred music improve reading comprehension performance?* Applied Cognitive Psychology, 28(2), 279–284. DOI: [10.1002/acp.2994](https://doi.org/10.1002/acp.2994).
+  - *Case File:* Teams synthesize their findings into a persistent team case file that carries over across the subsequent 4 workshops.
 
 ---
 

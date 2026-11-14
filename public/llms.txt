@@ -44,6 +44,7 @@ Institution: ESTIN, Amizour 06340, Béjaïa, Algeria (https://estin.dz/)
 
 - **Welcome Day 2026 (4 November 2026):** Official launch of INSIGHT at ESTIN. Included presentations of the seven departments, recruit interactive challenges, and a live keynote from New York by **Dr. Pin-Yu Chen**, Principal Research Scientist at IBM Research, on trustworthy AI and adversarial robustness.
 - **SPARK 2026: Research Foundations (15 November – 1 December 2026):** Flagship 5-workshop series covering paper selection, targeted reading, academic writing, synthesis, and culminating in the final SPARK Research Competition.
+  - **Session 1: The Music Case (https://insight.estin.dz/spark):** Hands-on scientific investigation simulating real research methodology. Student teams of 4 investigate whether background music improves or impairs reading comprehension performance, using a structured 4-part question breakdown (Who? · What are you testing? · Compared to what? · Measured how?), boolean academic search queries, paper triage (Keep / Maybe / Not for us), and citation trail tracing to uncover the key empirical study by Perham & Currie (2014) (*Applied Cognitive Psychology*, DOI: [10.1002/acp.2994](https://doi.org/10.1002/acp.2994)).
 
 ## Frequently Asked Questions
 

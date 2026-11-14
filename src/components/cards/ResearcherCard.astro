@@ -10,7 +10,7 @@ const link = r.links.profile ?? r.links.scholar ?? r.links.site;
 ---
 <li class="rcard group">
   <div class="rportrait">
-    {r.photo ? <img src={assetUrl(r.photo)} alt={r.name} loading="lazy" /> : <span class="rportrait-initials">{r.initials}</span>}
+    {r.photo ? <img src={assetUrl(r.photo)} alt={r.name} width="400" height="500" loading="lazy" decoding="async" /> : <span class="rportrait-initials">{r.initials}</span>}
     {!r.photo && showPlaceholders && <span class="rportrait-tag">{r.placeholder ? '[Photo]' : '[Official photo]'}</span>}
     {r.badge && <span class="rbadge">{r.badge}</span>}
   </div>
@@ -26,7 +26,7 @@ const link = r.links.profile ?? r.links.scholar ?? r.links.site;
       </ul>
     )}
     {link
-      ? <a href={link} target="_blank" rel="noopener" class="rlink">Profile ↗</a>
-      : <a href="#" class="rlink">Profile ↗</a>}
+      ? <a href={link} target="_blank" rel="noopener noreferrer" class="rlink" aria-label={`View academic profile of ${r.name}`}>Profile ↗</a>
+      : <span class="rlink opacity-40 select-none" aria-hidden="true">Profile ↗</span>}
   </div>
 </li>

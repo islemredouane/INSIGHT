@@ -2,21 +2,64 @@
 // SPARK · The Music Case — public landing page for the Session 1 game.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+
+const steps = [
+  { num: '00', title: 'The Story', desc: 'Read the briefing: A student argues that listening to upbeat music helps them study better, while another insists total silence is superior. Your mission starts here.' },
+  { num: '01', title: 'Question Lab', desc: 'Formulate your team’s empirical question and break it down across 4 criteria: Who? · What are you testing? · Compared to what? · Measured how?' },
+  { num: '02', title: 'Keyword Builder', desc: 'Translate your question into Boolean search terms (AND/OR operators), refine queries, and locate relevant academic literature.' },
+  { num: '03', title: 'Paper Cards', desc: 'Review 8 peer-reviewed research papers. Critically triage each study into Keep, Maybe, or Not for us with scientific rationale.' },
+  { num: '04', title: 'Follow the Trail', desc: 'Analyze backward citation trees and bibliographic references to hunt down the hidden landmark paper.' },
+  { num: '05', title: 'Case File', desc: 'Synthesize your evidence, document surprising insights, and lock your team’s permanent Case File for Session 2.' },
+];
+
+const sparkSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: 'SPARK Session 1: The Music Case',
+  description: 'Interactive scientific research game where student teams investigate the cognitive effects of background music on studying through paper triage and citation tracing.',
+  educationalLevel: 'Undergraduate / Preparatory',
+  learningResourceType: 'Simulated Research Investigation',
+  provider: {
+    '@type': 'Organization',
+    name: 'INSIGHT Research Club',
+    url: 'https://insight.estin.dz/',
+  },
+};
 ---
-<BaseLayout title="The Music Case · SPARK" description="SPARK 2026 Session 1: The Music Case. Teams investigate whether music helps or hurts studying.">
+<BaseLayout
+  title="The Music Case · SPARK"
+  description="SPARK 2026 Session 1: The Music Case. Student teams investigate whether music helps or hurts studying through real peer-reviewed papers."
+  schemaExtra={[sparkSchema]}
+>
   <PageHeader
     eyebrow="SPARK 2026 · Session 1"
     title="The Music Case."
-    lead={'Does listening to music while studying help or hurt? Your team investigates like real researchers, across all 5 sessions of SPARK.'}
-  />
-  <section class="bg-paper text-ink py-16 sm:py-20">
-    <div class="max-w-2xl mx-auto px-6 text-center">
-      <p class="text-[16px] text-body leading-relaxed">
-        In teams of 4, you'll write a research question, build a search, sort 8 real papers,
-        follow a trail of citations to find a hidden key paper, and build your team's case file —
-        which carries over to every session.
-      </p>
-      <a href="/spark/join" class="btn btn-primary mt-8">Join your team →</a>
+    lead="Does listening to music while studying help or hurt? Your team investigates like real researchers across 6 interactive steps."
+  >
+    <div class="hero-in mt-8 flex flex-wrap gap-4" style="--hd:.8s">
+      <a href="/spark/join" class="btn btn-primary">Join your team →</a>
+      <a href="/events/spark-2026" class="btn btn-secondary">SPARK 2026 overview →</a>
+    </div>
+  </PageHeader>
+
+  <!-- Roadmap -->
+  <section class="bg-paper text-ink py-20 sm:py-28">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="The Investigation" title="Six steps from question to discovery." />
+      <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {steps.map((s) => (
+          <article class="p-8 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition">
+            <span class="font-mono text-sm font-semibold text-blue">{s.num}</span>
+            <h3 class="mt-4 font-display text-xl font-bold text-ink">{s.title}</h3>
+            <p class="mt-2 text-[15px] text-body leading-relaxed">{s.desc}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-16 text-center">
+        <a href="/spark/join" class="btn btn-lg btn-primary inline-flex">Enter the Game →</a>
+      </div>
     </div>
   </section>
 </BaseLayout>

@@ -4,10 +4,58 @@
 
 User-agent: *
 Allow: /
+Disallow: /spark/mentor/
+Disallow: /spark/case/
+Disallow: /spark/join/
+Disallow: /404
 
 # Sitemaps
 Sitemap: https://insight.estin.dz/sitemap-index.xml
 Sitemap: https://insight.estin.dz/sitemap-0.xml
+
+# AI & Answer Engine Directives (AEO / GEO)
+# Welcoming modern AI research, search, and synthesis engines to index public research and resources
+User-agent: GPTBot
+Allow: /
+Disallow: /spark/mentor/
+Disallow: /spark/case/
+Disallow: /spark/join/
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /spark/mentor/
+Disallow: /spark/case/
+Disallow: /spark/join/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /spark/mentor/
+Disallow: /spark/case/
+Disallow: /spark/join/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /spark/mentor/
+Disallow: /spark/case/
+Disallow: /spark/join/
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
 
 # Generative AI & Answer Engine Optimization (AEO/GEO)
 # Machine-readable knowledge documents for LLMs (Perplexity, ChatGPT, Claude, Gemini):

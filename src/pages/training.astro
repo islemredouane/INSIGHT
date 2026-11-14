@@ -17,29 +17,23 @@ const today = todayUTC();
 const sessions = (await getEventsSorted())
   .filter((e) => ['training', 'workshop', 'paper-reading'].includes(e.data.type) && e.data.date >= today)
   .reverse();
+
+const programSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'EducationalOccupationalProgram',
+  name: 'INSIGHT Scientific Training Path: From Rookie to Captain',
+  description: "INSIGHT's training path, from Rookie to Captain: paper reading, research methodology, academic writing and technical workshops.",
+  provider: {
+    '@type': 'Organization',
+    name: 'INSIGHT Research Club',
+    url: 'https://insight.estin.dz/',
+  },
+  educationalProgramMode: 'hybrid',
+  timeToComplete: 'P1Y',
+  programType: 'Scientific Research Methodology & CS Training',
+};
 ---
-<BaseLayout title="Training" description="INSIGHT's training path, from Rookie to Captain: paper reading, research methodology, academic writing and technical workshops.">
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'EducationalOccupationalProgram',
-    name: 'INSIGHT Scientific Training Path: From Rookie to Captain',
-    description: "INSIGHT's training path, from Rookie to Captain: paper reading, research methodology, academic writing and technical workshops.",
-    provider: {
-      '@type': 'Organization',
-      name: 'INSIGHT Research Club',
-      url: 'https://insight.estin.dz/',
-    },
-    educationalProgramMode: 'hybrid',
-    timeToComplete: 'P1Y',
-    programType: 'Scientific Research Methodology & CS Training',
-    breadcrumb: {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
-        { '@type': 'ListItem', position: 2, name: 'Training', item: new URL('/training', Astro.site).href },
-      ],
-    },
-  })} />
+<BaseLayout title="Training" description="INSIGHT's training path, from Rookie to Captain: paper reading, research methodology, academic writing and technical workshops." schemaExtra={[programSchema]}>
   <PageHeader
     eyebrow="Training"
     title="Every captain started as a rookie."

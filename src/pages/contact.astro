@@ -26,31 +26,25 @@ const shortcuts = [
   { href: '/collaborate', eyebrow: 'Researchers, labs, companies', title: 'Want to work with us?', text: 'Five ways to collaborate with our crew.' },
   { href: '/events', eyebrow: 'Everyone', title: 'Looking for an event?', text: 'Talks, paper readings and workshops.' },
 ];
----
-<BaseLayout title="Contact" description={`Contact INSIGHT, ESTIN's student-led research club. Write to the right team; we reply within ${contactForm.replyTime}.`}>
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'ContactPage',
-    name: 'Contact INSIGHT Research Club',
-    description: `Contact INSIGHT, ESTIN's student-led research club. Write to the right team; we reply within ${contactForm.replyTime}.`,
-    mainEntity: {
-      '@type': 'Organization',
-      name: site.fullName,
+
+const contactSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact INSIGHT Research Club',
+  description: `Contact INSIGHT, ESTIN's student-led research club. Write to the right team; we reply within ${contactForm.replyTime}.`,
+  mainEntity: {
+    '@type': 'Organization',
+    name: site.fullName,
+    email: site.email,
+    contactPoint: {
+      '@type': 'ContactPoint',
       email: site.email,
-      contactPoint: {
-        '@type': 'ContactPoint',
-        email: site.email,
-        contactType: 'General Inquiries & Research Collaboration',
-      },
+      contactType: 'General Inquiries & Research Collaboration',
     },
-    breadcrumb: {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
-        { '@type': 'ListItem', position: 2, name: 'Contact', item: new URL('/contact', Astro.site).href },
-      ],
-    },
-  })} />
+  },
+};
+---
+<BaseLayout title="Contact" description={`Contact INSIGHT, ESTIN's student-led research club. Write to the right team; we reply within ${contactForm.replyTime}.`} schemaExtra={[contactSchema]}>
   <PageHeader
     eyebrow="Contact"
     title="Get in touch."
