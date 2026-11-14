@@ -10,11 +10,11 @@ interface Props {
   secondary?: { href: string; label: string } | null;
 }
 const {
-  eyebrow = `Our voyage · ${site.season}`,
+  eyebrow = 'Work with our crew',
   title = closingLines.discovery,
   line = closingLines.setSail,
-  primary = { href: '/research', label: 'Explore our research' },
-  secondary = { href: '/events', label: 'See events →' },
+  primary = { href: '/collaborate', label: 'Collaborate with us' },
+  secondary = { href: '/contact', label: 'Get in touch →' },
 } = Astro.props;
 ---
 <section id="cta" class="relative bg-ink py-28 overflow-hidden">

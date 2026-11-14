@@ -3,7 +3,7 @@
 import SectionHeader from '../ui/SectionHeader.astro';
 import { voyage } from '../../data/club';
 interface Props { eyebrow?: string; cta?: { href: string; label: string } | null }
-const { eyebrow = 'Log 04 · How research works', cta = { href: '/research', label: 'Explore our research →' } } = Astro.props;
+const { eyebrow = 'Log 04 · How research works', cta = { href: '/training', label: 'See our training path →' } } = Astro.props;
 // Stop positions on the 1200×380 route (x%, y%), alternating up/down
 const pos = [[5, 34.2], [20, 68.4], [35, 34.2], [50, 68.4], [65, 34.2], [80, 68.4]];
 const path = 'M60 130 C150 130 150 260 240 260 S330 130 420 130 S510 260 600 260 S690 130 780 130 S870 260 960 260 S1060 170 1130 170';

@@ -65,7 +65,7 @@ export const secondaryNav: NavItem[] = [
 ];
 
 /** Footer link columns. `soon: true` shows a "Soon" tag instead of a link. */
-export const footerNav: { title: string; links: (NavItem & { soon?: boolean })[] }[] = [
+export const footerNav: { title: string; links: (NavItem & { soon?: boolean; closed?: boolean })[] }[] = [
   {
     title: 'Club',
     links: [
@@ -86,6 +86,7 @@ export const footerNav: { title: string; links: (NavItem & { soon?: boolean })[]
   {
     title: 'Get involved',
     links: [
+      { href: '/join', label: 'Join the crew', closed: true },
       { href: '/collaborate', label: 'Collaborate' },
       { href: '/contact', label: 'Contact' },
     ],

@@ -36,7 +36,11 @@ const path = Astro.url.pathname;
         </ul>
       </nav>
       <div class="mm-item mt-auto pt-10" style={`--i:${mainNav.length + 2}`}>
-        {registrations.open && <a href="/join" class="mm-cta btn btn-primary w-full">Join the crew</a>}
+        {registrations.open ? (
+          <a href="/join" class="mm-cta btn btn-primary w-full">Join the crew</a>
+        ) : (
+          <a href="/collaborate" class="mm-cta btn btn-primary w-full">Collaborate with our crew →</a>
+        )}
         <div class="mt-6 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-[14px]">
           <a href={`mailto:${site.email}`} class="text-silver/80 hover:text-white transition-colors">{site.email}</a>
           <a href={site.instagram.url} target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-silver/80 hover:text-white transition-colors">
