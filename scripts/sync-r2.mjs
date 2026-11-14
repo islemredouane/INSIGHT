@@ -33,7 +33,7 @@ if (fs.existsSync(envLocalPath)) {
     if (eqIdx !== -1) {
       const key = trimmed.slice(0, eqIdx).trim();
       const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
-      if (!process.env[key]) {
+      if (val) {
         process.env[key] = val;
       }
     }
@@ -113,14 +113,19 @@ async function main() {
   console.log(`   Endpoint: https://${accountId}.r2.cloudflarestorage.com`);
   console.log(`   Public CDN: ${publicCdnUrl}\n`);
 
-  const eventsDir = path.join(rootDir, 'public', 'events');
-  if (!fs.existsSync(eventsDir)) {
-    console.error(`Directory not found: ${eventsDir}`);
-    process.exit(1);
+  const mediaDirs = ['events', 'crew', 'researchers', 'labs', 'brand'];
+  const publicDir = path.join(rootDir, 'public');
+  let files = [];
+
+  for (const dirName of mediaDirs) {
+    const dirPath = path.join(publicDir, dirName);
+    if (fs.existsSync(dirPath)) {
+      const dirFiles = await getLocalFiles(dirPath, publicDir);
+      files = files.concat(dirFiles);
+    }
   }
 
-  const files = await getLocalFiles(eventsDir, path.join(rootDir, 'public'));
-  console.log(`Found ${files.length} event assets to sync:\n`);
+  console.log(`Found ${files.length} website media assets to sync:\n`);
 
   let uploadedCount = 0;
   for (const file of files) {

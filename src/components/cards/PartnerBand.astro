@@ -1,6 +1,7 @@
 ---
 // Partner lab band (home-v3 "Research network").
 import type { CollectionEntry } from 'astro:content';
+import { assetUrl } from '../../lib/assets';
 interface Props { partner: CollectionEntry<'partners'>; roundTop?: boolean; roundBottom?: boolean }
 const p = Astro.props.partner.data;
 const { roundTop = true, roundBottom = true } = Astro.props;
@@ -8,7 +9,7 @@ const { roundTop = true, roundBottom = true } = Astro.props;
 <div style="--d:200ms" class:list={['rv border border-silver/10 bg-ink-2 p-6 sm:p-8 grid md:grid-cols-12 gap-6 md:items-center', roundTop && 'rounded-t-2xl', roundBottom && 'rounded-b-2xl']}>
   <div class="md:col-span-2">
     {p.logo
-      ? <img src={p.logo} alt={p.name} class="w-20 h-20 object-contain" loading="lazy" />
+      ? <img src={assetUrl(p.logo)} alt={p.name} class="w-20 h-20 object-contain" loading="lazy" />
       : <div class="w-20 h-20 border border-silver/15 bg-white/[.03] flex items-center justify-center font-mono text-[11px] text-muted text-center leading-tight">[Lab<br />logo]</div>}
   </div>
   <div class="md:col-span-7">

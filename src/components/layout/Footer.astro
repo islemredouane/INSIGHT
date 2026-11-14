@@ -2,6 +2,7 @@
 // Footer (home-v3): 1. contact band · 2. brand, link columns, affiliation · 3. bottom bar
 import Icon from '../ui/Icon.astro';
 import { footerNav, site, mailto } from '../../data/site';
+import { assetUrl } from '../../lib/assets';
 const year = new Date().getFullYear();
 ---
 <footer class="bg-ink-deep border-t border-white/10" aria-labelledby="footer-title">
@@ -33,7 +34,7 @@ const year = new Date().getFullYear();
     <div class="py-14 grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-12">
       <div class="col-span-2 md:col-span-12 lg:col-span-4">
         <a href="/" class="inline-flex items-center gap-3" aria-label={`${site.name} ${site.shortDescription}, home`}>
-          <img src="/brand/insight-logo-sm.png" alt="" width="61" height="36" class="h-9 w-auto logo-glow" loading="lazy" />
+          <img src={assetUrl('/brand/insight-logo-sm.png')} alt="" width="61" height="36" class="h-9 w-auto logo-glow" loading="lazy" />
           <span class="flex flex-col leading-none">
             <span class="font-display text-xl font-bold tracking-tight text-white">{site.name}</span>
             <span class="mt-1 text-[13px] text-muted">{site.shortDescription}</span>
@@ -70,7 +71,7 @@ const year = new Date().getFullYear();
       <div class="col-span-2 md:col-span-4 lg:col-span-3 md:justify-self-end">
         <h3 class="eyebrow text-silver">A club of</h3>
         <a href={site.school.url} target="_blank" rel="noopener" class="mt-5 inline-block opacity-80 hover:opacity-100 transition-opacity" aria-label={`${site.school.name}, ${site.school.fullName} (opens in a new tab)`}>
-          <img src="/brand/estin-logo-white.png" alt={site.school.name} width="111" height="40" class="h-10 w-auto" loading="lazy" />
+          <img src={assetUrl('/brand/estin-logo-white.png')} alt={site.school.name} width="111" height="40" class="h-10 w-auto" loading="lazy" />
         </a>
         <p class="mt-4 text-[14px] text-silver/60 leading-relaxed">{site.school.fullName}<br />{site.school.location}</p>
       </div>

@@ -9,6 +9,7 @@ import Navbar from '../components/layout/Navbar.astro';
 import MobileMenu from '../components/layout/MobileMenu.astro';
 import Footer from '../components/layout/Footer.astro';
 import { site, reviewMode } from '../data/site';
+import { assetUrl } from '../lib/assets';
 
 interface Props {
   /** Page title; the site name is appended (the home page passes nothing). */
@@ -21,10 +22,12 @@ interface Props {
 const { title, description = site.description, image = '/brand/og-default.jpg', noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · ${site.fullName}` : `${site.fullName} · ${site.school.name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL(image, Astro.site);
+const resolvedImage = assetUrl(image);
+const ogImage = resolvedImage.startsWith('http') ? new URL(resolvedImage) : new URL(resolvedImage, Astro.site);
 
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/+$/, '') : 'https://insight.estin.dz';
-const logoUrl = new URL('/brand/insight-logo.png', Astro.site).href;
+const resolvedLogo = assetUrl('/brand/insight-logo.png');
+const logoUrl = resolvedLogo.startsWith('http') ? resolvedLogo : new URL('/brand/insight-logo.png', Astro.site).href;
 
 // Enterprise Schema.org Graph for Google Rich Snippets & AI Answer Engines (Perplexity, ChatGPT, Claude, Gemini)
 const schemaGraph = {

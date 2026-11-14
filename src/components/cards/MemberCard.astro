@@ -3,6 +3,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { initials } from '../../lib/format';
 import { showPlaceholders } from '../../data/site';
+import { assetUrl } from '../../lib/assets';
 interface Props { member: CollectionEntry<'crew'>; roleLabel?: string }
 const { member, roleLabel } = Astro.props;
 const m = member.data;
@@ -10,7 +11,7 @@ const m = member.data;
 <li class="member group">
   <div class="portrait">
     {m.photo
-      ? <img class="portrait-img" src={m.photo} alt={m.name} loading="lazy" style={m.photoPosition ? `object-position:${m.photoPosition}` : undefined} />
+      ? <img class="portrait-img" src={assetUrl(m.photo)} alt={m.name} loading="lazy" style={m.photoPosition ? `object-position:${m.photoPosition}` : undefined} />
       : <><span class="portrait-initials">{initials(m.name)}</span>{showPlaceholders && <span class="portrait-tag">[Photo]</span>}</>}
     <span class="wanted" aria-hidden="true">Wanted</span>
   </div>
