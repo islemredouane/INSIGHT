@@ -1,7 +1,7 @@
 ---
 // Full-width navbar (home-v3): transparent over the hero, solid ink + hairline once you scroll.
 import { getCollection } from 'astro:content';
-import { mainNav, secondaryNav, site } from '../../data/site';
+import { mainNav, secondaryNav, site, registrations } from '../../data/site';
 import { isActive } from '../../lib/nav';
 import { getPoles } from '../../lib/content';
 import { shortDate, todayUTC } from '../../lib/format';
@@ -36,9 +36,11 @@ const featured = next ?? latest;
         <a href={collaborate.href} class:list={['btn btn-sm btn-ghost', { active: isActive(path, collaborate.href) }]} aria-current={isActive(path, collaborate.href) ? 'page' : undefined}>{collaborate.label}</a>
       </span>
       <!-- Under 360px only the menu button fits; Join stays the big button inside the menu -->
-      <span class="hidden min-[360px]:inline-flex">
-        <a href="/join" class="btn btn-sm btn-secondary">Join the crew</a>
-      </span>
+      {registrations.open && (
+        <span class="hidden min-[360px]:inline-flex">
+          <a href="/join" class="btn btn-sm btn-secondary">Join the crew</a>
+        </span>
+      )}
       <button id="menu-btn" class="menu-btn lg:hidden w-11 h-11 rounded-none border border-silver/20 text-silver hover:border-silver/50 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
         <span class="mb-line" aria-hidden="true"></span><span class="mb-line" aria-hidden="true"></span>
       </button>
