@@ -27,11 +27,17 @@ gallery:
   - /events/welcome-day-2026/welcome-day-4.jpg
   - /events/welcome-day-2026/welcome-day-5.jpg
   - /events/welcome-day-2026/live.jpg
+  - /events/welcome-day-2026/welcome-day-6.jpg
   - /events/welcome-day-2026/welcome-day-7.jpg
   - /events/welcome-day-2026/game.jpg
   - /events/welcome-day-2026/welcome-day-8.jpg
+  - /events/welcome-day-2026/welcome-day-9.jpg
+  - /events/welcome-day-2026/welcome-day-10.jpg
   - /events/welcome-day-2026/welcome-day-11.jpg
+  - /events/welcome-day-2026/welcome-day-12.jpg
   - /events/welcome-day-2026/winners-and-prizes.jpg
+  - /events/welcome-day-2026/welcome-day-13.png
+  - /events/welcome-day-2026/welcome-day-14.png
   - /events/welcome-day-2026/welcome-day-15.png
 ---
 
