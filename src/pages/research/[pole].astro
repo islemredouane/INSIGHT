@@ -114,9 +114,9 @@ const events = (await getEventsSorted()).filter((e) => e.data.poles.includes(pol
   </section>
 
   <FinalCTA
-    eyebrow={`Join ${p.name}`}
-    title="Pick the ship that excites you."
-    primary={{ href: '/join', label: 'Join the crew' }}
-    secondary={{ href: '/research', label: 'All research poles →' }}
+    eyebrow={`Research pole ${number}`}
+    title={`Explore ${p.name}.`}
+    primary={{ href: '/research', label: 'All research poles' }}
+    secondary={{ href: '/contact', label: 'Contact pole leads →' }}
   />
 </BaseLayout>

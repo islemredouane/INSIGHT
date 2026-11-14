@@ -14,6 +14,8 @@ export default defineConfig({
         const url = page.toLowerCase();
         return (
           !url.includes('/404') &&
+          !url.endsWith('/join') &&
+          !url.endsWith('/join/') &&
           !url.includes('/spark/case') &&
           !url.includes('/spark/join') &&
           !url.includes('/spark/mentor')

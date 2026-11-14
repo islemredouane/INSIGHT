@@ -86,7 +86,6 @@ export const footerNav: { title: string; links: (NavItem & { soon?: boolean })[]
   {
     title: 'Get involved',
     links: [
-      { href: '/join', label: 'Join the crew' },
       { href: '/collaborate', label: 'Collaborate' },
       { href: '/contact', label: 'Contact' },
     ],

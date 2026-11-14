@@ -15,7 +15,7 @@ const poles = await getPoles();
 const open = registrations.open && registrations.applyUrl;
 const support = ['Communication & Media', 'Design', 'Events & Logistics', 'External Relations', 'Human Resources'];
 ---
-<BaseLayout title="Join the crew" description="Join INSIGHT, ESTIN's student-led research club. Free, open to all ESTIN students, no experience required.">
+<BaseLayout title="Join the crew" description="Join INSIGHT, ESTIN's student-led research club. Free, open to all ESTIN students, no experience required." noindex>
   <PageHeader
     eyebrow={open ? `Registrations open · ${site.season}` : `Registrations · ${site.season}`}
     title={open ? 'Join the crew.' : 'The next crew sets sail soon.'}
