@@ -19,6 +19,7 @@ const crew = defineCollection({
     photoPosition: z.string().optional(), // CSS object-position, e.g. "top" or "center 20%"
     order: z.number().default(100),
     season: z.string().default('2026/27'),
+    email: z.string().email().optional(),
   }),
 });
 

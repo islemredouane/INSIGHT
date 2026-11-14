@@ -16,6 +16,7 @@
   duty: Runs meetings and strategy.
   photo: /crew/madaoui-sara.png
   photoPosition: "center 70%"
+  email: s_madaoui@estin.dz
   order: 2
 - id: redouane-mohamed-islem
   name: Redouane Mohamed Islem
@@ -59,7 +60,7 @@
 - { id: richi-roufaida, name: Richi Roufaida, role: Head, group: department, department: events, photo: /crew/richi-roufaida.jpg, order: 30 }
 - { id: belkaioua-nouha, name: Belkaioua Nouha, role: Head, group: department, department: events, photo: /crew/belkaioua-nouha.jpg, order: 31 }
 - { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, photo: /crew/diabi-lyna.jpg, photoPosition: top, order: 32 }
-- { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, photo: /crew/bey-ahmed-khernache-mounir.png, photoPosition: top, order: 40 }
+- { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, photo: /crew/bey-ahmed-khernache-mounir.png, photoPosition: top, email: m_beyahmedkhernache@estin.dz, order: 40 }
 - { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, photo: /crew/abadelia-mohammed-abdelghani.jpg, photoPosition: top, order: 41 }
 - { id: dou-abderraouf, name: Dou Abderraouf, role: Head, group: department, department: external-relations, order: 42 }
 - { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, photo: /crew/belkerrouche-asma.jpg, photoPosition: top, order: 50 }
