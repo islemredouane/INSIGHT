@@ -161,6 +161,98 @@ const schemaGraph: Record<string, any> = {
         postalCode: '06340',
         addressCountry: 'DZ',
       },
+      location: {
+        '@type': 'Place',
+        name: "ESTIN — École Supérieure en Sciences et Technologies de l'Informatique et du Numérique",
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Amizour',
+          addressRegion: 'Béjaïa',
+          postalCode: '06340',
+          addressCountry: 'DZ',
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: 36.66364687538598,
+          longitude: 4.909960575296492,
+        },
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Béjaïa' },
+        { '@type': 'Country', name: 'Algeria' },
+      ],
+      keywords:
+        'INSIGHT Research Club, ESTIN Béjaïa, student-led research, artificial intelligence, cybersecurity, software engineering, computer networks, trustworthy AI, academic research Algeria',
+      subOrganization: [
+        {
+          '@type': 'ResearchOrganization',
+          name: 'INSIGHT Artificial Intelligence Pole',
+          url: `${siteUrl}/research/ai`,
+          description: 'Machine learning, data science, trustworthy AI, and adversarial robustness.',
+        },
+        {
+          '@type': 'ResearchOrganization',
+          name: 'INSIGHT Cybersecurity Pole',
+          url: `${siteUrl}/research/security`,
+          description: 'System security, cryptography, and defensive AI security.',
+        },
+        {
+          '@type': 'ResearchOrganization',
+          name: 'INSIGHT Software Systems Pole',
+          url: `${siteUrl}/research/software`,
+          description: 'Distributed architectures, systems engineering, and formal program verification.',
+        },
+        {
+          '@type': 'ResearchOrganization',
+          name: 'INSIGHT Networks & IoT Pole',
+          url: `${siteUrl}/research/networks`,
+          description: 'Computer networking protocols, IoT embedded systems, and edge resilience.',
+        },
+      ],
+      member: [
+        {
+          '@type': 'OrganizationRole',
+          roleName: 'President',
+          startDate: '2026',
+          member: {
+            '@type': 'Person',
+            name: 'Mohamed Amine Faci',
+            jobTitle: 'President',
+          },
+        },
+        {
+          '@type': 'OrganizationRole',
+          roleName: 'Vice President',
+          startDate: '2026',
+          member: {
+            '@type': 'Person',
+            name: 'Sara Madaoui',
+            jobTitle: 'Vice President',
+            email: 's_madaoui@estin.dz',
+          },
+        },
+        {
+          '@type': 'OrganizationRole',
+          roleName: 'Secretary General',
+          startDate: '2026',
+          member: {
+            '@type': 'Person',
+            name: 'Sirine Mezhoud',
+            jobTitle: 'Secretary General',
+          },
+        },
+        {
+          '@type': 'OrganizationRole',
+          roleName: 'Head of External Relations',
+          startDate: '2026',
+          member: {
+            '@type': 'Person',
+            name: 'Mounir Bey Ahmed Khernache',
+            jobTitle: 'Head of External Relations',
+            email: 'm_beyahmedkhernache@estin.dz',
+          },
+        },
+      ],
       parentOrganization: {
         '@type': 'CollegeOrUniversity',
         name: site.school.fullName,
@@ -246,8 +338,9 @@ const schemaGraph: Record<string, any> = {
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/brand/insight-logo-sm.png" />
-    <link rel="apple-touch-icon" href="/brand/insight-logo-sm.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/brand/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/brand/icon-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png" />
 
     <!-- Open Graph / Facebook / LinkedIn / Discord / Telegram -->
     <meta property="og:type" content="website" />
