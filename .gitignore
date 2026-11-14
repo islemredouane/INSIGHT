@@ -32,4 +32,4 @@ desktop.ini
 .claude/
 
 # SPARK working files: paper PDFs (copyrighted) and answer keys, never commit
-spark-2026/
+/spark-2026/
