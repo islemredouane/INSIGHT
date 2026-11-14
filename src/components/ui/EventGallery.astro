@@ -41,6 +41,35 @@ const editorialCaptions: Record<number, string> = {
   17: 'Official Welcome Day 2026 Finale',
 };
 
+// Curated per-photo focal point alignment (object-position)
+// Guarantees subjects, faces, and stage elements remain perfectly framed
+// without clipping or showing empty ceilings, while keeping grid architecture intact.
+const imagePositions: Record<string, string> = {
+  'welcome-day-1.jpg': 'center 20%',      // Recruits at onboarding table & INSIGHT Ship sign
+  'welcome-day-2.jpg': 'center 45%',      // Sword pose with One Piece Wanted posters
+  'welcome-day-3.jpg': 'center 25%',      // Recruits at activity table & treasure chest
+  'welcome-day-4.jpg': 'center 15%',      // Recruits standing at table (prevents head clipping)
+  'welcome-day-5.jpg': 'center 50%',      // Three recruits holding Wanted frame
+  'live.jpg': 'center 48%',               // Dr. Pin-Yu Chen keynote stream from IBM Research
+  'welcome-day-6.jpg': 'center 45%',      // Stage projection of virtual keynote
+  'welcome-day-7.jpg': 'center 65%',      // Seated student audience in auditorium
+  'game.jpg': 'center 45%',               // Stage recruit challenge & Homelander guessing game
+  'welcome-day-8.jpg': 'center 45%',      // Speaker presentation with microphone
+  'welcome-day-9.jpg': 'center 52%',      // Presenter on stage ("Choose Your Destiny")
+  'welcome-day-10.jpg': 'center 68%',     // Hall overview with seated recruits
+  'welcome-day-11.jpg': 'center 45%',     // Stage guessing game with timer & Itachi
+  'welcome-day-12.jpg': 'center 42%',     // Stage guessing game with Trump slide
+  'winners-and-prizes.jpg': 'center 40%', // Prize winners on stage with ESTIN gift bags
+  'welcome-day-13.png': 'center 38%',     // Department Head presentation on stage
+  'welcome-day-14.png': 'center 50%',     // Student attendees in auditorium seats
+  'welcome-day-15.png': 'center 58%',     // Full INSIGHT Club finale group photo
+};
+
+function getImagePosition(src: string): string {
+  const filename = src.split('/').pop() || '';
+  return imagePositions[filename] || 'center center';
+}
+
 // Pro Bento span configuration:
 // Locked to uniform row-unit heights (270px desktop, 240px tablet)
 // Guaranteed mathematical baseline alignment
@@ -122,7 +151,8 @@ function getBentoSpan(index: number, total: number) {
               <img
                 src={src}
                 alt={caption}
-                class="gallery-img w-full h-full object-cover object-[center_top] transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105"
+                class="gallery-img w-full h-full object-cover transition-transform duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-105"
+                style={`object-position: ${getImagePosition(src)};`}
                 loading="lazy"
                 decoding="async"
               />
@@ -267,7 +297,13 @@ function getBentoSpan(index: number, total: number) {
               role="tab"
               aria-label={`Jump to photo ${idx + 1}`}
             >
-              <img src={src} alt="" class="w-full h-full object-cover pointer-events-none" loading="lazy" />
+              <img
+                src={src}
+                alt=""
+                class="w-full h-full object-cover pointer-events-none"
+                style={`object-position: ${getImagePosition(src)};`}
+                loading="lazy"
+              />
             </button>
           ))}
         </div>
