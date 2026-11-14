@@ -37,6 +37,7 @@ gallery:
   - /events/welcome-day-2026/welcome-day-12.jpg
   - /events/welcome-day-2026/winners-and-prizes.jpg
   - /events/welcome-day-2026/welcome-day-13.png
+  - /events/welcome-day-2026/welcome-day-14.png
 ---
 
 On 4 November 2026, INSIGHT officially set sail at ESTIN. The crew presented the club: a student-led

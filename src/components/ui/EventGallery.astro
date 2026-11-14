@@ -1,5 +1,5 @@
 ---
-// Modern interactive event gallery with editorial bento grid, keyboard-navigable lightbox & filmstrip
+// Modern interactive event gallery with self-balancing bento grid, keyboard-navigable lightbox & filmstrip
 import SectionHeader from './SectionHeader.astro';
 import EmptyState from './EmptyState.astro';
 
@@ -17,16 +17,65 @@ const {
   title = 'Gallery.',
 } = Astro.props;
 
-// Layout helper: give prominent shots a featured bento span
-function getItemSpan(index: number, total: number) {
-  // Opening hero shot
-  if (index === 0 && total >= 3) return 'sm:col-span-2 lg:col-span-2 aspect-[16/10]';
-  // Mid keynote/talk highlight (index 5 or 6)
-  if (index === 5 && total >= 8) return 'sm:col-span-2 lg:col-span-2 aspect-[16/10]';
-  // Wrap-up / prizes highlight (e.g. index 14)
-  if (index === 14 && total >= 15) return 'sm:col-span-2 lg:col-span-2 aspect-[16/10]';
-  return 'aspect-[4/3]';
+// Helper: mathematically compute spans so:
+// 1) Key moments (intro, keynote, games, awards) get featured wide spans
+// 2) Total column units modulo 3 == 0 on desktop (lg), so the final row is 100% full
+// 3) On tablet (sm), any odd single-column photos are sealed by expanding the final photo
+function computeSpans(total: number) {
+  if (total <= 2) return new Map<number, string>();
+
+  const priorityCandidates = [0, 5, 8, 14].filter((i) => i < total - 1);
+
+  let chosenWide: number[] = [];
+  for (let k = 0; k <= priorityCandidates.length; k++) {
+    const combos = getCombinations(priorityCandidates, k);
+    for (const combo of combos) {
+      if ((total + combo.length) % 3 === 0) {
+        chosenWide = combo;
+        break;
+      }
+    }
+    if (chosenWide.length > 0 || (total % 3 === 0 && k === 0)) break;
+  }
+
+  const wideSet = new Set(chosenWide);
+  const remainingLg = (total + wideSet.size) % 3;
+  const singlesCount = total - wideSet.size;
+  const lastNeedsSmWide = singlesCount % 2 !== 0;
+
+  const result = new Map<number, string>();
+
+  for (let i = 0; i < total; i++) {
+    const isWideLg = wideSet.has(i);
+    const isLast = i === total - 1;
+
+    if (isWideLg) {
+      result.set(i, 'sm:col-span-2 lg:col-span-2 aspect-[16/10]');
+    } else if (isLast && remainingLg === 2) {
+      result.set(i, 'sm:col-span-2 lg:col-span-2 aspect-[16/10]');
+    } else if (isLast && remainingLg === 1) {
+      result.set(i, 'sm:col-span-2 lg:col-span-3 aspect-[21/9]');
+    } else if (isLast && lastNeedsSmWide) {
+      result.set(i, 'sm:col-span-2 lg:col-span-1 aspect-[16/9] lg:aspect-[4/3]');
+    } else {
+      result.set(i, 'aspect-[4/3]');
+    }
+  }
+
+  return result;
 }
+
+function getCombinations<T>(arr: T[], k: number): T[][] {
+  if (k === 0) return [[]];
+  if (arr.length === 0) return [];
+  const head = arr[0];
+  const tail = arr.slice(1);
+  const withHead = getCombinations(tail, k - 1).map((c) => [head, ...c]);
+  const withoutHead = getCombinations(tail, k);
+  return [...withHead, ...withoutHead];
+}
+
+const spanMap = computeSpans(images.length);
 ---
 
 <section class="bg-white text-ink py-24 border-t border-navy/10 relative overflow-hidden" id="gallery">
@@ -46,16 +95,16 @@ function getItemSpan(index: number, total: number) {
     </div>
 
     {images.length > 0 ? (
-      <div class="rv-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" role="region" aria-label="Event photos">
+      <div class="rv-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 [grid-auto-flow:dense]" role="region" aria-label="Event photos">
         {images.map((src, idx) => {
-          const spanClass = getItemSpan(idx, images.length);
+          const spanClass = spanMap.get(idx) || 'aspect-[4/3]';
           const indexLabel = String(idx + 1).padStart(2, '0');
           const totalLabel = String(images.length).padStart(2, '0');
           return (
             <button
               type="button"
               class:list={[
-                'gallery-trigger group relative w-full overflow-hidden rounded-2xl bg-paper border border-navy/10 hover:border-blue/50 text-left transition-all duration-500 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2',
+                'gallery-trigger group relative w-full overflow-hidden rounded-2xl bg-paper border border-navy/10 hover:border-blue/50 text-left transition-all duration-500 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 cursor-pointer',
                 spanClass,
               ]}
               data-index={idx}
