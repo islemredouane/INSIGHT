@@ -2,12 +2,11 @@
 
 /**
  * Messages from the form are forwarded to site.email by Web3Forms (free, no server needed).
- * TODO (Helm): create the access key at https://web3forms.com with insight@estin.dz and paste it below.
- * The key is public by design (it only lets the form send to our inbox).
- * Until it is set, the form opens the visitor's email app with the message ready.
+ * The access key below was created at https://web3forms.com with insight@estin.dz.
+ * It is public by design (it only lets the form send to our inbox).
  */
 export const contactForm = {
-  web3formsKey: '',
+  web3formsKey: '2f7c25a1-1b9d-47d7-aa7f-2a345b9449ba',
   endpoint: 'https://api.web3forms.com/submit',
   /** The reply time we promise. TODO (Helm): confirm the club can keep it. */
   replyTime: '3 working days',
