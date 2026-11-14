@@ -3,7 +3,7 @@ title: "SPARK 2026: Research Foundations"
 date: 2026-11-15
 endDate: 2026-12-01
 type: training
-location: ESTIN, Amizour # TODO (Events): room
+location: ESTIN, Amizour
 summary: INSIGHT's research workshop series. Five workshops take you from reading research papers to writing your own, ending with a research competition on 1 December.
 featured: true
 cover: /events/spark-2026/cover.webp
@@ -27,23 +27,18 @@ programme:
   - time: "Tue 1 Dec · Apply"
     title: Final SPARK research competition
     text: Teams put everything into practice. The format will be announced soon.
-# registrationUrl: TODO (Training)
 ---
 
-SPARK is INSIGHT's research workshop series. It opens the club season every year and helps students take
-their first steps into academic research, through clear explanations, guided practice and teamwork.
+SPARK is INSIGHT's flagship research workshop series. It opens the club season every year and helps undergraduate students take their first steps into academic research through clear explanations, guided practice, and collaborative casework.
 
-This first edition follows a simple path: **read → write → connect → apply**. You start by learning what
-research is and how to choose and read papers. Then you practise writing clear academic text, combine
-information from several sources, and finally put it all to work in a research competition.
+### The Learning Pathway: Read → Write → Connect → Apply
+This inaugural edition follows an empirical 4-stage progression:
+1. **Read (Sessions 1 & 2):** Understand what scientific inquiry looks like, dissect the anatomy of peer-reviewed papers, and master targeted reading strategies (skimming, scanning, and evidence extraction).
+2. **Write (Sessions 3 & 4):** Formulate clear scientific questions, craft introductions with narrative tension, and transform notes into coherent academic paragraphs using topic sentences and rigorous citations.
+3. **Connect (Session 5):** Synthesize empirical findings across multiple papers and develop a coherent literature review.
+4. **Apply (Session 6):** Compete in the final SPARK research challenge, presenting original synthesis and experimental designs before a mentor jury.
 
-**Who is it for?** University students with little or no research experience. No specialist knowledge
-is needed: each workshop starts from simple examples and builds up to a short research-based text.
+### Interactive Casework: The Music Case
+Throughout the workshop series, teams of four investigate a real-world scenario on the [SPARK Game Platform](/spark): **The Music Case**. Teams formulate hypotheses, evaluate 8 real studies, follow backward citation trails, and build their team's permanent case file.
 
-**How it works.** Each workshop pairs a short explanation with a practical team activity and feedback.
-Teams of about four are recommended, and keeping the same team for the whole series lets you build on
-your earlier work.
-
-*Dates may still be adjusted. The format of the final competition will be confirmed soon.*
-
-<!-- TODO (Training): time and room of each workshop, registration link, competition format. -->
+**Who is it for?** University students with little or no prior research background. No specialized prerequisite is needed: each workshop starts from intuitive fundamentals and builds toward a complete research-based text.

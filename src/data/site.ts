@@ -39,8 +39,8 @@ export const reviewMode = import.meta.env.PUBLIC_REVIEW_MODE === 'true';
 export const showPlaceholders = import.meta.env.DEV || reviewMode;
 
 export const registrations = {
-  open: false, // TODO: confirm with HR
-  applyUrl: '', // TODO: Google Form link from HR
+  open: false,
+  applyUrl: '',
 } as const;
 
 export type NavItem = { href: string; label: string };

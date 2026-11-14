@@ -8,7 +8,7 @@
 export const contactForm = {
   web3formsKey: '2f7c25a1-1b9d-47d7-aa7f-2a345b9449ba',
   endpoint: 'https://api.web3forms.com/submit',
-  /** The reply time we promise. TODO (Helm): confirm the club can keep it. */
+  /** Expected reply timeframe. */
   replyTime: '3 working days',
 } as const;
 

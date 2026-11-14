@@ -1,7 +1,6 @@
 ---
 // Researcher card (home-v3 "Research network"): 4:5 portrait, institution · country, name, title, fields, profile link.
 import type { CollectionEntry } from 'astro:content';
-import { showPlaceholders } from '../../data/site';
 import { assetUrl } from '../../lib/assets';
 interface Props { researcher: CollectionEntry<'researchers'>; detailed?: boolean }
 const { researcher, detailed = false } = Astro.props;
@@ -11,7 +10,6 @@ const link = r.links.profile ?? r.links.scholar ?? r.links.site;
 <li class="rcard group">
   <div class="rportrait">
     {r.photo ? <img src={assetUrl(r.photo)} alt={r.name} width="400" height="500" loading="lazy" decoding="async" /> : <span class="rportrait-initials">{r.initials}</span>}
-    {!r.photo && showPlaceholders && <span class="rportrait-tag">{r.placeholder ? '[Photo]' : '[Official photo]'}</span>}
     {r.badge && <span class="rbadge">{r.badge}</span>}
   </div>
   <div class="rbody">

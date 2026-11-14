@@ -1,6 +1,4 @@
 # The 4 research poles. Leads are in crew.yaml (pole: <id>).
-# draft: true → description and topics are a reasonable first draft written for the site;
-#               TODO (pole leads): validate or rewrite, and add a reading list (5–10 papers each).
 
 - id: ai
   number: 1

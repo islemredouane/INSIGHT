@@ -8,7 +8,7 @@ import EventGallery from '../../components/ui/EventGallery.astro';
 import ResearcherCard from '../../components/cards/ResearcherCard.astro';
 import FinalCTA from '../../components/sections/FinalCTA.astro';
 import { longDate, eventTypeLabel, todayUTC } from '../../lib/format';
-import { site, showPlaceholders } from '../../data/site';
+import { site } from '../../data/site';
 import { assetUrl } from '../../lib/assets';
 
 export async function getStaticPaths() {
@@ -98,7 +98,7 @@ const coverSrc = assetUrl(e.cover);
           ? e.coverFit === 'contain'
             ? <><img src={coverSrc} alt="" aria-hidden="true" width="1200" height="600" class="absolute inset-0 w-full h-full object-cover blur-2xl scale-125 brightness-75" decoding="async" /><img src={coverSrc} alt={e.title} width="1200" height="600" class="absolute inset-0 w-full h-full object-contain" decoding="async" /></>
             : <img src={coverSrc} alt={e.title} width="1200" height="600" class="absolute inset-0 w-full h-full object-cover" decoding="async" />
-          : <><div class="absolute inset-0 dots opacity-30"></div>{showPlaceholders && <span class="absolute left-5 bottom-4 font-mono text-[12px] text-silver/80">[{e.title.split(':')[0].replace(/\s\d{4}$/, '')} photo]</span>}</>}
+          : <div class="absolute inset-0 dots opacity-30"></div>}
       </div>
     </div>
   </section>
