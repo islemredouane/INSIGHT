@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://insight-club.vercel.app">
+<a href="https://insight.estin.dz">
   <img src="public/brand/og-default.jpg" alt="INSIGHT Research Club — ESTIN Béjaïa · Where curiosity meets clarity" width="100%">
 </a>
 
@@ -9,8 +9,8 @@
 # ⚓ INSIGHT Research Club
 ### *Where curiosity meets clarity.*
 
-[![Website](https://img.shields.io/badge/insight--club.vercel.app-Live_Production-2563EB?style=for-the-badge&logo=vercel&logoColor=white&labelColor=0B1120)](https://insight-club.vercel.app)
-[![Domain](https://img.shields.io/badge/insight.estin.dz-Planned_Domain-1E293B?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=0B1120)](https://insight.estin.dz)
+[![Official Website](https://img.shields.io/badge/insight.estin.dz-Official_Domain-2563EB?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=0B1120)](https://insight.estin.dz)
+[![Vercel Edge](https://img.shields.io/badge/Vercel-Production-000000?style=for-the-badge&logo=vercel&logoColor=white&labelColor=0B1120)](https://insight-club.vercel.app)
 [![Astro](https://img.shields.io/badge/Astro-5.0-FF5D01?style=for-the-badge&logo=astro&logoColor=white&labelColor=0B1120)](https://astro.build)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=0B1120)](https://tailwindcss.com)
 [![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2_CDN-F38020?style=for-the-badge&logo=cloudflare&logoColor=white&labelColor=0B1120)](https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev)
@@ -26,7 +26,7 @@ Engineered for ultra-fast edge delivery, accessible academic publishing, and nat
 
 <br>
 
-[**Explore Live Platform**](https://insight-club.vercel.app) &nbsp;✦&nbsp;
+[**Explore Live Platform**](https://insight.estin.dz) &nbsp;✦&nbsp;
 [**Key Pillars**](#-key-pillars--platform-features) &nbsp;✦&nbsp;
 [**Architecture**](#-system-architecture) &nbsp;✦&nbsp;
 [**Visual Identity**](#-visual-identity--design-tokens) &nbsp;✦&nbsp;
@@ -118,7 +118,7 @@ flowchart TB
     AI(["🤖 AI Answer Engines<br>Perplexity · ChatGPT · Claude · Gemini"])
 
     subgraph Edge["☁️ Global Edge Delivery"]
-        Vercel["▲ Vercel Production Network<br>Static HTML · CSS · JS Bundles<br><code>https://insight-club.vercel.app</code>"]
+        Vercel["▲ Vercel Production Network<br>Static HTML · CSS · JS Bundles<br><code>https://insight.estin.dz</code>"]
         R2["⚡ Cloudflare R2 CDN<br>Zero-Egress Object Storage<br><code>https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev</code>"]
     end
 
