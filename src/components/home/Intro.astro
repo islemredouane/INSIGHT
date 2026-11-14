@@ -2,14 +2,13 @@
 // Home intro: the logo appears on a dark screen, its beam crosses the page, the screen opens along
 // the beam and the logo flies to its place in the hero. Plays only on a direct arrival (not when
 // coming from another page of the site), never with reduced motion, and any input skips it.
-import { assetUrl } from '../../lib/assets';
 ---
 <div id="intro" aria-hidden="true">
   <div class="intro-panel intro-top"></div>
   <div class="intro-panel intro-bottom"></div>
   <span class="intro-ray intro-ray-l"></span>
   <span class="intro-ray intro-ray-r"></span>
-  <img id="intro-logo" class="logo-glow" src={assetUrl('/brand/insight-logo.webp')} alt="" width="340" height="201" />
+  <img id="intro-logo" class="logo-glow" src="/brand/insight-logo.webp" alt="" width="340" height="201" />
 </div>
 
 <script is:inline>

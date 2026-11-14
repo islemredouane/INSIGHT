@@ -1,7 +1,6 @@
 ---
 // Home hero (home-v3): headline words rise in, then the real logo and its particle beam.
 import { site } from '../../data/site';
-import { assetUrl } from '../../lib/assets';
 ---
 <section class="relative min-h-screen min-h-[100svh] overflow-hidden bg-ink flex flex-col">
   <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
@@ -24,7 +23,7 @@ import { assetUrl } from '../../lib/assets';
     </div>
     <!-- Real logo, large; the canvas beam leaves from its rays -->
     <div class="lg:col-span-6 relative h-[300px] lg:h-[460px] flex items-center">
-      <img id="hero-logo" src={assetUrl('/brand/insight-logo.webp')} alt="" width="340" height="201" class="relative z-10 w-[230px] sm:w-[300px] lg:w-[340px] h-auto logo-glow" fetchpriority="high" />
+      <img id="hero-logo" src="/brand/insight-logo.webp" alt="" width="340" height="201" class="relative z-10 w-[230px] sm:w-[300px] lg:w-[340px] h-auto logo-glow" fetchpriority="high" />
     </div>
   </div>
 
