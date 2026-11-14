@@ -8,7 +8,7 @@ import { sparkCards, sparkStory, sparkQuestionExamples, sparkKeywordIdeas, spark
 const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
 ---
 <BaseLayout title="The Music Case · SPARK" description="SPARK 2026 Session 1: find the papers." noindex>
-  <section class="bg-ink text-white pt-[104px] pb-8 border-b border-white/10">
+  <section class="bg-ink text-white pt-24 xl:pt-32 pb-8 border-b border-white/10">
     <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
       <div>
         <p class="eyebrow text-peri">SPARK 2026 · The Music Case</p>
@@ -18,7 +18,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     </div>
   </section>
 
-  <nav id="progress" class="sticky top-[72px] z-20 bg-white border-b border-navy/10 overflow-x-auto" aria-label="Game progress">
+  <nav id="progress" class="sticky top-[72px] xl:top-[116px] z-20 bg-white border-b border-navy/10 overflow-x-auto" aria-label="Game progress">
     <div class="max-w-[1100px] mx-auto px-5 flex gap-1 py-3 min-w-max">
       {steps.map((label, i) => (
         <button type="button" class="step-tab" data-step={i}>
