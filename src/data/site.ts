@@ -20,7 +20,9 @@ export const site = {
   },
   founded: '2026-11-04', // Welcome Day 2026, the official start of the club
   season: '2026/27',
-  cdnUrl: (import.meta.env.PUBLIC_CDN_URL as string | undefined) || '',
+  cdnUrl:
+    (import.meta.env.PUBLIC_CDN_URL as string | undefined) ||
+    'https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev',
 } as const;
 
 /** Membership. Set `open` and `applyUrl` when the board confirms registrations (the Join page follows). */
