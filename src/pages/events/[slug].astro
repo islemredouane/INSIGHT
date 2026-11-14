@@ -34,7 +34,7 @@ const eventSchema = {
   ...(e.cover ? { image: new URL(e.cover, Astro.site).href } : {}),
 };
 const meta = [
-  { label: 'Date', value: longDate(e.date) },
+  e.endDate ? { label: 'Dates', value: `${longDate(e.date)} – ${longDate(e.endDate)}` } : { label: 'Date', value: longDate(e.date) },
   { label: 'Place', value: e.location },
   { label: 'Type', value: eventTypeLabel[e.type] },
   ...(e.attendance ? [{ label: 'Attendance', value: `${e.attendance} people` }] : []),
