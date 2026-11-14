@@ -138,4 +138,10 @@ export const sparkKeywordIdeas = {
 };
 
 export const sparkHomework =
-  'Before the next session: open the key paper (free copy link) and read only the title and the abstract. As a team, write down 2 questions you hope the paper answers.';
+  'Before the next session: open the key paper and read only the title and the abstract. As a team, write down 2 questions you hope the paper answers.';
+
+export const sparkNextSessionPaper = {
+  citation: 'Perham, N., & Currie, H. (2014). Does listening to preferred music improve reading comprehension performance? Applied Cognitive Psychology, 28(2), 279–284.',
+  doiLink: 'https://doi.org/10.1002/acp.2994',
+  cardId: 'KEY' as const,
+};

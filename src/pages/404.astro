@@ -3,6 +3,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Page not found" noindex>
+  <script is:inline>
+    // Handle dynamic client-side routes in static mode
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/spark/mentor/team/')) {
+      const id = window.location.pathname.replace('/spark/mentor/team/', '').replace(/\/$/, '');
+      if (id) {
+        window.location.replace('/spark/mentor/team?id=' + encodeURIComponent(id));
+      }
+    }
+  </script>
   <section class="relative min-h-[80vh] overflow-hidden bg-ink flex items-center">
     <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[460px] rounded-full bg-blue/15 blur-[140px] pointer-events-none"></div>

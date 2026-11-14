@@ -1,0 +1,684 @@
+---
+// SPARK · The Music Case — Detailed Team Page for Mentors.
+// URL: /spark/mentor/team?id=[id] or /spark/mentor/team/[id]
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Icon from '../../../../components/ui/Icon.astro';
+---
+<BaseLayout title="Team Details · SPARK Mentor" description="Detailed step-by-step answers for team." noindex>
+  <!-- Print & Top Bar -->
+  <section class="bg-ink text-white pt-24 xl:pt-28 pb-6 border-b border-white/10 print:hidden">
+    <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a href="/spark/mentor" class="text-[13px] text-peri hover:text-white flex items-center gap-1.5 transition-colors">
+          ← Back to Mentor Panel
+        </a>
+        <span class="text-white/20">|</span>
+        <span class="font-mono text-[11px] uppercase tracking-wider text-silver/70">SPARK 2026 Session 1</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" id="print-btn" class="btn btn-sm btn-secondary btn-on-light !bg-white/10 hover:!bg-white/20 !text-white !border-white/20 flex items-center gap-1.5">
+          <span>🖨️ Print / Save as PDF</span>
+        </button>
+        <span id="live-indicator" class="flex items-center gap-1.5 text-[12px] text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-800/60">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Live updates</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <main class="bg-paper text-ink py-10 min-h-[85vh] print:bg-white print:py-0">
+    <div class="max-w-[1000px] mx-auto px-5 print:max-w-none print:px-0">
+
+      <div id="loading" class="py-24 text-center">
+        <p class="font-display text-xl font-bold text-ink">Loading team case file...</p>
+      </div>
+
+      <div id="error-box" class="hidden bg-white border border-signal/30 p-8 rounded text-center my-10 max-w-lg mx-auto">
+        <p id="error-text" class="text-signal font-semibold"></p>
+        <a href="/spark/mentor" class="btn btn-sm btn-primary mt-4 inline-block">Return to Mentor Panel</a>
+      </div>
+
+      <div id="content" class="hidden space-y-6">
+
+        <!-- TEAM HEADER (Step 0 is story, so only needs this header) -->
+        <header class="bg-white border border-navy/10 rounded-lg p-6 shadow-sm print:border-navy/30 print:shadow-none">
+          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-navy/10 pb-4">
+            <div>
+              <div class="flex items-center gap-3">
+                <h1 id="team-name" class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">—</h1>
+                <span id="team-code" class="font-mono text-sm bg-navy/5 text-navy px-2.5 py-0.5 rounded font-bold">—</span>
+              </div>
+              <p id="team-members" class="text-[14px] text-body mt-1.5">Members: —</p>
+            </div>
+            <div class="text-right">
+              <span id="current-step-badge" class="inline-block bg-blue text-white font-mono text-[12px] uppercase px-3 py-1 rounded font-semibold">
+                Step 0 · Story
+              </span>
+              <p id="last-activity" class="text-[12px] text-muted mt-1.5">Last active: —</p>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-[13px]">
+            <div class="flex items-center gap-2">
+              <span class="text-muted font-medium">Assigned mentor:</span>
+              <span id="assigned-mentor" class="font-semibold text-ink">Unassigned</span>
+              <button type="button" id="assign-mentor-btn" class="text-blue hover:underline text-[12px] ml-1 print:hidden">(change)</button>
+            </div>
+            <p class="text-[12px] text-muted italic">Step 0 is the introduction story · Case answers begin in Step 1</p>
+          </div>
+        </header>
+
+        <!-- STEP 1: QUESTION LAB -->
+        <details class="step-card group" open data-step-section="1">
+          <summary class="step-summary">
+            <div class="flex items-center gap-3">
+              <span class="step-number">1</span>
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 1 — Question Lab</h2>
+                <p class="text-[12px] text-muted">Research question and 4-field breakdown</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="s1-status-pill" class="status-pill status-draft">Draft</span>
+              <span class="chevron text-muted">▼</span>
+            </div>
+          </summary>
+
+          <div class="step-body">
+            <div id="s1-content" class="space-y-4">
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted">Team Research Question</p>
+                <div class="mt-1 p-3.5 bg-paper rounded border border-navy/10 font-serif text-[16px] text-ink" id="s1-question-text">
+                  —
+                </div>
+              </div>
+
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-2">4-Part Breakdown Table</p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[13px] border border-navy/10 rounded overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-navy/10 bg-white">
+                  <div class="p-3 bg-paper/60"><strong class="block text-ink font-semibold mb-1">Who?</strong><span id="s1-who" class="text-body">—</span></div>
+                  <div class="p-3 bg-paper/60"><strong class="block text-ink font-semibold mb-1">What tested?</strong><span id="s1-what" class="text-body">—</span></div>
+                  <div class="p-3 bg-paper/60"><strong class="block text-ink font-semibold mb-1">Compared to?</strong><span id="s1-comp" class="text-body">—</span></div>
+                  <div class="p-3 bg-paper/60"><strong class="block text-ink font-semibold mb-1">Measured how?</strong><span id="s1-meas" class="text-body">—</span></div>
+                </div>
+              </div>
+
+              <!-- Mentor approval status / action -->
+              <div id="s1-review-block" class="pt-3 border-t border-navy/10"></div>
+            </div>
+            <div id="s1-empty" class="hidden not-started">Not started yet</div>
+          </div>
+        </details>
+
+        <!-- STEP 2: KEYWORD BUILDER -->
+        <details class="step-card group" open data-step-section="2">
+          <summary class="step-summary">
+            <div class="flex items-center gap-3">
+              <span class="step-number">2</span>
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 2 — Keyword Builder</h2>
+                <p class="text-[12px] text-muted">Keywords, search line & Scholar result</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="s2-ideas-pill" class="hidden text-[11px] bg-purple-100 text-purple-900 font-semibold px-2 py-0.5 rounded">Showed ideas</span>
+              <span class="chevron text-muted">▼</span>
+            </div>
+          </summary>
+
+          <div class="step-body">
+            <div id="s2-content" class="space-y-4">
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-2">Team's Keywords</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[13px]">
+                  <div class="p-3 bg-paper rounded border border-navy/10"><strong class="text-muted block text-[11px] uppercase">Music</strong><span id="s2-kw-music" class="text-ink font-medium">—</span></div>
+                  <div class="p-3 bg-paper rounded border border-navy/10"><strong class="text-muted block text-[11px] uppercase">Studying</strong><span id="s2-kw-studying" class="text-ink font-medium">—</span></div>
+                  <div class="p-3 bg-paper rounded border border-navy/10"><strong class="text-muted block text-[11px] uppercase">Silence</strong><span id="s2-kw-silence" class="text-ink font-medium">—</span></div>
+                  <div class="p-3 bg-paper rounded border border-navy/10"><strong class="text-muted block text-[11px] uppercase">Remembering</strong><span id="s2-kw-remembering" class="text-ink font-medium">—</span></div>
+                </div>
+              </div>
+
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Search line</p>
+                <code id="s2-search-line" class="block p-3 bg-paper rounded border border-navy/10 font-mono text-[13px] text-ink">—</code>
+              </div>
+
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Useful Result Pasted</p>
+                <p id="s2-useful-title" class="p-3 bg-paper rounded border border-navy/10 text-[14px] text-ink italic">—</p>
+              </div>
+
+              <div class="flex items-center gap-2 text-[13px] text-muted pt-2 border-t border-navy/10">
+                <span>Opened "Show ideas":</span>
+                <span id="s2-ideas-text" class="font-semibold text-ink">No</span>
+              </div>
+            </div>
+            <div id="s2-empty" class="hidden not-started">Not started yet</div>
+          </div>
+        </details>
+
+        <!-- STEP 3: PAPER CARDS -->
+        <details class="step-card group" open data-step-section="3">
+          <summary class="step-summary">
+            <div class="flex items-center gap-3">
+              <span class="step-number">3</span>
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 3 — Paper Cards</h2>
+                <p class="text-[12px] text-muted">8 cards sorted with reasons, expected fit & PDF opens</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="s3-count-pill" class="text-[12px] font-mono text-muted">0 / 8 sorted</span>
+              <span class="chevron text-muted">▼</span>
+            </div>
+          </summary>
+
+          <div class="step-body">
+            <div id="s3-content" class="overflow-x-auto">
+              <table class="w-full text-[13px] text-left border border-navy/10 rounded">
+                <thead class="bg-paper text-muted uppercase text-[11px] font-mono tracking-wider border-b border-navy/10">
+                  <tr>
+                    <th class="p-3">Paper</th>
+                    <th class="p-3">Team Choice</th>
+                    <th class="p-3">Team Reason</th>
+                    <th class="p-3">Expected Fit (Mentors)</th>
+                    <th class="p-3">Match</th>
+                    <th class="p-3">PDF Opens</th>
+                    <th class="p-3 text-right print:hidden">Preview</th>
+                  </tr>
+                </thead>
+                <tbody id="s3-cards-tbody" class="divide-y divide-navy/10"></tbody>
+              </table>
+            </div>
+            <div id="s3-empty" class="hidden not-started">Not started yet</div>
+          </div>
+        </details>
+
+        <!-- STEP 4: FOLLOW THE TRAIL -->
+        <details class="step-card group" open data-step-section="4">
+          <summary class="step-summary">
+            <div class="flex items-center gap-3">
+              <span class="step-number">4</span>
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 4 — Follow the Trail</h2>
+                <p class="text-[12px] text-muted">Key paper discovery, title attempts & hints opened</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="s4-status-pill" class="status-pill status-draft">Not found</span>
+              <span class="chevron text-muted">▼</span>
+            </div>
+          </summary>
+
+          <div class="step-body">
+            <div id="s4-content" class="space-y-4">
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div class="p-3.5 bg-paper rounded border border-navy/10">
+                  <p class="text-[11px] font-mono uppercase text-muted">Key Paper Found</p>
+                  <p id="s4-found-text" class="text-base font-bold text-ink mt-0.5">—</p>
+                  <p id="s4-found-time" class="text-[12px] text-muted mt-0.5">—</p>
+                </div>
+                <div class="p-3.5 bg-paper rounded border border-navy/10">
+                  <p class="text-[11px] font-mono uppercase text-muted">Hints Opened</p>
+                  <p id="s4-hints-text" class="text-base font-bold text-ink mt-0.5">0 / 4</p>
+                  <p class="text-[12px] text-muted mt-0.5">Clues used on Google Scholar</p>
+                </div>
+                <div class="p-3.5 bg-paper rounded border border-navy/10">
+                  <p class="text-[11px] font-mono uppercase text-muted">Key Paper PDF Opens</p>
+                  <p id="s4-key-views" class="text-base font-bold text-ink mt-0.5">0 opens</p>
+                  <p class="text-[12px] text-muted mt-0.5">By team members</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-2">Titles Tried by Team</p>
+                <div id="s4-attempts-box" class="space-y-1.5 text-[13px]">
+                  <p class="text-muted italic">No attempts yet</p>
+                </div>
+              </div>
+
+              <div id="s4-key-card-box" class="hidden p-4 bg-blue/5 border border-blue/20 rounded">
+                <p class="text-[11px] font-mono uppercase tracking-wider text-blue font-semibold">Key Paper Details</p>
+                <p id="s4-key-title" class="text-[15px] font-bold text-ink mt-1"></p>
+                <p id="s4-key-authors" class="text-[13px] text-muted mt-0.5"></p>
+                <p id="s4-key-summary" class="text-[13px] text-body mt-2 leading-relaxed"></p>
+                <div class="mt-3 flex items-center gap-3 print:hidden">
+                  <button type="button" id="preview-key-pdf" class="btn btn-sm btn-primary">Preview Key PDF ↗</button>
+                  <a id="s4-key-doi" href="#" target="_blank" rel="noopener" class="text-[13px] text-blue underline">Official DOI page</a>
+                </div>
+              </div>
+            </div>
+            <div id="s4-empty" class="hidden not-started">Not started yet</div>
+          </div>
+        </details>
+
+        <!-- STEP 5: CASE FILE -->
+        <details class="step-card group" open data-step-section="5">
+          <summary class="step-summary">
+            <div class="flex items-center gap-3">
+              <span class="step-number">5</span>
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 5 — Case File</h2>
+                <p class="text-[12px] text-muted">Final takeaway and reflection</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="chevron text-muted">▼</span>
+            </div>
+          </summary>
+
+          <div class="step-body">
+            <div id="s5-content" class="space-y-4">
+              <div>
+                <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">What surprised you today?</p>
+                <div class="p-4 bg-paper rounded border border-navy/10 text-[14px] text-ink italic" id="s5-surprised-text">
+                  —
+                </div>
+              </div>
+            </div>
+            <div id="s5-empty" class="hidden not-started">Not started yet</div>
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import {
+    getStoredMentor, mentorTeamDetail, mentorApproveStep1, mentorAssignTeam,
+    getPaperSignedUrl, friendlyError, type MentorTeamDetail, type MentorSession,
+  } from '../../../../lib/spark/api';
+
+  const mentor: MentorSession | null = getStoredMentor();
+  if (!mentor) {
+    location.href = '/spark/mentor';
+  }
+
+  // Parse team id from pathname (/spark/mentor/team/<id>) OR search param (?id=...)
+  function getTeamId(): string | null {
+    const fromQuery = new URLSearchParams(location.search).get('id');
+    if (fromQuery) return fromQuery;
+    const parts = location.pathname.split('/').filter(Boolean);
+    const teamIdx = parts.indexOf('team');
+    if (teamIdx >= 0 && parts[teamIdx + 1]) {
+      return parts[teamIdx + 1];
+    }
+    return null;
+  }
+
+  const teamId = getTeamId();
+  if (!teamId) {
+    location.href = '/spark/mentor';
+  }
+
+  const loadingEl = document.getElementById('loading')!;
+  const errorBox = document.getElementById('error-box')!;
+  const errorText = document.getElementById('error-text')!;
+  const contentEl = document.getElementById('content')!;
+
+  let teamDetail: MentorTeamDetail | null = null;
+
+  async function loadTeam() {
+    if (!mentor || !teamId) return;
+    try {
+      teamDetail = await mentorTeamDetail(mentor.token, teamId);
+      render();
+      loadingEl.classList.add('hidden');
+      errorBox.classList.add('hidden');
+      contentEl.classList.remove('hidden');
+    } catch (e) {
+      loadingEl.classList.add('hidden');
+      errorText.textContent = friendlyError(e);
+      errorBox.classList.remove('hidden');
+    }
+  }
+
+  function render() {
+    if (!teamDetail) return;
+    const { header, step1, step2, step3, step4, step5 } = teamDetail;
+
+    // Header
+    document.getElementById('team-name')!.textContent = header.name;
+    document.getElementById('team-code')!.textContent = header.code;
+    document.getElementById('team-members')!.textContent = `Members: ${header.members.join(', ')}`;
+    document.getElementById('current-step-badge')!.textContent = `Step ${header.current_step}`;
+    document.getElementById('last-activity')!.textContent = `Last active: ${new Date(header.last_activity).toLocaleTimeString()}`;
+    document.getElementById('assigned-mentor')!.textContent = header.assigned_mentor || 'Unassigned';
+
+    // Step 1
+    const s1Empty = document.getElementById('s1-empty')!;
+    const s1Content = document.getElementById('s1-content')!;
+    const s1Pill = document.getElementById('s1-status-pill')!;
+    const s1Review = document.getElementById('s1-review-block')!;
+
+    if (!step1 || (!step1.question_text && !step1.who)) {
+      s1Content.classList.add('hidden');
+      s1Empty.classList.remove('hidden');
+      s1Pill.textContent = 'Not started';
+      s1Pill.className = 'status-pill status-draft';
+    } else {
+      s1Empty.classList.add('hidden');
+      s1Content.classList.remove('hidden');
+      document.getElementById('s1-question-text')!.textContent = step1.question_text || '—';
+      document.getElementById('s1-who')!.textContent = step1.who || '—';
+      document.getElementById('s1-what')!.textContent = step1.what || '—';
+      document.getElementById('s1-comp')!.textContent = step1.compared_to || '—';
+      document.getElementById('s1-meas')!.textContent = step1.measured_how || '—';
+
+      if (step1.status === 'approved') {
+        s1Pill.textContent = '✓ Approved';
+        s1Pill.className = 'status-pill status-approved';
+        s1Review.innerHTML = `
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded text-[13px] text-emerald-900">
+            <p class="font-semibold">✓ Approved by ${step1.approved_by || 'Mentor'}${step1.approved_at ? ` at ${new Date(step1.approved_at).toLocaleTimeString()}` : ''}</p>
+            ${step1.mentor_comment ? `<p class="mt-1 text-emerald-800">Comment: "${step1.mentor_comment}"</p>` : ''}
+          </div>
+        `;
+      } else if (step1.status === 'pending') {
+        s1Pill.textContent = '⏳ Pending review';
+        s1Pill.className = 'status-pill status-pending';
+        s1Review.innerHTML = `
+          <div class="p-4 bg-amber-50 border border-amber-200 rounded space-y-3">
+            <p class="font-semibold text-amber-900 text-[14px]">This team is waiting for mentor review.</p>
+            <div class="flex flex-wrap items-center gap-3">
+              <input id="detail-comment-input" class="field text-[13px] !py-1.5 flex-1 min-w-[220px]" placeholder="Optional note for the team" />
+              <button type="button" id="detail-approve-btn" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+                ✓ Approve Question
+              </button>
+            </div>
+          </div>
+        `;
+        document.getElementById('detail-approve-btn')?.addEventListener('click', async () => {
+          const comment = (document.getElementById('detail-comment-input') as HTMLInputElement)?.value.trim() || undefined;
+          try {
+            await mentorApproveStep1(mentor!.token, header.id, mentor!.mentorName, comment);
+            await loadTeam();
+          } catch (e) {
+            alert(friendlyError(e));
+          }
+        });
+      } else {
+        s1Pill.textContent = 'Draft';
+        s1Pill.className = 'status-pill status-draft';
+        s1Review.innerHTML = '<p class="text-[13px] text-muted italic">Team is still drafting their question and has not submitted to mentor yet.</p>';
+      }
+    }
+
+    // Step 2
+    const s2Empty = document.getElementById('s2-empty')!;
+    const s2Content = document.getElementById('s2-content')!;
+    const s2IdeasPill = document.getElementById('s2-ideas-pill')!;
+    if (!step2 || (!step2.search_line && !step2.words_music && !step2.useful_title)) {
+      s2Content.classList.add('hidden');
+      s2Empty.classList.remove('hidden');
+      s2IdeasPill.classList.add('hidden');
+    } else {
+      s2Empty.classList.add('hidden');
+      s2Content.classList.remove('hidden');
+      document.getElementById('s2-kw-music')!.textContent = step2.words_music || '—';
+      document.getElementById('s2-kw-studying')!.textContent = step2.words_studying || '—';
+      document.getElementById('s2-kw-silence')!.textContent = step2.words_silence || '—';
+      document.getElementById('s2-kw-remembering')!.textContent = step2.words_remembering || '—';
+      document.getElementById('s2-search-line')!.textContent = step2.search_line || '—';
+      document.getElementById('s2-useful-title')!.textContent = step2.useful_title || '—';
+      document.getElementById('s2-ideas-text')!.textContent = step2.ideas_opened ? 'Yes' : 'No';
+      s2IdeasPill.classList.toggle('hidden', !step2.ideas_opened);
+    }
+
+    // Step 3
+    const s3Empty = document.getElementById('s3-empty')!;
+    const s3Content = document.getElementById('s3-content')!;
+    const s3Tbody = document.getElementById('s3-cards-tbody')!;
+    const s3CountPill = document.getElementById('s3-count-pill')!;
+
+    if (!step3 || !step3.cards || !step3.cards.length) {
+      s3Content.classList.add('hidden');
+      s3Empty.classList.remove('hidden');
+      s3CountPill.textContent = '0 / 8 sorted';
+    } else {
+      s3Empty.classList.add('hidden');
+      s3Content.classList.remove('hidden');
+      s3CountPill.textContent = `${step3.total_sorted} / 8 sorted`;
+
+      s3Tbody.innerHTML = step3.cards
+        .map((c) => {
+          let choiceBadge = '<span class="text-muted italic">Not sorted</span>';
+          if (c.team_choice === 'keep') choiceBadge = '<span class="text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-semibold text-[11px]">Keep</span>';
+          else if (c.team_choice === 'maybe') choiceBadge = '<span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded font-semibold text-[11px]">Maybe</span>';
+          else if (c.team_choice === 'not_for_us') choiceBadge = '<span class="text-slate-800 bg-slate-100 px-2 py-0.5 rounded font-semibold text-[11px]">Not for us</span>';
+
+          let matchBadge = '<span class="text-muted">—</span>';
+          if (c.match === true) matchBadge = '<span class="text-emerald-700 font-bold text-[14px]">✓ Match</span>';
+          else if (c.match === false) matchBadge = '<span class="text-muted text-[12px]">Different</span>';
+
+          const viewsBadge = c.view_count > 0
+            ? `<span class="font-mono text-blue font-semibold">${c.view_count}×</span>`
+            : '<span class="text-muted font-mono">0</span>';
+
+          return `
+            <tr class="hover:bg-paper/50">
+              <td class="p-3 font-medium text-ink max-w-[220px]">
+                <strong class="text-blue font-mono mr-1">${c.card_id}</strong>
+                ${c.title}
+                <span class="block text-[11px] text-muted font-normal">${c.authors} (${c.year})</span>
+              </td>
+              <td class="p-3">${choiceBadge}</td>
+              <td class="p-3 text-body max-w-[200px] text-[12px]">${c.team_reason || '<span class="text-muted">—</span>'}</td>
+              <td class="p-3 text-[12px]">
+                <strong class="font-semibold text-ink">${c.expected_choice}</strong>
+                <span class="block text-[11px] text-muted">${c.note_why}</span>
+              </td>
+              <td class="p-3">${matchBadge}</td>
+              <td class="p-3">${viewsBadge}</td>
+              <td class="p-3 text-right print:hidden">
+                <button type="button" class="btn btn-sm btn-secondary btn-on-light !py-1 !px-2 !text-[11px] preview-pdf-btn" data-card="${c.card_id}">
+                  PDF ↗
+                </button>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+
+      s3Tbody.querySelectorAll('.preview-pdf-btn').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          const cardId = (e.currentTarget as HTMLElement).dataset.card!;
+          try {
+            const url = await getPaperSignedUrl(cardId, { token: mentor!.token });
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } catch (err) {
+            alert(friendlyError(err));
+          }
+        });
+      });
+    }
+
+    // Step 4
+    const s4Empty = document.getElementById('s4-empty')!;
+    const s4Content = document.getElementById('s4-content')!;
+    const s4Pill = document.getElementById('s4-status-pill')!;
+
+    if (!step4 || (!step4.found && (!step4.attempts || !step4.attempts.length))) {
+      s4Content.classList.add('hidden');
+      s4Empty.classList.remove('hidden');
+      s4Pill.textContent = 'Not started';
+      s4Pill.className = 'status-pill status-draft';
+    } else {
+      s4Empty.classList.add('hidden');
+      s4Content.classList.remove('hidden');
+
+      if (step4.found) {
+        s4Pill.textContent = '★ Discovered';
+        s4Pill.className = 'status-pill status-approved';
+        document.getElementById('s4-found-text')!.innerHTML = '<span class="text-emerald-600 font-bold">Yes ★ Found</span>';
+        document.getElementById('s4-found-time')!.textContent = step4.found_at ? `At ${new Date(step4.found_at).toLocaleTimeString()}` : '';
+      } else {
+        s4Pill.textContent = 'Searching…';
+        s4Pill.className = 'status-pill status-pending';
+        document.getElementById('s4-found-text')!.textContent = 'Not yet';
+        document.getElementById('s4-found-time')!.textContent = 'In progress';
+      }
+
+      document.getElementById('s4-hints-text')!.textContent = `${step4.hints_opened} / 4 opened`;
+      document.getElementById('s4-key-views')!.textContent = `${step4.key_views} opens`;
+
+      // Attempts
+      const attemptsBox = document.getElementById('s4-attempts-box')!;
+      if (!step4.attempts || !step4.attempts.length) {
+        attemptsBox.innerHTML = '<p class="text-muted italic">No titles checked yet.</p>';
+      } else {
+        attemptsBox.innerHTML = step4.attempts
+          .map((a) => `
+            <div class="flex items-center justify-between p-2 rounded ${a.ok ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-paper text-body border border-navy/10'}">
+              <span>${a.ok ? '★ ' : '✗ '}${a.title}</span>
+              <span class="text-muted font-mono text-[11px]">${new Date(a.at).toLocaleTimeString()}</span>
+            </div>
+          `)
+          .join('');
+      }
+
+      // Key card details
+      const keyBox = document.getElementById('s4-key-card-box')!;
+      if (step4.found && step4.key_card) {
+        keyBox.classList.remove('hidden');
+        document.getElementById('s4-key-title')!.textContent = step4.key_card.title;
+        document.getElementById('s4-key-authors')!.textContent = `${step4.key_card.authors} (${step4.key_card.year}) · ${step4.key_card.journal}`;
+        document.getElementById('s4-key-summary')!.textContent = step4.key_card.summary;
+        (document.getElementById('s4-key-doi') as HTMLAnchorElement).href = step4.key_card.official_link;
+        document.getElementById('preview-key-pdf')?.addEventListener('click', async () => {
+          try {
+            const url = await getPaperSignedUrl('KEY', { token: mentor!.token });
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } catch (e) {
+            alert(friendlyError(e));
+          }
+        });
+      } else {
+        keyBox.classList.add('hidden');
+      }
+    }
+
+    // Step 5
+    const s5Empty = document.getElementById('s5-empty')!;
+    const s5Content = document.getElementById('s5-content')!;
+    if (!step5 || !step5.surprised_text) {
+      s5Content.classList.add('hidden');
+      s5Empty.classList.remove('hidden');
+    } else {
+      s5Empty.classList.add('hidden');
+      s5Content.classList.remove('hidden');
+      document.getElementById('s5-surprised-text')!.textContent = `"${step5.surprised_text}"`;
+    }
+  }
+
+  // Mentor assign button
+  document.getElementById('assign-mentor-btn')?.addEventListener('click', async () => {
+    const cur = teamDetail?.header.assigned_mentor || '';
+    const name = prompt('Assign mentor name to this team:', cur);
+    if (name === null) return;
+    try {
+      await mentorAssignTeam(mentor!.token, teamId!, name);
+      await loadTeam();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  // Print button
+  document.getElementById('print-btn')?.addEventListener('click', () => {
+    // Open all details for print
+    document.querySelectorAll('details').forEach((d) => (d.open = true));
+    window.print();
+  });
+
+  // Initial load & poll every 5s
+  loadTeam();
+  setInterval(loadTeam, 5000);
+</script>
+
+<style>
+  .step-card {
+    background: #fff;
+    border: 1px solid rgba(27, 42, 85, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(27, 42, 85, 0.04);
+  }
+  .step-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    background: #fff;
+    user-select: none;
+    transition: background-color 0.2s;
+  }
+  .step-summary:hover {
+    background: #F5F6F8;
+  }
+  .step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #1B2A55;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .step-body {
+    padding: 20px;
+    border-top: 1px solid rgba(27, 42, 85, 0.08);
+  }
+  .not-started {
+    padding: 24px;
+    text-align: center;
+    color: #8A94A8;
+    font-style: italic;
+    font-size: 14px;
+    background: #FAFAFC;
+    border: 1px dashed rgba(27, 42, 85, 0.15);
+    border-radius: 6px;
+  }
+  .status-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .status-draft {
+    background: rgba(27, 42, 85, 0.08);
+    color: #3A4458;
+  }
+  .status-pending {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+  .status-approved {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+  .chevron {
+    font-size: 11px;
+    transition: transform 0.2s;
+  }
+  details[open] .chevron {
+    transform: rotate(180deg);
+  }
+
+  @media print {
+    .print\\:hidden { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .step-card { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; margin-bottom: 20px; }
+    .step-summary { pointer-events: none; }
+    .chevron { display: none; }
+  }
+</style>

@@ -1,0 +1,9 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/spark/mentor/team/:id",
+      "destination": "/spark/mentor/team?id=:id"
+    }
+  ]
+}

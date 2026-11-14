@@ -4,56 +4,129 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Mentor panel · SPARK" description="SPARK 2026 mentor panel." noindex>
-  <section class="bg-ink text-white pt-24 xl:pt-32 pb-10">
-    <div class="max-w-[1100px] mx-auto px-5">
-      <p class="eyebrow text-peri">SPARK 2026 · The Music Case</p>
-      <h1 class="mt-1 font-display text-2xl font-bold">Mentor panel</h1>
+  <section class="bg-ink text-white pt-24 xl:pt-32 pb-8 border-b border-white/10">
+    <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="eyebrow text-peri">SPARK 2026 · The Music Case</p>
+        <h1 class="mt-1 font-display text-2xl font-bold">Mentor Panel</h1>
+      </div>
+      <div id="mentor-badge" class="hidden text-[13px] text-silver/80 flex items-center gap-3">
+        <span id="mentor-role-label" class="bg-white/10 px-2.5 py-1 rounded font-mono uppercase text-[11px]">Mentor</span>
+        <button type="button" id="logout-btn" class="hover:text-white underline">Log out</button>
+      </div>
     </div>
   </section>
 
-  <section class="bg-paper text-ink py-10 min-h-[60vh]">
+  <section class="bg-paper text-ink py-10 min-h-[70vh]">
     <div class="max-w-[1100px] mx-auto px-5">
 
-      <form id="login-form" class="max-w-sm mx-auto  bg-white border border-navy/10 p-6 sm:p-8 mt-10">
-        <label for="mentor-password" class="field-label">Mentor password</label>
-        <input id="mentor-password" class="field mt-2" type="password" required />
+      <!-- Login Form -->
+      <form id="login-form" class="max-w-sm mx-auto bg-white border border-navy/10 p-6 sm:p-8 mt-10 rounded shadow-sm">
+        <h2 class="font-display text-lg font-bold text-ink">Sign in to Mentor Panel</h2>
+        <p class="text-[13px] text-muted mt-1">Enter the mentor password given to organizers.</p>
+        
+        <label for="mentor-name-input" class="field-label mt-4">Your name (optional)</label>
+        <input id="mentor-name-input" class="field mt-1" placeholder="e.g. Amine" />
+
+        <label for="mentor-password" class="field-label mt-4">Mentor password</label>
+        <input id="mentor-password" class="field mt-1" type="password" required />
         <p id="login-error" class="hidden mt-2 text-[14px] text-signal"></p>
-        <button type="submit" class="btn btn-primary w-full mt-4">Log in</button>
+        <button type="submit" class="btn btn-primary w-full mt-5">Log in</button>
       </form>
 
-      <div id="panel" class="hidden">
-        <div class="bg-white border border-navy/10 p-5 flex flex-wrap items-center gap-4">
-          <p class="font-semibold">Current step for everyone: <span id="current-step">Step 0 · Story</span></p>
-          <button type="button" id="unlock-next" class="btn btn-sm btn-primary">Unlock next step</button>
-          <button type="button" id="reveal-mission" class="btn btn-sm btn-secondary btn-on-light">Reveal mission question</button>
-          <div class="flex gap-1 ml-auto" id="jump-steps"></div>
-        </div>
+      <!-- Main Panel -->
+      <div id="panel" class="hidden space-y-6">
 
-        <div class="mt-6 overflow-x-auto  bg-white border border-navy/10">
-          <table class="w-full text-[13px]">
-            <thead class="bg-paper text-left">
-              <tr>
-                <th class="p-3">Team</th><th class="p-3">Members</th><th class="p-3">Cards</th>
-                <th class="p-3">Key paper</th><th class="p-3">Hints</th><th class="p-3">Last activity</th>
-              </tr>
-            </thead>
-            <tbody id="teams-body"></tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 grid sm:grid-cols-2 gap-4">
-          <div class="bg-white border border-navy/10 p-5">
-            <p class="font-semibold">Mentor notes</p>
-            <p class="text-[12px] text-muted mb-2">Only visible here — never sent to team pages.</p>
-            <ul id="notes-list" class="text-[13px] space-y-1"></ul>
+        <!-- Global Session Control Bar -->
+        <div class="bg-white border border-navy/10 p-5 rounded flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-semibold">Room Progress:</span>
+            <span id="current-step" class="font-display font-bold text-blue text-base">Step 0 · Story</span>
           </div>
-          <div class="bg-white border border-navy/10 p-5 space-y-3">
-            <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export all answers (CSV)</button>
-            <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session — admin</button>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="unlock-next" class="btn btn-sm btn-primary">Unlock next step</button>
+            <button type="button" id="reveal-mission" class="btn btn-sm btn-secondary btn-on-light">Reveal mission question</button>
+          </div>
+
+          <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
+            <span class="text-[12px] text-muted font-mono uppercase mr-1">Jump:</span>
+            <div class="flex gap-1" id="jump-steps"></div>
           </div>
         </div>
 
-        <div id="team-detail" class="hidden mt-6  bg-white border border-navy/10 p-6"></div>
+        <!-- Navigation Tabs: Overview vs Questions -->
+        <div class="flex border-b border-navy/15 gap-4">
+          <button type="button" id="tab-overview" class="mentor-tab active py-2.5 px-4 font-semibold text-[14px] border-b-2 border-blue text-blue transition-colors">
+            Teams Overview
+          </button>
+          <button type="button" id="tab-questions" class="mentor-tab py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
+            <span>Questions</span>
+            <span id="questions-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: OVERVIEW -->
+        <div id="view-overview" class="space-y-6">
+          <div class="overflow-x-auto bg-white border border-navy/10 rounded shadow-sm">
+            <table class="w-full text-[13px] text-left">
+              <thead class="bg-paper border-b border-navy/10 text-muted uppercase text-[11px] font-mono tracking-wider">
+                <tr>
+                  <th class="p-3.5">Team</th>
+                  <th class="p-3.5">Members</th>
+                  <th class="p-3.5">Assigned Mentor</th>
+                  <th class="p-3.5">Step 1 Question</th>
+                  <th class="p-3.5">Cards</th>
+                  <th class="p-3.5">Key Paper</th>
+                  <th class="p-3.5">Hints</th>
+                  <th class="p-3.5">Last Active</th>
+                  <th class="p-3.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="teams-body" class="divide-y divide-navy/10"></tbody>
+            </table>
+          </div>
+
+          <!-- Quick notes and exports -->
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="bg-white border border-navy/10 p-5 rounded shadow-sm">
+              <p class="font-semibold text-ink">Mentor Notes (Session Secrets)</p>
+              <p class="text-[12px] text-muted mb-3">Visible to mentors only — never sent to team pages.</p>
+              <ul id="notes-list" class="text-[13px] space-y-1.5 max-h-56 overflow-y-auto pr-1"></ul>
+            </div>
+            
+            <div class="bg-white border border-navy/10 p-5 rounded shadow-sm space-y-3 flex flex-col justify-between">
+              <div>
+                <p class="font-semibold text-ink">Session Management</p>
+                <p class="text-[12px] text-muted mt-1">Export full session responses or reset for a new workshop.</p>
+              </div>
+              <div class="space-y-2">
+                <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export all answers (CSV)</button>
+                <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session (Admin only)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: QUESTIONS LAB REVIEW -->
+        <div id="view-questions" class="hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded border border-navy/10">
+            <div>
+              <h2 class="font-display font-bold text-lg text-ink">Step 1 — Research Questions Review</h2>
+              <p class="text-[13px] text-muted">Review teams' questions and 4-field breakdowns. Mentors have one action: Approve.</p>
+            </div>
+            <div class="flex gap-2 text-[13px]">
+              <button type="button" class="q-filter-btn px-3 py-1 rounded bg-navy/10 font-medium" data-filter="all">All</button>
+              <button type="button" class="q-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="pending">Pending review</button>
+              <button type="button" class="q-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="approved">Approved</button>
+            </div>
+          </div>
+
+          <div id="questions-list" class="space-y-4">
+            <p class="text-center py-12 text-muted">Loading questions...</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -61,20 +134,58 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <script>
   import {
-    mentorLogin, mentorOverview, mentorSetStep, mentorRevealMission, mentorCaseFile, mentorNotes, mentorExport,
-    adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError, type MentorOverview, type MentorSession,
+    mentorLogin, mentorOverview, mentorQuestions, mentorApproveStep1,
+    mentorSetStep, mentorRevealMission, mentorNotes, mentorExport,
+    adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError,
+    type MentorOverview, type MentorSession, type MentorQuestionItem,
   } from '../../lib/spark/api';
-  import { sparkCardById } from '../../data/spark';
 
   const stepLabels = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   const loginForm = document.getElementById('login-form') as HTMLFormElement;
   const panel = document.getElementById('panel')!;
-  let mentor: MentorSession | null = getStoredMentor();
+  const mentorBadge = document.getElementById('mentor-badge')!;
+  const mentorRoleLabel = document.getElementById('mentor-role-label')!;
 
+  let mentor: MentorSession | null = getStoredMentor();
+  let currentQuestions: MentorQuestionItem[] = [];
+  let questionFilter: 'all' | 'pending' | 'approved' = 'all';
+
+  // Tabs
+  const tabOverview = document.getElementById('tab-overview')!;
+  const tabQuestions = document.getElementById('tab-questions')!;
+  const viewOverview = document.getElementById('view-overview')!;
+  const viewQuestions = document.getElementById('view-questions')!;
+
+  tabOverview.addEventListener('click', () => switchTab('overview'));
+  tabQuestions.addEventListener('click', () => switchTab('questions'));
+
+  function switchTab(tab: 'overview' | 'questions') {
+    if (tab === 'overview') {
+      tabOverview.classList.add('border-blue', 'text-blue');
+      tabOverview.classList.remove('border-transparent', 'text-muted');
+      tabQuestions.classList.remove('border-blue', 'text-blue');
+      tabQuestions.classList.add('border-transparent', 'text-muted');
+      viewOverview.classList.remove('hidden');
+      viewQuestions.classList.add('hidden');
+    } else {
+      tabQuestions.classList.add('border-blue', 'text-blue');
+      tabQuestions.classList.remove('border-transparent', 'text-muted');
+      tabOverview.classList.remove('border-blue', 'text-blue');
+      tabOverview.classList.add('border-transparent', 'text-muted');
+      viewQuestions.classList.remove('hidden');
+      viewOverview.classList.add('hidden');
+      renderQuestions();
+    }
+  }
+
+  // Jump buttons
   const jumpWrap = document.getElementById('jump-steps')!;
   stepLabels.forEach((_, i) => {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'btn btn-sm btn-secondary btn-on-light'; b.textContent = String(i);
+    b.type = 'button';
+    b.className = 'w-7 h-7 rounded border border-navy/20 text-[12px] font-semibold hover:border-blue hover:text-blue transition-colors';
+    b.textContent = String(i);
+    b.title = `Step ${i}: ${stepLabels[i]}`;
     b.addEventListener('click', () => setStep(i));
     jumpWrap.appendChild(b);
   });
@@ -83,95 +194,297 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     if (!mentor) return;
     loginForm.classList.add('hidden');
     panel.classList.remove('hidden');
-    if (mentor.role === 'admin') document.getElementById('admin-reset')!.classList.remove('hidden');
-    await refresh();
-    setInterval(refresh, 5000);
+    mentorBadge.classList.remove('hidden');
+    mentorRoleLabel.textContent = mentor.mentorName ? `${mentor.mentorName} (${mentor.role})` : mentor.role;
+
+    if (mentor.role === 'admin') {
+      document.getElementById('admin-reset')?.classList.remove('hidden');
+    }
+
+    await refreshAll();
+    setInterval(refreshAll, 4000);
+
     const notes = await mentorNotes(mentor.token).catch(() => []);
     const list = document.getElementById('notes-list')!;
-    list.innerHTML = notes.map((n) => `<li><strong>${n.card}</strong> — ${n.fit}: ${n.why}</li>`).join('');
+    list.innerHTML = notes
+      .map((n) => `<li class="border-b border-navy/5 pb-1"><strong class="text-blue">${n.card}</strong> — <span class="font-semibold text-ink">${n.fit}</span>: <span class="text-muted">${n.why}</span></li>`)
+      .join('');
   }
 
-  async function refresh() {
-    if (!mentor) return;
-    let data: MentorOverview;
-    try { data = await mentorOverview(mentor.token); }
-    catch (e) { alert(friendlyError(e)); clearMentor(); mentor = null; location.reload(); return; }
-    document.getElementById('current-step')!.textContent = `Step ${data.state.unlocked_step} · ${stepLabels[data.state.unlocked_step]}`;
-    (document.getElementById('reveal-mission') as HTMLButtonElement).classList.toggle('btn-primary', data.state.mission_revealed);
-    const body = document.getElementById('teams-body')!;
-    body.innerHTML = data.teams.map((t) => `
-      <tr class="border-t border-navy/10 cursor-pointer hover:bg-paper" data-team="${t.id}">
-        <td class="p-3 font-medium">${t.name} <span class="text-muted font-mono text-[11px]">${t.code}</span></td>
-        <td class="p-3">${t.members.join(', ')}</td>
-        <td class="p-3">${t.cards_sorted} / 8</td>
-        <td class="p-3">${t.key_paper_found ? 'Yes' : '—'}</td>
-        <td class="p-3">${t.hints_opened}</td>
-        <td class="p-3 text-muted">${new Date(t.last_activity).toLocaleTimeString()}</td>
-      </tr>`).join('');
-    body.querySelectorAll<HTMLElement>('tr').forEach((row) => row.addEventListener('click', () => openTeam(row.dataset.team!)));
-  }
-
-  async function openTeam(teamId: string) {
+  async function refreshAll() {
     if (!mentor) return;
     try {
-      const cf = await mentorCaseFile(mentor.token, teamId);
-      const detail = document.getElementById('team-detail')!;
-      const cards = Object.entries(cf.cards || {}).map(([id, v]) => `${sparkCardById[id as keyof typeof sparkCardById]?.title || id}: ${v.choice} — ${v.reason}`);
-      detail.innerHTML = `
-        <p class="font-display text-xl font-bold">${cf.team.name} (${cf.team.code})</p>
-        <p class="mt-2 text-[14px]"><strong>Question:</strong> ${cf.step1?.question_text || '—'}</p>
-        <p class="mt-2 text-[14px]"><strong>Search line:</strong> ${cf.step2?.search_line || '—'}</p>
-        <div class="mt-2 text-[14px]"><strong>Cards:</strong><ul class="list-disc pl-5">${cards.map((c) => `<li>${c}</li>`).join('') || '<li>None yet</li>'}</ul></div>
-        <p class="mt-2 text-[14px]"><strong>Key paper found:</strong> ${cf.step4?.found ? 'Yes' : 'Not yet'} · hints opened: ${cf.step4?.hints_opened ?? 0}</p>
-        <p class="mt-2 text-[14px]"><strong>What surprised them:</strong> ${cf.step5?.surprised_text || '—'}</p>`;
-      detail.classList.remove('hidden');
-      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } catch (e) { alert(friendlyError(e)); }
+      const [overviewData, questionsData] = await Promise.all([
+        mentorOverview(mentor.token),
+        mentorQuestions(mentor.token),
+      ]);
+      renderOverview(overviewData);
+      currentQuestions = questionsData;
+      updatePendingBadge();
+      if (!viewQuestions.classList.contains('hidden')) {
+        renderQuestions();
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
+
+  function renderOverview(data: MentorOverview) {
+    document.getElementById('current-step')!.textContent = `Step ${data.state.unlocked_step} · ${stepLabels[data.state.unlocked_step]}`;
+    (document.getElementById('reveal-mission') as HTMLButtonElement).classList.toggle('btn-primary', data.state.mission_revealed);
+
+    const body = document.getElementById('teams-body')!;
+    if (!data.teams.length) {
+      body.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-muted">No teams have joined yet. Share /spark/join with students.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = data.teams
+      .map((t) => {
+        let qStatusBadge = '<span class="text-muted">Draft</span>';
+        if (t.step1_status === 'approved') {
+          qStatusBadge = '<span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold text-[11px]">✓ Approved</span>';
+        } else if (t.step1_status === 'pending') {
+          qStatusBadge = '<span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold text-[11px]">⏳ Pending</span>';
+        }
+
+        return `
+          <tr class="hover:bg-paper/70 transition-colors">
+            <td class="p-3.5 font-semibold text-ink">
+              <a href="/spark/mentor/team?id=${t.id}" class="hover:text-blue hover:underline">
+                ${t.name} <span class="text-muted font-mono text-[11px] block font-normal">${t.code}</span>
+              </a>
+            </td>
+            <td class="p-3.5 text-body">${t.members.join(', ')}</td>
+            <td class="p-3.5 text-muted">${t.assigned_mentor || '<span class="text-muted/60">—</span>'}</td>
+            <td class="p-3.5">${qStatusBadge}</td>
+            <td class="p-3.5 font-mono">${t.cards_sorted} / 8</td>
+            <td class="p-3.5">${t.key_paper_found ? '<span class="text-emerald-600 font-bold">Yes ★</span>' : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono">${t.hints_opened}</td>
+            <td class="p-3.5 text-muted text-[12px]">${new Date(t.last_activity).toLocaleTimeString()}</td>
+            <td class="p-3.5 text-right">
+              <a href="/spark/mentor/team?id=${t.id}" class="btn btn-sm btn-secondary btn-on-light !py-1 !px-2.5 !text-[12px]">
+                Details →
+              </a>
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+  }
+
+  function updatePendingBadge() {
+    const pendingCount = currentQuestions.filter((q) => q.status === 'pending').length;
+    const badge = document.getElementById('questions-pending-badge')!;
+    if (pendingCount > 0) {
+      badge.textContent = String(pendingCount);
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  function renderQuestions() {
+    const list = document.getElementById('questions-list')!;
+    let filtered = currentQuestions;
+    if (questionFilter === 'pending') filtered = currentQuestions.filter((q) => q.status === 'pending');
+    else if (questionFilter === 'approved') filtered = currentQuestions.filter((q) => q.status === 'approved');
+
+    if (!filtered.length) {
+      list.innerHTML = `<div class="bg-white p-8 text-center text-muted rounded border border-navy/10">No questions found in this filter.</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered
+      .map((q) => {
+        const isPending = q.status === 'pending';
+        const isApproved = q.status === 'approved';
+
+        let badge = '<span class="text-muted bg-navy/5 px-2.5 py-1 rounded text-[12px]">Draft</span>';
+        if (isApproved) {
+          badge = `<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded text-[12px] flex items-center gap-1">✓ Approved ${q.approved_by ? `by ${q.approved_by}` : ''}</span>`;
+        } else if (isPending) {
+          badge = '<span class="bg-amber-100 text-amber-900 font-semibold px-2.5 py-1 rounded text-[12px] animate-pulse">⏳ Pending Review</span>';
+        }
+
+        return `
+          <div class="bg-white border ${isPending ? 'border-amber-300 ring-1 ring-amber-200' : 'border-navy/10'} rounded-lg p-5 shadow-sm space-y-4" data-team-id="${q.team_id}">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-navy/10 pb-3">
+              <div>
+                <a href="/spark/mentor/team?id=${q.team_id}" class="font-display font-bold text-lg text-ink hover:text-blue hover:underline">
+                  ${q.team_name}
+                </a>
+                <span class="text-muted font-mono text-[12px] ml-2">${q.team_code}</span>
+                <span class="text-muted text-[13px] block sm:inline sm:ml-3">(${q.members.join(', ')})</span>
+              </div>
+              <div class="flex items-center gap-2">
+                ${badge}
+                <a href="/spark/mentor/team?id=${q.team_id}" class="text-[12px] text-blue hover:underline ml-2">Team page →</a>
+              </div>
+            </div>
+
+            <!-- Question text -->
+            <div>
+              <p class="font-mono text-[11px] uppercase tracking-wider text-muted">Research question</p>
+              <p class="text-[16px] font-medium text-ink mt-1 font-serif">${q.question_text || '<span class="text-muted italic">Not written yet</span>'}</p>
+            </div>
+
+            <!-- 4 breakdown fields -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[13px] bg-paper p-3 rounded border border-navy/10">
+              <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${q.who || '—'}</span></div>
+              <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${q.what || '—'}</span></div>
+              <div><span class="font-semibold text-ink">Compared to:</span> <span class="text-body">${q.compared_to || '—'}</span></div>
+              <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${q.measured_how || '—'}</span></div>
+            </div>
+
+            <!-- Action bar -->
+            ${
+              isPending
+                ? `
+              <div class="pt-2 border-t border-navy/10 flex flex-wrap items-center gap-3">
+                <input class="field text-[13px] !py-1.5 flex-1 min-w-[200px] q-comment-input" placeholder="Optional short comment (e.g. 'Great focus', 'Solid variables')" />
+                <button type="button" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white font-semibold approve-btn flex items-center gap-1.5">
+                  <span>✓ Approve</span>
+                </button>
+              </div>
+            `
+                : ''
+            }
+
+            ${
+              isApproved && q.mentor_comment
+                ? `
+              <p class="text-[12px] text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded border border-emerald-200">
+                <strong>Mentor note:</strong> "${q.mentor_comment}"
+              </p>
+            `
+                : ''
+            }
+          </div>
+        `;
+      })
+      .join('');
+
+    // Attach approve handlers
+    list.querySelectorAll('.approve-btn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const card = target.closest('[data-team-id]') as HTMLElement;
+        const teamId = card.dataset.teamId!;
+        const comment = (card.querySelector('.q-comment-input') as HTMLInputElement)?.value.trim() || undefined;
+
+        target.disabled = true;
+        target.textContent = 'Approving…';
+
+        try {
+          await mentorApproveStep1(mentor!.token, teamId, mentor!.mentorName, comment);
+          await refreshAll();
+        } catch (err) {
+          alert(friendlyError(err));
+          target.disabled = false;
+          target.textContent = '✓ Approve';
+        }
+      });
+    });
+  }
+
+  // Filter buttons in Questions tab
+  document.querySelectorAll('.q-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.q-filter-btn').forEach((b) => {
+        b.classList.remove('bg-navy/10', 'font-medium');
+        b.classList.add('text-muted');
+      });
+      const target = e.currentTarget as HTMLButtonElement;
+      target.classList.add('bg-navy/10', 'font-medium');
+      target.classList.remove('text-muted');
+      questionFilter = target.dataset.filter as any;
+      renderQuestions();
+    });
+  });
 
   async function setStep(n: number) {
     if (!mentor) return;
-    try { await mentorSetStep(mentor.token, n); await refresh(); } catch (e) { alert(friendlyError(e)); }
+    try {
+      await mentorSetStep(mentor.token, n);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
   }
-  document.getElementById('unlock-next')!.addEventListener('click', async () => {
+
+  document.getElementById('unlock-next')?.addEventListener('click', async () => {
     const current = document.getElementById('current-step')!.textContent?.match(/Step (\d)/);
     const n = Math.min(5, Number(current?.[1] ?? 0) + 1);
     await setStep(n);
   });
-  document.getElementById('reveal-mission')!.addEventListener('click', async () => {
+
+  document.getElementById('reveal-mission')?.addEventListener('click', async () => {
     if (!mentor) return;
     const btn = document.getElementById('reveal-mission') as HTMLButtonElement;
     const next = !btn.classList.contains('btn-primary');
-    try { await mentorRevealMission(mentor.token, next); await refresh(); } catch (e) { alert(friendlyError(e)); }
+    try {
+      await mentorRevealMission(mentor.token, next);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
   });
-  document.getElementById('export-csv')!.addEventListener('click', async () => {
+
+  document.getElementById('export-csv')?.addEventListener('click', async () => {
     if (!mentor) return;
     try {
       const rows = await mentorExport(mentor.token);
       if (!rows.length) return alert('No teams yet.');
       const headers = Object.keys(rows[0]);
-      const csv = [headers.join(','), ...rows.map((r) => headers.map((h) => `"${String((r as any)[h] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
+      const csv = [
+        headers.join(','),
+        ...rows.map((r) => headers.map((h) => `"${String((r as any)[h] ?? '').replace(/"/g, '""')}"`).join(',')),
+      ].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'spark-session-1.csv'; a.click();
-    } catch (e) { alert(friendlyError(e)); }
+      a.href = URL.createObjectURL(blob);
+      a.download = `spark-session-1-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
   });
-  document.getElementById('admin-reset')!.addEventListener('click', async () => {
+
+  document.getElementById('admin-reset')?.addEventListener('click', async () => {
     if (!mentor) return;
-    if (!confirm('Reset the whole session? This deletes every team and their answers.')) return;
-    try { await adminReset(mentor.token); await refresh(); } catch (e) { alert(friendlyError(e)); }
+    if (!confirm('DANGER: Reset the whole session? This permanently deletes every team and all answers.')) return;
+    try {
+      await adminReset(mentor.token);
+      await refreshAll();
+      alert('Session reset.');
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    clearMentor();
+    mentor = null;
+    location.reload();
   });
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const pw = (document.getElementById('mentor-password') as HTMLInputElement).value;
+    const name = (document.getElementById('mentor-name-input') as HTMLInputElement).value.trim();
     const err = document.getElementById('login-error')!;
     err.classList.add('hidden');
     try {
-      mentor = await mentorLogin(pw);
-      storeMentor(mentor);
+      const session = await mentorLogin(pw);
+      session.mentorName = name || undefined;
+      storeMentor(session);
+      mentor = session;
       await init();
-    } catch (ex) { err.textContent = friendlyError(ex); err.classList.remove('hidden'); }
+    } catch (ex) {
+      err.textContent = friendlyError(ex);
+      err.classList.remove('hidden');
+    }
   });
 
   init();

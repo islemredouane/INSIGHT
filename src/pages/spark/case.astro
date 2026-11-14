@@ -3,7 +3,7 @@
 // No scores, no timers, no right/wrong colours anywhere on this page.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/ui/Icon.astro';
-import { sparkCards, sparkStory, sparkQuestionExamples, sparkKeywordIdeas, sparkHomework } from '../../data/spark';
+import { sparkCards, sparkStory, sparkQuestionExamples, sparkKeywordIdeas, sparkHomework, sparkNextSessionPaper } from '../../data/spark';
 
 const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
 ---
@@ -39,41 +39,74 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       <!-- Step 0 · The case -->
       <section data-panel="0" class="panel">
         <h1 class="font-display text-3xl font-bold tracking-tight">The Music Case — Part 1: Find the papers</h1>
-        <div class="mt-6  bg-white border border-navy/10 p-6 sm:p-8 prose-insight whitespace-pre-line">{sparkStory}</div>
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 prose-insight whitespace-pre-line">{sparkStory}</div>
         <button type="button" id="start-investigation" class="btn btn-primary mt-6">Start the investigation →</button>
       </section>
 
       <!-- Step 1 · Question Lab -->
       <section data-panel="1" class="panel hidden">
         <h1 class="font-display text-3xl font-bold tracking-tight">Step 1 · Question Lab</h1>
-        <div class="mt-6  bg-white border border-navy/10 p-6 sm:p-8">
-          <label for="q1-text" class="field-label">Write your team's research question</label>
-          <textarea id="q1-text" class="field mt-2" maxlength="300" rows="3" placeholder="Does...?"></textarea>
-          <div class="mt-3 flex items-center gap-3">
-            <button type="button" id="q1-save-btn" class="btn btn-sm btn-primary">Save</button>
-            <p id="q1-saved" class="save-status"></p>
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8">
+          <div>
+            <label for="q1-text" class="field-label">Write your team's research question</label>
+            <textarea id="q1-text" class="field mt-2" maxlength="300" rows="3" placeholder="Does listening to music while studying affect...?"></textarea>
           </div>
 
-          <p class="field-label mt-6">Checklist</p>
-          <div class="mt-2 grid grid-cols-2 gap-2 text-[14px]">
-            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="0" /> Who?</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="1" /> What?</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="2" /> Compared to what?</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-checklist="3" /> Measured how?</label>
+          <div class="mt-6">
+            <p class="field-label">Break your question down</p>
+            <p class="text-[13px] text-muted mt-0.5">Fill this 4-part table to check that your question is written properly.</p>
+
+            <div class="mt-3 border border-navy/10 rounded overflow-hidden divide-y divide-navy/10 bg-white">
+              <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+                <div class="bg-paper/70 p-3 text-[13px] font-semibold text-ink flex items-center">Who?</div>
+                <div class="p-2"><input id="q1-who" class="field !border-0 focus:!ring-1" maxlength="150" placeholder="e.g. University students" /></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+                <div class="bg-paper/70 p-3 text-[13px] font-semibold text-ink flex items-center">What are you testing?</div>
+                <div class="p-2"><input id="q1-what" class="field !border-0 focus:!ring-1" maxlength="150" placeholder="e.g. Studying with background songs with lyrics" /></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+                <div class="bg-paper/70 p-3 text-[13px] font-semibold text-ink flex items-center">Compared to what?</div>
+                <div class="p-2"><input id="q1-compared" class="field !border-0 focus:!ring-1" maxlength="150" placeholder="e.g. Studying in quiet / silence" /></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+                <div class="bg-paper/70 p-3 text-[13px] font-semibold text-ink flex items-center">Measured how?</div>
+                <div class="p-2"><input id="q1-measured" class="field !border-0 focus:!ring-1" maxlength="150" placeholder="e.g. Score on a reading comprehension test" /></div>
+              </div>
+            </div>
           </div>
 
-          <div class="mt-6 space-y-2">
+          <div class="mt-6 flex flex-wrap items-center gap-4">
+            <button type="button" id="q1-submit-btn" class="btn btn-primary disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+              Send to my mentor
+            </button>
+            <div id="q1-status-box" class="flex items-center gap-2 text-[14px]">
+              <span id="q1-status-text" class="font-medium text-muted">Fill all 5 fields above to submit</span>
+            </div>
+          </div>
+
+          <!-- Real-time green check notification when approved -->
+          <div id="q1-approved-box" class="hidden mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 text-[14px] flex items-start gap-3">
+            <span class="text-emerald-600 font-bold text-xl leading-none">✓</span>
+            <div>
+              <p class="font-semibold text-emerald-800">Approved by mentor</p>
+              <p id="q1-mentor-comment" class="text-[13px] text-emerald-700 mt-0.5 hidden"></p>
+            </div>
+          </div>
+
+          <div class="mt-8 space-y-2">
+            <p class="text-[12px] font-mono uppercase text-muted tracking-wider">Examples for guidance</p>
             {sparkQuestionExamples.map((ex) => (
               <details class="text-[14px]">
-                <summary class="cursor-pointer text-blue">{ex.label}: {ex.text}</summary>
+                <summary class="cursor-pointer text-blue font-medium">{ex.label}: {ex.text}</summary>
                 <p class="mt-1 text-muted pl-4">{ex.hint}</p>
               </details>
             ))}
           </div>
 
-          <div id="mission-box" class="hidden mt-6  bg-ink text-white p-5">
+          <div id="mission-box" class="hidden mt-8 bg-ink text-white p-6 rounded">
             <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">Official mission question</p>
-            <p id="mission-text" class="mt-2 text-[16px]"></p>
+            <p id="mission-text" class="mt-2 text-[16px] leading-relaxed font-serif"></p>
           </div>
         </div>
       </section>
@@ -81,21 +114,21 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       <!-- Step 2 · Keyword Builder -->
       <section data-panel="2" class="panel hidden">
         <h1 class="font-display text-3xl font-bold tracking-tight">Step 2 · Keyword Builder</h1>
-        <div class="mt-6  bg-white border border-navy/10 p-6 sm:p-8 space-y-4">
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 space-y-4">
           {(['music', 'studying', 'silence', 'remembering'] as const).map((k) => (
             <div class="grid grid-cols-[110px_1fr] gap-3 items-center">
               <span class="font-mono text-[12px] uppercase text-muted">{k}</span>
               <input class="field" data-kw={k} placeholder="other words, comma-separated" />
             </div>
           ))}
-          <details class="text-[13px] text-muted">
-            <summary class="cursor-pointer text-blue">Show ideas</summary>
+          <details id="kw-ideas-details" class="text-[13px] text-muted">
+            <summary class="cursor-pointer text-blue font-medium">Show ideas</summary>
             <ul class="mt-2 space-y-1 pl-4">
               {Object.entries(sparkKeywordIdeas).map(([k, v]) => <li><strong>{k}:</strong> {v}</li>)}
             </ul>
           </details>
           <details class="text-[13px] text-muted">
-            <summary class="cursor-pointer text-blue">How search works</summary>
+            <summary class="cursor-pointer text-blue font-medium">How search works</summary>
             <p class="mt-2">Quotes keep words together: "background music". OR gives choices: reading OR studying. A space means all the words must appear.</p>
           </details>
 
@@ -107,7 +140,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
 
           <div>
             <label for="useful-title" class="field-label">Paste the title of one useful result</label>
-            <input id="useful-title" class="field mt-2" maxlength="300" />
+            <input id="useful-title" class="field mt-2" maxlength="300" placeholder="Copy/paste a paper title you found" />
           </div>
           <div class="flex items-center gap-3">
             <button type="button" id="q2-save-btn" class="btn btn-sm btn-primary">Save</button>
@@ -120,7 +153,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       <section data-panel="3" class="panel hidden">
         <h1 class="font-display text-3xl font-bold tracking-tight">Step 3 · The Paper Cards</h1>
         <p id="cards-progress" class="mt-2 text-[14px] text-muted">0 of 8 sorted</p>
-        <div id="cards-grid" class="mt-6  overflow-hidden border border-navy/10 grid grid-cols-2 sm:grid-cols-4 gap-px bg-navy/10">
+        <div id="cards-grid" class="mt-6 overflow-hidden border border-navy/10 grid grid-cols-2 sm:grid-cols-4 gap-px bg-navy/10">
           {sparkCards.map((c) => (
             <button type="button" class="card-tile" data-card={c.id}>
               <span class="block font-semibold text-[13px] leading-tight">{c.title}</span>
@@ -141,12 +174,12 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       <!-- Step 4 · Follow the Trail -->
       <section data-panel="4" class="panel hidden">
         <h1 class="font-display text-3xl font-bold tracking-tight">Step 4 · Follow the Trail</h1>
-        <div class="mt-6  bg-white border border-navy/10 p-6 sm:p-8">
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8">
           <div id="trail-locked" class="text-[15px] text-body">This step opens when the mentor unlocks it.</div>
           <div id="trail-open" class="hidden">
-            <div class="bg-ink text-white p-5">
+            <div class="bg-ink text-white p-5 rounded">
               <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">The clue</p>
-              <p id="trail-clue" class="mt-2 text-[15px]"></p>
+              <p id="trail-clue" class="mt-2 text-[15px] leading-relaxed"></p>
             </div>
             <div class="mt-4 flex flex-wrap gap-3">
               <a href="https://scholar.google.com" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Open Google Scholar ↗</a>
@@ -157,14 +190,19 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
             <div class="mt-6">
               <label for="trail-answer" class="field-label">Paste the title of the paper you found</label>
               <div class="mt-2 flex gap-2">
-                <input id="trail-answer" class="field" maxlength="300" />
+                <input id="trail-answer" class="field" maxlength="300" placeholder="Paste the title here" />
                 <button type="button" id="trail-check" class="btn btn-sm btn-primary shrink-0">Check</button>
               </div>
             </div>
             <p id="trail-not-yet" class="hidden mt-3 text-[14px] text-body">Not this one yet. Check the clue again, or open a hint.</p>
-            <div id="trail-found" class="hidden mt-5  bg-blue/10 border border-blue/30 p-5">
+            <div id="trail-found" class="hidden mt-5 bg-blue/10 border border-blue/30 p-5 rounded">
               <p class="font-semibold text-blue">★ You found the key paper of the case!</p>
-              <p id="key-card-text" class="mt-2 text-[14px] text-body"></p>
+              <p id="key-card-text" class="mt-2 text-[14px] text-body leading-relaxed"></p>
+              <div class="mt-4 flex flex-wrap items-center gap-3">
+                <button type="button" id="trail-key-pdf-btn" class="btn btn-sm btn-primary">Open key paper (PDF) ↗</button>
+                <a id="trail-key-doi-link" href="#" target="_blank" rel="noopener" class="text-[13px] text-blue underline">Official page ↗</a>
+              </div>
+              <p id="trail-key-error" class="hidden mt-2 text-[13px] text-signal"></p>
             </div>
           </div>
         </div>
@@ -173,20 +211,34 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       <!-- Step 5 · Case File -->
       <section data-panel="5" class="panel hidden">
         <h1 class="font-display text-3xl font-bold tracking-tight">Step 5 · Case File</h1>
-        <div id="summary" class="mt-6  bg-white border border-navy/10 p-6 sm:p-8 text-[14px] leading-relaxed space-y-3"></div>
+        <div id="summary" class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 text-[14px] leading-relaxed space-y-4 rounded"></div>
 
         <div class="mt-6">
           <label for="surprised" class="field-label">What surprised you today?</label>
-          <textarea id="surprised" class="field mt-2" maxlength="500" rows="3"></textarea>
+          <textarea id="surprised" class="field mt-2" maxlength="500" rows="3" placeholder="Write what surprised your team during this investigation..."></textarea>
           <div class="mt-3 flex items-center gap-3">
             <button type="button" id="q5-save-btn" class="btn btn-sm btn-primary">Save</button>
             <p id="q5-saved" class="save-status"></p>
           </div>
         </div>
 
-        <div class="mt-6  bg-ink text-white p-5">
+        <div class="mt-6 bg-ink text-white p-6 rounded">
           <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">Homework</p>
-          <p class="mt-2 text-[14px]">{sparkHomework}</p>
+          <p class="mt-2 text-[14px] leading-relaxed">{sparkHomework}</p>
+          
+          <div class="mt-4 pt-4 border-t border-white/15">
+            <p class="text-[12px] font-mono uppercase tracking-wider text-peri">Paper to read for next session</p>
+            <p class="mt-1 text-[14px] text-white/95 font-serif italic">{sparkNextSessionPaper.citation}</p>
+            <div class="mt-3 flex flex-wrap items-center gap-4">
+              <button type="button" id="homework-pdf-btn" class="btn btn-sm btn-primary">
+                Open the paper (PDF) ↗
+              </button>
+              <a href={sparkNextSessionPaper.doiLink} target="_blank" rel="noopener" class="text-[13px] text-peri underline hover:text-white transition-colors">
+                Read the abstract ↗
+              </a>
+            </div>
+            <p id="homework-pdf-error" class="hidden mt-2 text-[13px] text-signal"></p>
+          </div>
         </div>
 
         <p class="mt-8 font-display text-xl font-bold text-ink">Case File #1 complete. See you in Session 2.</p>
@@ -195,14 +247,24 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     </div>
   </main>
 
-  <!-- Card modal -->
+  <!-- Card modal with private PDF signed link and DOI -->
   <div id="card-modal" class="hidden fixed inset-0 z-50 bg-ink/70 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8">
+    <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 rounded shadow-xl">
       <button type="button" id="modal-close" class="float-right text-muted hover:text-ink"><Icon name="x" /></button>
       <p id="modal-title" class="font-display text-xl font-bold"></p>
       <p id="modal-meta" class="mt-1 text-[13px] text-muted"></p>
       <p id="modal-summary" class="mt-4 text-[14px] leading-relaxed text-body"></p>
-      <a id="modal-link" href="#" target="_blank" rel="noopener" class="mt-4 inline-block text-[14px] text-blue">See the real paper ↗</a>
+
+      <div class="mt-5 p-4 bg-paper rounded border border-navy/10">
+        <button type="button" id="modal-paper-btn" class="btn btn-sm btn-primary">
+          See the real paper (PDF) ↗
+        </button>
+        <p class="mt-2 text-[12px] text-muted">
+          Official page: <a id="modal-doi-link" href="#" target="_blank" rel="noopener" class="underline hover:text-blue">DOI page</a>
+        </p>
+        <p id="modal-paper-error" class="hidden mt-2 text-[13px] text-signal"></p>
+      </div>
+
       <div class="mt-5 flex gap-2">
         <button type="button" class="choice-btn" data-choice="keep">Keep</button>
         <button type="button" class="choice-btn" data-choice="maybe">Maybe</button>
@@ -210,7 +272,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       </div>
       <div id="modal-reason-wrap" class="hidden mt-4">
         <label for="modal-reason" class="field-label">Why? (one line)</label>
-        <input id="modal-reason" class="field mt-2" maxlength="200" />
+        <input id="modal-reason" class="field mt-2" maxlength="200" placeholder="e.g. Music while studying compared to silence" />
         <button type="button" id="modal-save" class="btn btn-sm btn-primary mt-3">Save</button>
       </div>
     </div>
@@ -219,8 +281,10 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
 
 <script>
   import {
-    getStoredTeamCode, getTeam, saveStep1, saveStep2, chooseCard, getTrail, openHint, checkTrail, saveStep5,
-    watchSessionState, friendlyError, type TeamCaseFile, type SessionState,
+    getStoredTeamCode, getTeam, saveStep1Draft, submitStep1, saveStep2, chooseCard,
+    getTrail, openHint, checkTrail, saveStep5, getPaperSignedUrl,
+    watchSessionState, watchTeamStep1, friendlyError,
+    type TeamCaseFile, type SessionState, type Step1Answers,
   } from '../../lib/spark/api';
   import { sparkCardById } from '../../data/spark';
 
@@ -233,15 +297,16 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   let sessionState: SessionState = { unlocked_step: 0, mission_revealed: false };
   let view = 0;
   let loaded1 = false, loaded2 = false, loaded5 = false, trailLoaded = false;
+  let unsubStep1: (() => void) | null = null;
 
-  function debounce<T extends (...a: any[]) => void>(fn: T, ms = 900) {
+  function debounce<T extends (...a: any[]) => void>(fn: T, ms = 800) {
     let t: ReturnType<typeof setTimeout>;
     return (...a: Parameters<T>) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
   }
 
-  /** Visible save status next to a Save button: 'saving' | 'saved' | error text. */
   function markStatus(id: string, state: 'saving' | 'saved' | string) {
-    const el = document.getElementById(id)!;
+    const el = document.getElementById(id);
+    if (!el) return;
     el.classList.remove('status-saving', 'status-saved', 'status-error');
     if (state === 'saving') { el.textContent = 'Saving…'; el.classList.add('status-saving'); }
     else if (state === 'saved') { el.textContent = '✓ Saved'; el.classList.add('status-saved'); }
@@ -273,31 +338,166 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     btn.addEventListener('click', () => showPanel(Number(btn.dataset.step)));
   });
 
-  document.getElementById('start-investigation')!.addEventListener('click', () => {
-    if (sessionState.unlocked_step >= 1) showPanel(1);
-    else showPanel(1); // locked view still switches the active tab target; renderLocks keeps it disabled visually
+  document.getElementById('start-investigation')?.addEventListener('click', () => {
+    showPanel(1);
   });
 
-  /* ---- Step 1 ---- */
+  /* ---- Step 1: Question Lab ---- */
+  const q1Text = document.getElementById('q1-text') as HTMLTextAreaElement;
+  const q1Who = document.getElementById('q1-who') as HTMLInputElement;
+  const q1What = document.getElementById('q1-what') as HTMLInputElement;
+  const q1Comp = document.getElementById('q1-compared') as HTMLInputElement;
+  const q1Meas = document.getElementById('q1-measured') as HTMLInputElement;
+  const q1SubmitBtn = document.getElementById('q1-submit-btn') as HTMLButtonElement;
+  const q1StatusText = document.getElementById('q1-status-text')!;
+  const q1ApprovedBox = document.getElementById('q1-approved-box')!;
+  const q1MentorComment = document.getElementById('q1-mentor-comment')!;
+
+  function getStep1Values() {
+    return {
+      question: q1Text.value.trim(),
+      who: q1Who.value.trim(),
+      what: q1What.value.trim(),
+      comparedTo: q1Comp.value.trim(),
+      measuredHow: q1Meas.value.trim(),
+    };
+  }
+
+  function checkStep1Completeness() {
+    const vals = getStep1Values();
+    return !!(vals.question && vals.who && vals.what && vals.comparedTo && vals.measuredHow);
+  }
+
+  function updateStep1UI() {
+    const s1 = caseFile?.step1;
+    const status = s1?.status || 'draft';
+    const allFilled = checkStep1Completeness();
+
+    if (status === 'approved') {
+      [q1Text, q1Who, q1What, q1Comp, q1Meas].forEach((el) => { el.disabled = true; });
+      q1SubmitBtn.classList.add('hidden');
+      q1StatusText.classList.add('hidden');
+      q1ApprovedBox.classList.remove('hidden');
+      if (s1?.mentor_comment) {
+        q1MentorComment.textContent = `Mentor note: "${s1.mentor_comment}"`;
+        q1MentorComment.classList.remove('hidden');
+      } else {
+        q1MentorComment.classList.add('hidden');
+      }
+    } else if (status === 'pending') {
+      [q1Text, q1Who, q1What, q1Comp, q1Meas].forEach((el) => { el.disabled = true; });
+      q1SubmitBtn.disabled = true;
+      q1SubmitBtn.classList.remove('hidden');
+      q1SubmitBtn.classList.add('opacity-40', 'cursor-not-allowed');
+      q1StatusText.classList.remove('hidden');
+      q1StatusText.textContent = '⏳ Sent to your mentor';
+      q1StatusText.className = 'font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded border border-amber-200';
+      q1ApprovedBox.classList.add('hidden');
+    } else {
+      // draft
+      [q1Text, q1Who, q1What, q1Comp, q1Meas].forEach((el) => { el.disabled = false; });
+      q1SubmitBtn.classList.remove('hidden');
+      q1ApprovedBox.classList.add('hidden');
+      q1StatusText.classList.remove('hidden');
+
+      if (allFilled) {
+        q1SubmitBtn.disabled = false;
+        q1SubmitBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+        q1StatusText.textContent = 'All 5 fields filled · ready to send';
+        q1StatusText.className = 'text-[13px] text-emerald-600 font-medium';
+      } else {
+        q1SubmitBtn.disabled = true;
+        q1SubmitBtn.classList.add('opacity-40', 'cursor-not-allowed');
+        q1StatusText.textContent = 'Fill all 5 fields above to submit';
+        q1StatusText.className = 'text-[13px] text-muted';
+      }
+    }
+  }
+
   function fillStep1() {
-    const t = (document.getElementById('q1-text') as HTMLTextAreaElement);
-    t.value = caseFile?.step1?.question_text || '';
-    const cl = caseFile?.step1?.checklist || [false, false, false, false];
-    document.querySelectorAll<HTMLInputElement>('[data-checklist]').forEach((cb, i) => (cb.checked = !!cl[i]));
+    const s1 = caseFile?.step1;
+    if (s1) {
+      q1Text.value = s1.question_text || '';
+      q1Who.value = s1.who || '';
+      q1What.value = s1.what || '';
+      q1Comp.value = s1.compared_to || '';
+      q1Meas.value = s1.measured_how || '';
+    }
+    updateStep1UI();
   }
-  async function doSaveStep1() {
-    const q = (document.getElementById('q1-text') as HTMLTextAreaElement).value;
-    const cl = [...document.querySelectorAll<HTMLInputElement>('[data-checklist]')].map((cb) => cb.checked);
-    markStatus('q1-saved', 'saving');
+
+  const autoSaveDraftStep1 = debounce(async () => {
+    if (caseFile?.step1?.status && caseFile.step1.status !== 'draft') return;
+    const vals = getStep1Values();
     try {
-      await saveStep1(code!, q, cl);
-      markStatus('q1-saved', 'saved');
-    } catch (e) { markStatus('q1-saved', friendlyError(e)); }
-  }
-  const saveQ1 = debounce(doSaveStep1);
-  document.getElementById('q1-text')!.addEventListener('input', saveQ1);
-  document.querySelectorAll('[data-checklist]').forEach((cb) => cb.addEventListener('change', saveQ1));
-  document.getElementById('q1-save-btn')!.addEventListener('click', doSaveStep1);
+      await saveStep1Draft(code!, vals);
+      if (!caseFile!.step1) {
+        caseFile!.step1 = {
+          question_text: vals.question,
+          who: vals.who,
+          what: vals.what,
+          compared_to: vals.comparedTo,
+          measured_how: vals.measuredHow,
+          status: 'draft',
+          submitted_at: null,
+          approved_at: null,
+          approved_by: null,
+          mentor_comment: null,
+        };
+      } else {
+        caseFile!.step1.question_text = vals.question;
+        caseFile!.step1.who = vals.who;
+        caseFile!.step1.what = vals.what;
+        caseFile!.step1.compared_to = vals.comparedTo;
+        caseFile!.step1.measured_how = vals.measuredHow;
+      }
+    } catch {
+      // silent autosave
+    }
+  }, 1000);
+
+  [q1Text, q1Who, q1What, q1Comp, q1Meas].forEach((input) => {
+    input.addEventListener('input', () => {
+      updateStep1UI();
+      autoSaveDraftStep1();
+    });
+  });
+
+  q1SubmitBtn.addEventListener('click', async () => {
+    if (!checkStep1Completeness()) return;
+    const vals = getStep1Values();
+    q1SubmitBtn.disabled = true;
+    q1StatusText.textContent = 'Sending to mentor…';
+
+    try {
+      await submitStep1(code!, vals as { question: string; who: string; what: string; comparedTo: string; measuredHow: string });
+      if (!caseFile!.step1) {
+        caseFile!.step1 = {
+          question_text: vals.question,
+          who: vals.who,
+          what: vals.what,
+          compared_to: vals.comparedTo,
+          measured_how: vals.measuredHow,
+          status: 'pending',
+          submitted_at: new Date().toISOString(),
+          approved_at: null,
+          approved_by: null,
+          mentor_comment: null,
+        };
+      } else {
+        caseFile!.step1.status = 'pending';
+        caseFile!.step1.question_text = vals.question;
+        caseFile!.step1.who = vals.who;
+        caseFile!.step1.what = vals.what;
+        caseFile!.step1.compared_to = vals.comparedTo;
+        caseFile!.step1.measured_how = vals.measuredHow;
+      }
+      updateStep1UI();
+    } catch (e) {
+      alert(friendlyError(e));
+      updateStep1UI();
+    }
+  });
 
   function renderMission() {
     const box = document.getElementById('mission-box')!;
@@ -305,10 +505,12 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     if (sessionState.mission_revealed && caseFile?.mission_question) {
       text.textContent = caseFile.mission_question;
       box.classList.remove('hidden');
-    } else box.classList.add('hidden');
+    } else {
+      box.classList.add('hidden');
+    }
   }
 
-  /* ---- Step 2 ---- */
+  /* ---- Step 2: Keywords ---- */
   function fillStep2() {
     const s = caseFile?.step2;
     (document.querySelector('[data-kw="music"]') as HTMLInputElement).value = s?.words_music || '';
@@ -319,11 +521,14 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     (document.getElementById('useful-title') as HTMLInputElement).value = s?.useful_title || '';
     updateScholarLink();
   }
+
   function updateScholarLink() {
     const line = (document.getElementById('search-line') as HTMLInputElement).value;
-    (document.getElementById('scholar-link') as HTMLAnchorElement).href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(line);
+    (document.getElementById('scholar-link') as HTMLAnchorElement).href =
+      'https://scholar.google.com/scholar?q=' + encodeURIComponent(line);
   }
-  async function doSaveStep2() {
+
+  async function doSaveStep2(ideasOpened = false) {
     markStatus('q2-saved', 'saving');
     try {
       await saveStep2(code!, {
@@ -333,17 +538,30 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
         wordsRemembering: (document.querySelector('[data-kw="remembering"]') as HTMLInputElement).value,
         searchLine: (document.getElementById('search-line') as HTMLInputElement).value,
         usefulTitle: (document.getElementById('useful-title') as HTMLInputElement).value,
+        ideasOpened,
       });
       markStatus('q2-saved', 'saved');
-    } catch (e) { markStatus('q2-saved', friendlyError(e)); }
+    } catch (e) {
+      markStatus('q2-saved', friendlyError(e));
+    }
   }
-  const saveQ2 = debounce(doSaveStep2);
-  ['[data-kw="music"]', '[data-kw="studying"]', '[data-kw="silence"]', '[data-kw="remembering"]', '#search-line', '#useful-title'].forEach((sel) => {
-    document.querySelector(sel)!.addEventListener('input', () => { updateScholarLink(); saveQ2(); });
-  });
-  document.getElementById('q2-save-btn')!.addEventListener('click', doSaveStep2);
+  const saveQ2 = debounce(() => doSaveStep2(false));
 
-  /* ---- Step 3: cards ---- */
+  ['[data-kw="music"]', '[data-kw="studying"]', '[data-kw="silence"]', '[data-kw="remembering"]', '#search-line', '#useful-title'].forEach((sel) => {
+    document.querySelector(sel)?.addEventListener('input', () => {
+      updateScholarLink();
+      saveQ2();
+    });
+  });
+  document.getElementById('q2-save-btn')?.addEventListener('click', () => doSaveStep2(false));
+
+  // Track if team opened ideas
+  document.getElementById('kw-ideas-details')?.addEventListener('toggle', (e) => {
+    const target = e.target as HTMLDetailsElement;
+    if (target.open) doSaveStep2(true);
+  });
+
+  /* ---- Step 3: Cards ---- */
   let activeCardId: string | null = null;
   function renderCards() {
     const cards = caseFile?.cards || {};
@@ -352,13 +570,20 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       const id = tile.dataset.card!;
       const tag = tile.querySelector('.card-tag') as HTMLElement;
       const entry = cards[id];
-      if (entry) { n++; tag.textContent = entry.choice === 'not_for_us' ? 'Not for us' : entry.choice[0].toUpperCase() + entry.choice.slice(1); tag.classList.remove('hidden'); }
-      else tag.classList.add('hidden');
+      if (entry) {
+        n++;
+        tag.textContent = entry.choice === 'not_for_us' ? 'Not for us' : entry.choice[0].toUpperCase() + entry.choice.slice(1);
+        tag.classList.remove('hidden');
+      } else {
+        tag.classList.add('hidden');
+      }
     });
     document.getElementById('cards-progress')!.textContent = `${n} of 8 sorted`;
 
     const board: Record<string, HTMLElement> = {
-      keep: document.getElementById('board-keep')!, maybe: document.getElementById('board-maybe')!, not_for_us: document.getElementById('board-not')!,
+      keep: document.getElementById('board-keep')!,
+      maybe: document.getElementById('board-maybe')!,
+      not_for_us: document.getElementById('board-not')!,
     };
     Object.values(board).forEach((el) => (el.innerHTML = ''));
     for (const [id, entry] of Object.entries(cards)) {
@@ -369,28 +594,75 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       board[entry.choice]?.appendChild(li);
     }
   }
+
   function openModal(id: string) {
     activeCardId = id;
     const c = sparkCardById[id as keyof typeof sparkCardById];
     document.getElementById('modal-title')!.textContent = c.title;
     document.getElementById('modal-meta')!.textContent = `${c.authors} · ${c.year} · ${c.journal}`;
     document.getElementById('modal-summary')!.textContent = c.summary;
-    (document.getElementById('modal-link') as HTMLAnchorElement).href = c.officialLink;
+
+    const doiLink = document.getElementById('modal-doi-link') as HTMLAnchorElement;
+    doiLink.href = c.officialLink;
+    doiLink.textContent = c.officialLink.replace('https://doi.org/', 'doi:');
+
+    const errorEl = document.getElementById('modal-paper-error')!;
+    errorEl.classList.add('hidden');
+    errorEl.textContent = '';
+
     const existing = caseFile?.cards?.[id];
-    document.querySelectorAll('.choice-btn').forEach((b) => b.classList.toggle('chosen', b.getAttribute('data-choice') === existing?.choice));
+    document.querySelectorAll('.choice-btn').forEach((b) =>
+      b.classList.toggle('chosen', b.getAttribute('data-choice') === existing?.choice)
+    );
     const reasonWrap = document.getElementById('modal-reason-wrap')!;
     const reasonInput = document.getElementById('modal-reason') as HTMLInputElement;
-    if (existing) { reasonWrap.classList.remove('hidden'); reasonInput.value = existing.reason; } else { reasonWrap.classList.add('hidden'); reasonInput.value = ''; }
+    if (existing) {
+      reasonWrap.classList.remove('hidden');
+      reasonInput.value = existing.reason;
+    } else {
+      reasonWrap.classList.add('hidden');
+      reasonInput.value = '';
+    }
     document.getElementById('card-modal')!.classList.remove('hidden');
   }
-  document.querySelectorAll<HTMLButtonElement>('.card-tile').forEach((tile) => tile.addEventListener('click', () => openModal(tile.dataset.card!)));
-  document.getElementById('modal-close')!.addEventListener('click', () => document.getElementById('card-modal')!.classList.add('hidden'));
-  document.querySelectorAll<HTMLButtonElement>('.choice-btn').forEach((btn) => btn.addEventListener('click', () => {
-    document.querySelectorAll('.choice-btn').forEach((b) => b.classList.toggle('chosen', b === btn));
-    document.getElementById('modal-reason-wrap')!.classList.remove('hidden');
-    (document.getElementById('modal-reason') as HTMLInputElement).focus();
-  }));
-  document.getElementById('modal-save')!.addEventListener('click', async () => {
+
+  document.querySelectorAll<HTMLButtonElement>('.card-tile').forEach((tile) =>
+    tile.addEventListener('click', () => openModal(tile.dataset.card!))
+  );
+  document.getElementById('modal-close')?.addEventListener('click', () =>
+    document.getElementById('card-modal')!.classList.add('hidden')
+  );
+
+  // Private PDF open in modal
+  document.getElementById('modal-paper-btn')?.addEventListener('click', async () => {
+    if (!activeCardId) return;
+    const btn = document.getElementById('modal-paper-btn') as HTMLButtonElement;
+    const errEl = document.getElementById('modal-paper-error')!;
+    errEl.classList.add('hidden');
+    const oldText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Opening secure PDF…';
+    try {
+      const url = await getPaperSignedUrl(activeCardId, { code });
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      errEl.textContent = friendlyError(e);
+      errEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.choice-btn').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.choice-btn').forEach((b) => b.classList.toggle('chosen', b === btn));
+      document.getElementById('modal-reason-wrap')!.classList.remove('hidden');
+      (document.getElementById('modal-reason') as HTMLInputElement).focus();
+    })
+  );
+
+  document.getElementById('modal-save')?.addEventListener('click', async () => {
     const choice = document.querySelector('.choice-btn.chosen')?.getAttribute('data-choice');
     const reason = (document.getElementById('modal-reason') as HTMLInputElement).value.trim();
     if (!activeCardId || !choice || !reason) return;
@@ -400,10 +672,12 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       caseFile!.cards[activeCardId] = { choice, reason };
       renderCards();
       document.getElementById('card-modal')!.classList.add('hidden');
-    } catch (e) { alert(friendlyError(e)); }
+    } catch (e) {
+      alert(friendlyError(e));
+    }
   });
 
-  /* ---- Step 4: trail ---- */
+  /* ---- Step 4: Trail ---- */
   async function loadTrail() {
     if (sessionState.unlocked_step < 4) {
       document.getElementById('trail-locked')!.classList.remove('hidden');
@@ -419,67 +693,219 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       if (info.locked) return;
       document.getElementById('trail-clue')!.textContent = info.clue || '';
       const list = document.getElementById('hints-list')!;
+      list.innerHTML = '';
       (info.hints || []).forEach((h, i) => addHintLine(list, i + 1, h));
+      if (info.hints_opened && info.hints_opened >= 4) {
+        (document.getElementById('need-hint') as HTMLButtonElement).disabled = true;
+      }
       if (info.found && caseFile?.key_card) showFound(caseFile.key_card);
-    } catch (e) { document.getElementById('trail-clue')!.textContent = friendlyError(e); }
+    } catch (e) {
+      document.getElementById('trail-clue')!.textContent = friendlyError(e);
+    }
   }
+
   function addHintLine(list: HTMLElement, n: number, text: string) {
     const li = document.createElement('li');
     li.innerHTML = `<strong>Hint ${n}:</strong> `;
     li.append(text);
     list.appendChild(li);
   }
-  document.getElementById('need-hint')!.addEventListener('click', async () => {
+
+  document.getElementById('need-hint')?.addEventListener('click', async () => {
     try {
       const { hint, hints_opened } = await openHint(code!);
       addHintLine(document.getElementById('hints-list')!, hints_opened, hint);
       if (hints_opened >= 4) (document.getElementById('need-hint') as HTMLButtonElement).disabled = true;
-    } catch (e) { alert(friendlyError(e)); }
+    } catch (e) {
+      alert(friendlyError(e));
+    }
   });
-  document.getElementById('trail-check')!.addEventListener('click', async () => {
+
+  document.getElementById('trail-check')?.addEventListener('click', async () => {
     const title = (document.getElementById('trail-answer') as HTMLInputElement).value.trim();
     if (!title) return;
     document.getElementById('trail-not-yet')!.classList.add('hidden');
     try {
       const result = await checkTrail(code!, title);
       if (result.found && result.key_card) {
-        if (caseFile) { caseFile.key_card = result.key_card; if (caseFile.step4) caseFile.step4.found = true; }
+        if (caseFile) {
+          caseFile.key_card = result.key_card;
+          if (caseFile.step4) caseFile.step4.found = true;
+        }
         showFound(result.key_card);
       } else {
         document.getElementById('trail-not-yet')!.classList.remove('hidden');
       }
-    } catch (e) { alert(friendlyError(e)); }
+    } catch (e) {
+      alert(friendlyError(e));
+    }
   });
+
   function showFound(key: NonNullable<TeamCaseFile['key_card']>) {
     document.getElementById('key-card-text')!.textContent = `${key.title} — ${key.authors} (${key.year}). ${key.summary}`;
+    const doi = document.getElementById('trail-key-doi-link') as HTMLAnchorElement;
+    if (doi && key.official_link) doi.href = key.official_link;
     document.getElementById('trail-found')!.classList.remove('hidden');
   }
 
-  /* ---- Step 5 ---- */
+  // Open key paper PDF from step 4
+  document.getElementById('trail-key-pdf-btn')?.addEventListener('click', async () => {
+    const errEl = document.getElementById('trail-key-error')!;
+    errEl.classList.add('hidden');
+    try {
+      const url = await getPaperSignedUrl('KEY', { code });
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      errEl.textContent = friendlyError(e);
+      errEl.classList.remove('hidden');
+    }
+  });
+
+  /* ---- Step 5: Case File ---- */
   function fillStep5() {
     (document.getElementById('surprised') as HTMLTextAreaElement).value = caseFile?.step5?.surprised_text || '';
   }
+
   async function doSaveStep5() {
     markStatus('q5-saved', 'saving');
     try {
       await saveStep5(code!, (document.getElementById('surprised') as HTMLTextAreaElement).value);
       markStatus('q5-saved', 'saved');
-    } catch (e) { markStatus('q5-saved', friendlyError(e)); }
+      if (caseFile?.step5) caseFile.step5.surprised_text = (document.getElementById('surprised') as HTMLTextAreaElement).value;
+    } catch (e) {
+      markStatus('q5-saved', friendlyError(e));
+    }
   }
   const saveQ5 = debounce(doSaveStep5);
-  document.getElementById('surprised')!.addEventListener('input', saveQ5);
-  document.getElementById('q5-save-btn')!.addEventListener('click', doSaveStep5);
+  document.getElementById('surprised')?.addEventListener('input', saveQ5);
+  document.getElementById('q5-save-btn')?.addEventListener('click', doSaveStep5);
+
+  // Homework PDF link in Step 5
+  document.getElementById('homework-pdf-btn')?.addEventListener('click', async () => {
+    const errEl = document.getElementById('homework-pdf-error')!;
+    errEl.classList.add('hidden');
+    try {
+      const url = await getPaperSignedUrl('KEY', { code });
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      errEl.textContent = friendlyError(e);
+      errEl.classList.remove('hidden');
+    }
+  });
 
   function renderSummary() {
     const el = document.getElementById('summary')!;
     const parts: string[] = [];
-    parts.push(`<p><strong>Your question:</strong> ${caseFile?.step1?.question_text || '—'}</p>`);
-    if (caseFile?.mission_question) parts.push(`<p><strong>Mission question:</strong> ${caseFile.mission_question}</p>`);
-    if (caseFile?.step2?.search_line) parts.push(`<p><strong>Search line:</strong> ${caseFile.step2.search_line}</p>`);
+
+    // 1. Team's research question (with green check if approved)
+    const s1 = caseFile?.step1;
+    const isApproved = s1?.status === 'approved';
+    const isPending = s1?.status === 'pending';
+    const qBadge = isApproved
+      ? '<span class="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[12px] font-semibold">✓ Approved</span>'
+      : isPending
+      ? '<span class="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-[12px] font-semibold">⏳ Sent to mentor</span>'
+      : '<span class="text-muted text-[12px]">(Draft)</span>';
+
+    parts.push(`
+      <div class="border-b border-navy/10 pb-4">
+        <div class="flex items-center gap-2 mb-1">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-muted">Your research question</p>
+          ${qBadge}
+        </div>
+        <p class="text-[15px] font-medium text-ink">${s1?.question_text || '—'}</p>
+        ${s1?.mentor_comment ? `<p class="text-[12px] text-emerald-700 mt-1">Mentor note: "${s1.mentor_comment}"</p>` : ''}
+      </div>
+    `);
+
+    // 2. Official mission question (if revealed)
+    if (caseFile?.mission_question) {
+      parts.push(`
+        <div class="border-b border-navy/10 pb-4">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Official mission question</p>
+          <p class="text-[15px] text-ink font-serif italic">${caseFile.mission_question}</p>
+        </div>
+      `);
+    }
+
+    // 3. 4-part table
+    parts.push(`
+      <div class="border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-2">Question breakdown</p>
+        <div class="grid grid-cols-2 gap-2 text-[13px] bg-paper p-3 rounded border border-navy/10">
+          <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${s1?.who || '—'}</span></div>
+          <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${s1?.what || '—'}</span></div>
+          <div><span class="font-semibold text-ink">Compared to:</span> <span class="text-body">${s1?.compared_to || '—'}</span></div>
+          <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${s1?.measured_how || '—'}</span></div>
+        </div>
+      </div>
+    `);
+
+    // 4. Search line from Step 2
+    if (caseFile?.step2?.search_line) {
+      parts.push(`
+        <div class="border-b border-navy/10 pb-4">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Your Google Scholar search</p>
+          <code class="font-mono text-[13px] bg-paper px-2 py-1 rounded text-ink block sm:inline-block">${caseFile.step2.search_line}</code>
+        </div>
+      `);
+    }
+
+    // 5. Card board: Keep, Maybe, and Not for us with reasons
     const cards = caseFile?.cards || {};
-    const kept = Object.entries(cards).filter(([, v]) => v.choice === 'keep').map(([id, v]) => `${sparkCardById[id as keyof typeof sparkCardById]?.title} — ${v.reason}`);
-    if (kept.length) parts.push(`<p><strong>Kept papers:</strong></p><ul class="list-disc pl-5">${kept.map((k) => `<li>${k}</li>`).join('')}</ul>`);
-    if (caseFile?.key_card) parts.push(`<p><strong>Key paper:</strong> ${caseFile.key_card.title} (${caseFile.key_card.year})</p>`);
+    const keepList = Object.entries(cards).filter(([, v]) => v.choice === 'keep');
+    const maybeList = Object.entries(cards).filter(([, v]) => v.choice === 'maybe');
+    const notList = Object.entries(cards).filter(([, v]) => v.choice === 'not_for_us');
+
+    const renderCardList = (list: [string, { choice: string; reason: string }][]) => {
+      if (!list.length) return '<p class="text-[12px] text-muted italic">None</p>';
+      return `<ul class="space-y-1 text-[13px] pl-3 list-disc">${list
+        .map(([id, v]) => `<li><strong>${sparkCardById[id as keyof typeof sparkCardById]?.title || id}</strong><br><span class="text-muted text-[12px]">Reason: ${v.reason}</span></li>`)
+        .join('')}</ul>`;
+    };
+
+    parts.push(`
+      <div class="border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-3">Our Card Board</p>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div class="p-3 bg-paper rounded border border-navy/10">
+            <p class="font-bold text-[12px] uppercase text-emerald-800 mb-2">Keep (${keepList.length})</p>
+            ${renderCardList(keepList)}
+          </div>
+          <div class="p-3 bg-paper rounded border border-navy/10">
+            <p class="font-bold text-[12px] uppercase text-amber-800 mb-2">Maybe (${maybeList.length})</p>
+            ${renderCardList(maybeList)}
+          </div>
+          <div class="p-3 bg-paper rounded border border-navy/10">
+            <p class="font-bold text-[12px] uppercase text-slate-700 mb-2">Not for us (${notList.length})</p>
+            ${renderCardList(notList)}
+          </div>
+        </div>
+      </div>
+    `);
+
+    // 6. Key paper found in Step 4
+    if (caseFile?.key_card) {
+      parts.push(`
+        <div class="border-b border-navy/10 pb-4">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Key paper discovered</p>
+          <p class="text-[14px] font-semibold text-blue">${caseFile.key_card.title} (${caseFile.key_card.year})</p>
+          <p class="text-[13px] text-body mt-0.5">${caseFile.key_card.authors} · ${caseFile.key_card.journal}</p>
+        </div>
+      `);
+    }
+
+    // 7. Answer to What surprised you today
+    const surprised = caseFile?.step5?.surprised_text;
+    if (surprised) {
+      parts.push(`
+        <div>
+          <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">What surprised us today</p>
+          <p class="text-[14px] text-body italic">"${surprised}"</p>
+        </div>
+      `);
+    }
+
     el.innerHTML = parts.join('');
   }
 
@@ -492,15 +918,30 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       sessionState = caseFile.state;
       waitingEl.classList.add('hidden');
       gameEl.classList.remove('hidden');
+
       renderLocks();
       renderMission();
       renderCards();
       showPanel(Math.min(view, sessionState.unlocked_step));
+
+      // Watch team step 1 approval in real time
+      unsubStep1 = watchTeamStep1(caseFile.team.id, (s1) => {
+        if (!caseFile) return;
+        caseFile.step1 = s1;
+        updateStep1UI();
+        if (view === 5) renderSummary();
+      });
+
+      // Watch session state
       watchSessionState(async (s) => {
         const missionJustRevealed = s.mission_revealed && !sessionState.mission_revealed;
         sessionState = s;
         renderLocks();
-        if (missionJustRevealed) { caseFile = await getTeam(code!); renderMission(); }
+        if (missionJustRevealed) {
+          caseFile = await getTeam(code!);
+          renderMission();
+          if (view === 5) renderSummary();
+        }
         if (view > s.unlocked_step) showPanel(s.unlocked_step);
         if (view === 4) loadTrail();
       });
@@ -508,8 +949,13 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       waitingEl.innerHTML = `<p class="text-signal">${friendlyError(e)}</p>`;
     }
   }
+
   waitingEl.classList.remove('hidden');
   boot();
+
+  window.addEventListener('beforeunload', () => {
+    if (unsubStep1) unsubStep1();
+  });
 </script>
 
 <style>
@@ -519,8 +965,8 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   .step-tab.locked { opacity: .4; cursor: not-allowed; }
   .card-tile { position: relative; text-align: left; background: #fff; padding: 12px; transition: background-color .2s; }
   .card-tile:hover { background: #F5F6F8; }
-  .card-tag { position: absolute; top: 6px; right: 6px; font-size: 10px; padding: 2px 6px; background: #3F66B0; color: #fff; }
-  .choice-btn { flex: 1; height: 40px; border: 1px solid rgba(27,42,85,.2); font-size: 14px; color: #3A4458; }
+  .card-tag { position: absolute; top: 6px; right: 6px; font-size: 10px; padding: 2px 6px; background: #3F66B0; color: #fff; border-radius: 2px; }
+  .choice-btn { flex: 1; height: 40px; border: 1px solid rgba(27,42,85,.2); font-size: 14px; color: #3A4458; border-radius: 4px; }
   .choice-btn.chosen { background: #3F66B0; color: #fff; border-color: #3F66B0; }
   .save-status { font-size: 13px; font-weight: 600; min-height: 1.2em; }
   .save-status.status-saving { color: #8A94A8; font-weight: 400; }
