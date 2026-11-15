@@ -12,6 +12,7 @@ export const site = {
   email: 'insight@estin.dz',
   instagram: { handle: '@insight.estin', url: 'https://www.instagram.com/insight.estin/' },
   linkedin: { url: 'https://www.linkedin.com/company/insight0' },
+  github: { url: 'https://github.com/islemredouane/INSIGHT' },
   school: {
     name: 'ESTIN',
     fullName: "École Supérieure en Sciences et Technologies de l'Informatique et du Numérique",
