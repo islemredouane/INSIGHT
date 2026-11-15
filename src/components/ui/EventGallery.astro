@@ -210,44 +210,48 @@ function getBentoSpan(index: number, total: number) {
       aria-label="Photo Lightbox"
       tabindex="-1"
     >
-      <!-- Top header bar -->
-      <div class="relative z-10 flex items-center justify-between px-6 py-5 border-b border-silver/10 text-white select-none">
-        <div class="flex items-center gap-3">
-          <span class="eyebrow text-peri-light font-mono text-[11px] tracking-wider hidden sm:inline">
-            INSIGHT ARCHIVE
+      <!-- Top header bar with safe-area & solid flex hierarchy -->
+      <div class="relative z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 text-white select-none bg-ink-deep/90 backdrop-blur-xl pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <!-- Left: Context & Event Title -->
+        <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-semibold tracking-wider text-peri-light bg-peri/15 border border-peri/30 uppercase shrink-0">
+            Archive
           </span>
-          <span class="hidden sm:inline text-silver/30 font-mono">/</span>
-          <span id="lightbox-title" class="text-[14px] font-medium text-silver truncate max-w-[200px] sm:max-w-xs md:max-w-md">
-            {eventTitle}
+          <span id="lightbox-title" class="text-[13px] sm:text-[14px] font-medium text-silver-light truncate">
+            <span class="sm:hidden">{eventTitle.split(':')[0]}</span>
+            <span class="hidden sm:inline">{eventTitle}</span>
           </span>
         </div>
 
-        <div class="flex items-center gap-4">
-          <span id="lightbox-counter" class="font-mono text-[13px] tracking-wider text-peri-light font-semibold bg-silver/10 px-3 py-1 rounded-lg border border-silver/10">
+        <!-- Right: Unbreakable Counter Badge + Close Action -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <span
+            id="lightbox-counter"
+            class="font-mono text-[12px] sm:text-[13px] font-bold tracking-wider text-peri-light bg-white/10 px-2.5 sm:px-3 py-1 rounded-lg border border-white/15 whitespace-nowrap shrink-0 tabular-nums shadow-sm select-none"
+          >
             01 / {String(images.length).padStart(2, '0')}
           </span>
 
           <button
             type="button"
             id="lightbox-close"
-            class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-white text-[13px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-peri cursor-pointer"
+            class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 border border-white/15 text-white transition-all focus:outline-none focus:ring-2 focus:ring-peri cursor-pointer"
             aria-label="Close photo lightbox"
           >
-            <span class="hidden sm:inline font-mono text-[11px] text-silver/70">ESC</span>
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
 
-      <!-- Main Stage with Navigation -->
-      <div class="relative flex-1 flex items-center justify-center p-4 sm:p-8 min-h-0 overflow-hidden" id="lightbox-stage">
-        <!-- Previous Button -->
+      <!-- Main Stage with Responsive Navigation -->
+      <div class="relative flex-1 flex flex-col items-center justify-center p-2 sm:p-6 min-h-0 overflow-hidden" id="lightbox-stage">
+        <!-- Desktop Floating Previous Button (hidden on mobile to prevent blocking the photo!) -->
         <button
           type="button"
           id="lightbox-prev"
-          class="absolute left-4 sm:left-8 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-peri cursor-pointer"
+          class="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 text-white items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-peri cursor-pointer"
           aria-label="Previous photo"
         >
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -255,45 +259,74 @@ function getBentoSpan(index: number, total: number) {
           </svg>
         </button>
 
-        <!-- Current Active Image & Caption -->
-        <div class="relative max-w-full max-h-full flex flex-col items-center justify-center" id="lightbox-image-container">
+        <!-- Current Active Image Container -->
+        <div class="relative w-full flex-1 flex items-center justify-center min-h-0 px-2 sm:px-6" id="lightbox-image-container">
           <img
             id="lightbox-image"
             src={assetUrl(images[0])}
             alt={`${eventTitle} fullscreen photo`}
-            class="max-h-[68vh] sm:max-h-[72vh] max-w-[92vw] sm:max-w-[85vw] object-contain rounded-xl shadow-2xl transition-all duration-300 select-none cursor-grab"
+            class="max-h-[60vh] sm:max-h-[66vh] md:max-h-[72vh] max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none cursor-grab"
             draggable="false"
           />
-          <p id="lightbox-caption" class="mt-3 font-display font-medium text-white/90 text-sm sm:text-base text-center max-w-xl truncate px-4">
-            {editorialCaptions[0]}
-          </p>
         </div>
 
-        <!-- Next Button -->
+        <!-- Desktop Floating Next Button (hidden on mobile to prevent blocking the photo!) -->
         <button
           type="button"
           id="lightbox-next"
-          class="absolute right-4 sm:right-8 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-peri cursor-pointer"
+          class="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 text-white items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-peri cursor-pointer"
           aria-label="Next photo"
         >
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
+
+        <!-- Clean Ergonomic Caption Bar with Mobile Thumb-Controls -->
+        <div class="w-full max-w-2xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 shrink-0">
+          <!-- Mobile Prev Arrow (thumb-friendly, outside the image) -->
+          <button
+            type="button"
+            id="lightbox-prev-mobile"
+            class="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 border border-white/15 text-white shrink-0 cursor-pointer transition-transform"
+            aria-label="Previous photo"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
+          <!-- Editorial Caption -->
+          <p id="lightbox-caption" class="font-display font-medium text-white/90 text-xs sm:text-sm md:text-base text-center truncate flex-1 px-1">
+            {editorialCaptions[0]}
+          </p>
+
+          <!-- Mobile Next Arrow (thumb-friendly, outside the image) -->
+          <button
+            type="button"
+            id="lightbox-next-mobile"
+            class="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 border border-white/15 text-white shrink-0 cursor-pointer transition-transform"
+            aria-label="Next photo"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Bottom Filmstrip Navigation -->
-      <div class="relative z-10 px-6 py-3 border-t border-silver/10 bg-ink-deep/80 backdrop-blur-lg">
+      <!-- Bottom Filmstrip Navigation with Safe-Area clearance -->
+      <div class="relative z-20 px-3 sm:px-6 py-2.5 sm:py-3 border-t border-white/10 bg-ink-deep/90 backdrop-blur-xl pb-[max(0.6rem,env(safe-area-inset-bottom))]">
         <div
           id="lightbox-filmstrip"
-          class="flex items-center justify-center gap-2 overflow-x-auto max-w-4xl mx-auto py-1 scrollbar-none"
+          class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto max-w-4xl mx-auto py-1 scroll-smooth scrollbar-none px-2"
           role="tablist"
           aria-label="Filmstrip thumbnails"
         >
           {images.map((src, idx) => (
             <button
               type="button"
-              class="filmstrip-thumb flex-none w-14 h-10 sm:w-16 sm:h-11 rounded-lg overflow-hidden border border-silver/20 opacity-40 hover:opacity-90 transition-all focus:outline-none cursor-pointer"
+              class="filmstrip-thumb flex-none w-13 h-9 sm:w-16 sm:h-11 rounded-lg overflow-hidden border border-white/15 opacity-40 hover:opacity-90 transition-all focus:outline-none cursor-pointer"
               data-index={idx}
               role="tab"
               aria-label={`Jump to photo ${idx + 1}`}
@@ -329,6 +362,8 @@ function getBentoSpan(index: number, total: number) {
     const closeBtn = document.getElementById('lightbox-close');
     const prevBtn = document.getElementById('lightbox-prev');
     const nextBtn = document.getElementById('lightbox-next');
+    const prevMobileBtn = document.getElementById('lightbox-prev-mobile');
+    const nextMobileBtn = document.getElementById('lightbox-next-mobile');
     const thumbs = document.querySelectorAll('.filmstrip-thumb');
     const stage = document.getElementById('lightbox-stage');
     const startSlideshowBtn = document.getElementById('start-slideshow-btn');
@@ -416,6 +451,8 @@ function getBentoSpan(index: number, total: number) {
     if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
     if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex - 1); });
     if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex + 1); });
+    if (prevMobileBtn) prevMobileBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex - 1); });
+    if (nextMobileBtn) nextMobileBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex + 1); });
 
     thumbs.forEach((thumb) => {
       thumb.addEventListener('click', (e) => {
@@ -448,20 +485,32 @@ function getBentoSpan(index: number, total: number) {
       }
     });
 
-    // Mobile Swipe Gestures
+    // Mobile Touch & Swipe Gestures (Horizontal navigation + Vertical pull-to-dismiss)
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
-    const swipeThreshold = 50;
+    let touchEndY = 0;
 
     lightbox.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
     }, { passive: true });
 
     lightbox.addEventListener('touchend', (e) => {
       touchEndX = e.changedTouches[0].screenX;
-      const diff = touchEndX - touchStartX;
-      if (Math.abs(diff) > swipeThreshold) {
-        if (diff > 0) {
+      touchEndY = e.changedTouches[0].screenY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+
+      // Swipe down to dismiss (pull-down threshold)
+      if (diffY > 75 && diffY > Math.abs(diffX) * 1.4) {
+        closeLightbox();
+        return;
+      }
+
+      // Horizontal swipe to navigate photos
+      if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 0) {
           updateLightbox(currentIndex - 1);
         } else {
           updateLightbox(currentIndex + 1);
