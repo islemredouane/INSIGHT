@@ -1,35 +1,58 @@
-# build output
+# Build output & generated types
 dist/
-# generated types
 .astro/
 
-# dependencies
+# Dependencies
 node_modules/
 
-# logs
+# Environment files & secrets (never commit secrets)
+.env
+.env.*
+.env.local
+!.env.example
+*.pem
+*.key
+*.cert
+
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment variables
-.env
-.env.*
-!.env.example
-
-# OS / editor files
+# OS-specific files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 desktop.ini
-.idea/
-.vscode/*
-!.vscode/extensions.json
 
-# deployment
+# IDE & Editor configurations
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+
+# Local developer & AI tooling state
+.claude/
+.cursor/
+.antigravity/
+scratch/
+*.tmp
+
+# Deployment platform metadata
 .vercel/
 
-# local tool settings (Claude Code preview config)
-.claude/
-
-# SPARK working files: paper PDFs (copyrighted) and answer keys, never commit
+# Internal research casework, prototypes & scratchpads
 /spark-2026/
+/docs/
+/design/
+/brand/

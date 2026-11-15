@@ -2,7 +2,7 @@
  * Cloudflare R2 Sync Script for INSIGHT Website
  *
  * Reads R2 credentials from .env.local or process.env:
- *   R2_ACCOUNT_ID=f3a05fcfad7f066dcee41b351a186282
+ *   R2_ACCOUNT_ID=your_cloudflare_account_id
  *   R2_BUCKET_NAME=insight-images
  *   R2_ACCESS_KEY_ID=...
  *   R2_SECRET_ACCESS_KEY=...
@@ -40,16 +40,17 @@ if (fs.existsSync(envLocalPath)) {
   }
 }
 
-const accountId = process.env.R2_ACCOUNT_ID || 'f3a05fcfad7f066dcee41b351a186282';
+const accountId = process.env.R2_ACCOUNT_ID;
 const bucketName = process.env.R2_BUCKET_NAME || 'insight-images';
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
 const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
 const publicCdnUrl = (process.env.PUBLIC_CDN_URL || 'https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev').replace(/\/+$/, '');
 
-if (!accessKeyId || !secretAccessKey) {
-  console.error('\n❌ Missing R2 API Credentials!');
-  console.error('Please provide R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY.');
+if (!accountId || !accessKeyId || !secretAccessKey) {
+  console.error('\n❌ Missing Cloudflare R2 Credentials!');
+  console.error('Please configure R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY.');
   console.error('You can add them to your .env.local file or pass them as environment variables:\n');
+  console.error('  R2_ACCOUNT_ID="your_cloudflare_account_id"');
   console.error('  R2_ACCESS_KEY_ID="your_access_key_id"');
   console.error('  R2_SECRET_ACCESS_KEY="your_secret_access_key"\n');
   process.exit(1);
