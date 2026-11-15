@@ -3,7 +3,7 @@
 // No scores, no timers, no right/wrong colours anywhere on this page.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/ui/Icon.astro';
-import { sparkCards, sparkStory, sparkQuestionExamples, sparkKeywordIdeas, sparkHomework, sparkNextSessionPaper } from '../../data/spark';
+import { sparkCards, sparkStory, sparkQuestionExamples, sparkKeywordIdeas, sparkHomework, sparkNextSessionPaper, sparkMissionQuestion } from '../../data/spark';
 
 const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
 ---
@@ -76,6 +76,11 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
             </div>
           </div>
 
+          <div class="mt-6 bg-ink text-white p-6 rounded">
+            <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">Official mission question</p>
+            <p class="mt-2 text-[16px] leading-relaxed font-serif">{sparkMissionQuestion}</p>
+          </div>
+
           <div class="mt-6 flex flex-wrap items-center gap-4">
             <button type="button" id="q1-submit-btn" class="btn btn-primary disabled:opacity-40 disabled:cursor-not-allowed" disabled>
               Send to my mentor
@@ -102,11 +107,6 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
                 <p class="mt-1 text-muted pl-4">{ex.hint}</p>
               </details>
             ))}
-          </div>
-
-          <div id="mission-box" class="hidden mt-8 bg-ink text-white p-6 rounded">
-            <p class="font-mono text-[11px] uppercase tracking-[.12em] text-peri">Official mission question</p>
-            <p id="mission-text" class="mt-2 text-[16px] leading-relaxed font-serif"></p>
           </div>
         </div>
       </section>
@@ -499,17 +499,6 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     }
   });
 
-  function renderMission() {
-    const box = document.getElementById('mission-box')!;
-    const text = document.getElementById('mission-text')!;
-    if (sessionState.mission_revealed && caseFile?.mission_question) {
-      text.textContent = caseFile.mission_question;
-      box.classList.remove('hidden');
-    } else {
-      box.classList.add('hidden');
-    }
-  }
-
   /* ---- Step 2: Keywords ---- */
   function fillStep2() {
     const s = caseFile?.step2;
@@ -818,15 +807,13 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       </div>
     `);
 
-    // 2. Official mission question (if revealed)
-    if (caseFile?.mission_question) {
-      parts.push(`
-        <div class="border-b border-navy/10 pb-4">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Official mission question</p>
-          <p class="text-[15px] text-ink font-serif italic">${caseFile.mission_question}</p>
-        </div>
-      `);
-    }
+    // 2. Official mission question (static, same text every team sees)
+    parts.push(`
+      <div class="border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Official mission question</p>
+        <p class="text-[15px] text-ink font-serif italic">${sparkMissionQuestion}</p>
+      </div>
+    `);
 
     // 3. 4-part table
     parts.push(`
@@ -920,7 +907,6 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       gameEl.classList.remove('hidden');
 
       renderLocks();
-      renderMission();
       renderCards();
       showPanel(Math.min(view, sessionState.unlocked_step));
 
@@ -933,15 +919,9 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       });
 
       // Watch session state
-      watchSessionState(async (s) => {
-        const missionJustRevealed = s.mission_revealed && !sessionState.mission_revealed;
+      watchSessionState((s) => {
         sessionState = s;
         renderLocks();
-        if (missionJustRevealed) {
-          caseFile = await getTeam(code!);
-          renderMission();
-          if (view === 5) renderSummary();
-        }
         if (view > s.unlocked_step) showPanel(s.unlocked_step);
         if (view === 4) loadTrail();
       });

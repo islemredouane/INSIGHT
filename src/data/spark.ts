@@ -9,6 +9,10 @@ export const sparkSupabase = {
   anonKey: 'sb_publishable_3fOj0JFbL5U8tww5GYs8hQ_OomI6vbP',
 } as const;
 
+/** Shown to every team from the start, on every step — no mentor reveal action needed. */
+export const sparkMissionQuestion =
+  'Do students understand and remember less of what they study when they listen to background music than when they study in silence?';
+
 export type CardId = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7' | 'C8';
 export type CardChoice = 'keep' | 'maybe' | 'not_for_us';
 
