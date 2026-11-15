@@ -1,12 +1,20 @@
 ---
-// Editorial event row (home-v3 "Next on the map").
+// Editorial event row (home-v3 "Next on the map" & /events directory).
 import type { CollectionEntry } from 'astro:content';
-import { shortDate, eventTypeLabel } from '../../lib/format';
+import { shortDate, dateRangeShort, eventTypeLabel, todayUTC, eventEnd } from '../../lib/format';
 import { assetUrl } from '../../lib/assets';
 interface Props { event: CollectionEntry<'events'>; upcoming?: boolean }
 const { event, upcoming = false } = Astro.props;
 const e = event.data;
 const coverSrc = assetUrl(e.cover);
+
+const today = todayUTC();
+const end = eventEnd(event);
+const isCurrent = e.date <= today && end >= today;
+const isToday = e.date.getTime() === today.getTime();
+const isMultiDay = Boolean(e.endDate && e.endDate.getTime() !== e.date.getTime());
+const formattedDate = dateRangeShort(e.date, e.endDate);
+const initialStatus = isToday ? 'Today' : isCurrent && isMultiDay ? 'Live now' : 'Upcoming';
 ---
 <article class="py-10 grid lg:grid-cols-12 gap-8 items-center group">
   <a href={`/events/${event.id}`} class="lg:col-span-4 aspect-[16/10] rounded-2xl overflow-hidden relative bg-gradient-to-br from-blue/80 to-navy block" tabindex="-1" aria-hidden="true">
@@ -17,11 +25,45 @@ const coverSrc = assetUrl(e.cover);
       : <div class="absolute inset-0 dots opacity-30"></div>}
   </a>
   <div class="lg:col-span-8">
-    {upcoming
-      ? <p class="eyebrow text-signal flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-signal"></span>Upcoming · {shortDate(e.date)}</p>
-      : <p class="eyebrow text-blue">{eventTypeLabel[e.type]} · {shortDate(e.date)}</p>}
+    {upcoming ? (
+      <p
+        class="eyebrow text-signal flex items-center gap-2 event-status-eyebrow"
+        data-event-date={e.date.toISOString()}
+        data-event-end-date={e.endDate ? e.endDate.toISOString() : ''}
+      >
+        <span class="w-2 h-2 rounded-full bg-signal animate-pulse"></span>
+        <span class="status-text">{initialStatus}</span>
+        <span>·</span>
+        <span class="date-text">{formattedDate}</span>
+      </p>
+    ) : (
+      <p class="eyebrow text-blue">{eventTypeLabel[e.type]} · {formattedDate}</p>
+    )}
     <h3 class="mt-3 font-display text-2xl sm:text-3xl font-bold group-hover:text-blue transition"><a href={`/events/${event.id}`}>{e.title}</a></h3>
     <p class="mt-3 text-[16px] text-body leading-relaxed">{e.summary}</p>
-    <a href={`/events/${event.id}`} class="mt-4 inline-block text-[15px] font-medium text-blue hover:text-navy transition">{upcoming ? 'Details →' : 'Read the recap →'}</a>
+    <a href={`/events/${event.id}`} class="mt-4 inline-block text-[15px] font-medium text-blue hover:text-navy transition">{upcoming ? 'Details & Schedule →' : 'Read the recap →'}</a>
   </div>
 </article>
+
+<script>
+  // Dynamic in-browser event status updater for event rows
+  document.querySelectorAll<HTMLElement>('.event-status-eyebrow[data-event-date]').forEach((el) => {
+    const start = new Date(el.dataset.eventDate!);
+    const end = el.dataset.eventEndDate ? new Date(el.dataset.eventEndDate) : null;
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const todayYMD = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const startYMD = `${start.getUTCFullYear()}-${pad(start.getUTCMonth() + 1)}-${pad(start.getUTCDate())}`;
+    const endYMD = end ? `${end.getUTCFullYear()}-${pad(end.getUTCMonth() + 1)}-${pad(end.getUTCDate())}` : startYMD;
+
+    const statusEl = el.querySelector('.status-text');
+    if (!statusEl) return;
+    if (todayYMD === startYMD) {
+      statusEl.textContent = 'Today';
+    } else if (todayYMD > startYMD && todayYMD <= endYMD) {
+      statusEl.textContent = 'Live now';
+    } else if (todayYMD < startYMD) {
+      statusEl.textContent = 'Upcoming';
+    }
+  });
+</script>

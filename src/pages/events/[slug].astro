@@ -7,7 +7,7 @@ import EmptyState from '../../components/ui/EmptyState.astro';
 import EventGallery from '../../components/ui/EventGallery.astro';
 import ResearcherCard from '../../components/cards/ResearcherCard.astro';
 import FinalCTA from '../../components/sections/FinalCTA.astro';
-import { longDate, eventTypeLabel, todayUTC } from '../../lib/format';
+import { longDate, dateRangeLong, eventTypeLabel, todayUTC, eventEnd } from '../../lib/format';
 import { site } from '../../data/site';
 import { assetUrl } from '../../lib/assets';
 
@@ -20,7 +20,11 @@ const { event } = Astro.props;
 const e = event.data;
 const { Content } = await render(event);
 const speakers = e.speakers.length ? await getEntries(e.speakers.map((id) => ({ collection: 'researchers' as const, id }))) : [];
-const upcoming = e.date >= todayUTC();
+const today = todayUTC();
+const end = eventEnd(e);
+const upcoming = end >= today;
+const isLive = e.date <= today && end >= today;
+const formattedHeroDate = e.endDate ? dateRangeLong(e.date, e.endDate) : longDate(e.date);
 // The event, for search engines (Google event results).
 const eventSchema = {
   '@context': 'https://schema.org',
@@ -73,8 +77,8 @@ const coverSrc = assetUrl(e.cover);
     <div class="relative max-w-[1240px] mx-auto px-6 md:px-12 pt-40 xl:pt-48 pb-16">
       <a href="/events" class="hero-in inline-flex items-center gap-2 text-[14px] text-silver/70 hover:text-white transition-colors" style="--hd:.05s">← All events</a>
       <p class="hero-in mt-8 eyebrow text-peri flex items-center gap-2" style="--hd:.1s">
-        {upcoming && <span class="w-2 h-2 rounded-full bg-signal"></span>}
-        {upcoming ? 'Upcoming' : eventTypeLabel[e.type]} · {longDate(e.date)}
+        {upcoming && <span class="w-2 h-2 rounded-full bg-signal animate-pulse"></span>}
+        {upcoming ? (isLive ? 'Live now' : 'Upcoming') : eventTypeLabel[e.type]} · {formattedHeroDate}
       </p>
       <h1 data-split="hero" class="mt-5 max-w-4xl font-display font-bold text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-[-0.03em]">{e.title}</h1>
       <p style="--hd:.6s" class="hero-in mt-6 max-w-2xl text-[17px] sm:text-lg text-silver/75 leading-relaxed">{e.summary}</p>

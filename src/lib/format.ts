@@ -8,6 +8,50 @@ export const shortDate = (d: Date) =>
 export const longDate = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
+/** Formats a single date or date range concisely: "15 NOV 2026", "15 – 22 NOV 2026", or "15 NOV – 1 DEC 2026". */
+export const dateRangeShort = (start: Date, end?: Date) => {
+  if (!end || start.getTime() === end.getTime()) return shortDate(start);
+  const startDay = start.getUTCDate();
+  const endDay = end.getUTCDate();
+  const startMonth = start.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase();
+  const endMonth = end.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase();
+  const startYear = start.getUTCFullYear();
+  const endYear = end.getUTCFullYear();
+
+  if (startYear === endYear) {
+    if (startMonth === endMonth) {
+      return `${startDay} – ${endDay} ${startMonth} ${startYear}`;
+    }
+    return `${startDay} ${startMonth} – ${endDay} ${endMonth} ${startYear}`;
+  }
+  return `${startDay} ${startMonth} ${startYear} – ${endDay} ${endMonth} ${endYear}`;
+};
+
+/** Formats a date range in full English: "15 November – 1 December 2026". */
+export const dateRangeLong = (start: Date, end?: Date) => {
+  if (!end || start.getTime() === end.getTime()) return longDate(start);
+  const startDay = start.getUTCDate();
+  const endDay = end.getUTCDate();
+  const startMonth = start.toLocaleDateString('en-GB', { month: 'long', timeZone: 'UTC' });
+  const endMonth = end.toLocaleDateString('en-GB', { month: 'long', timeZone: 'UTC' });
+  const startYear = start.getUTCFullYear();
+  const endYear = end.getUTCFullYear();
+
+  if (startYear === endYear) {
+    if (startMonth === endMonth) {
+      return `${startDay} – ${endDay} ${startMonth} ${startYear}`;
+    }
+    return `${startDay} ${startMonth} – ${endDay} ${endMonth} ${startYear}`;
+  }
+  return `${startDay} ${startMonth} ${startYear} – ${endDay} ${endMonth} ${endYear}`;
+};
+
+/** Returns the effective end date of an event (endDate or date). */
+export const eventEnd = (e: { date: Date; endDate?: Date } | { data: { date: Date; endDate?: Date } }) => {
+  const data = 'data' in e ? e.data : e;
+  return data.endDate ?? data.date;
+};
+
 export const eventTypeLabel: Record<string, string> = {
   event: 'Event',
   talk: 'Talk',

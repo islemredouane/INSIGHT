@@ -7,13 +7,13 @@ import EmptyState from '../../components/ui/EmptyState.astro';
 import EventRow from '../../components/cards/EventRow.astro';
 import CollaborateStrip from '../../components/sections/CollaborateStrip.astro';
 import { getEventsSorted } from '../../lib/content';
-import { todayUTC } from '../../lib/format';
+import { todayUTC, eventEnd } from '../../lib/format';
 import { site } from '../../data/site';
 
 const today = todayUTC();
 const events = await getEventsSorted();
-const upcoming = events.filter((e) => e.data.date >= today).reverse();
-const past = events.filter((e) => e.data.date < today);
+const upcoming = events.filter((e) => eventEnd(e) >= today).reverse();
+const past = events.filter((e) => eventEnd(e) < today);
 
 const eventsListSchema = {
   '@context': 'https://schema.org',

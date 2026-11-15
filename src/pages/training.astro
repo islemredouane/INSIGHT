@@ -9,13 +9,13 @@ import EventRow from '../components/cards/EventRow.astro';
 import FinalCTA from '../components/sections/FinalCTA.astro';
 import { getDepartmentHeads, getEventsSorted } from '../lib/content';
 import { trainingLevels, shipyard } from '../data/club';
-import { todayUTC } from '../lib/format';
+import { todayUTC, eventEnd } from '../lib/format';
 
 const dept = (await getEntry('departments', 'training'))!;
 const [head] = await getDepartmentHeads('training');
 const today = todayUTC();
 const sessions = (await getEventsSorted())
-  .filter((e) => ['training', 'workshop', 'paper-reading'].includes(e.data.type) && e.data.date >= today)
+  .filter((e) => ['training', 'workshop', 'paper-reading'].includes(e.data.type) && eventEnd(e) >= today)
   .reverse();
 
 const programSchema = {

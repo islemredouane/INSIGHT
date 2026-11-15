@@ -5,7 +5,7 @@ import Icon from '../ui/Icon.astro';
 import { mainNav, secondaryNav, site, registrations } from '../../data/site';
 import { isActive } from '../../lib/nav';
 import { getPoles } from '../../lib/content';
-import { shortDate, todayUTC } from '../../lib/format';
+import { shortDate, todayUTC, eventEnd } from '../../lib/format';
 import { assetUrl } from '../../lib/assets';
 const path = Astro.url.pathname;
 const collaborate = secondaryNav[0];
@@ -14,9 +14,28 @@ const collaborate = secondaryNav[0];
 const poles = await getPoles();
 const today = todayUTC();
 const events = (await getCollection('events')).sort((a, b) => +a.data.date - +b.data.date);
-const next = events.find((e) => e.data.date >= today);
-const latest = events.filter((e) => e.data.date < today).at(-1);
+const next = events.find((e) => eventEnd(e) >= today);
+const latest = events.filter((e) => eventEnd(e) < today).at(-1);
 const featured = next ?? latest;
+
+// SSR initial status calculation:
+const featuredEnd = featured ? eventEnd(featured) : null;
+const isCurrent = featured ? featured.data.date <= today && featuredEnd! >= today : false;
+const isToday = featured ? featured.data.date.getTime() === today.getTime() : false;
+const isMultiDay = Boolean(featured?.data.endDate && featured.data.endDate.getTime() !== featured.data.date.getTime());
+
+let initialBadge = next ? 'NEXT' : 'LATEST';
+let initialDateText = featured ? shortDate(featured.data.date).replace(/ \d{4}$/, '') : '';
+
+if (next) {
+  if (isToday) {
+    initialBadge = 'TODAY';
+  } else if (isCurrent && isMultiDay) {
+    initialBadge = 'LIVE';
+    initialDateText = `UNTIL ${shortDate(featured.data.endDate!).replace(/ \d{4}$/, '')}`;
+  }
+}
+const isLiveBadge = initialBadge === 'TODAY' || initialBadge === 'LIVE';
 ---
 <header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent transition-colors duration-300">
   <div class="max-w-[1240px] mx-auto h-[72px] px-6 md:px-12 flex items-center justify-between gap-3 sm:gap-6">
@@ -78,8 +97,16 @@ const featured = next ?? latest;
         })}
       </nav>
       {featured && (
-        <a href={`/events/${featured.id}`} class="sub-next" data-event-date={featured.data.date.toISOString()}>
-          <span class="sub-next-label">{next ? 'Next' : 'Latest'} · {shortDate(featured.data.date).replace(/ \d{4}$/, '')}</span>
+        <a
+          href={`/events/${featured.id}`}
+          class="sub-next"
+          data-event-date={featured.data.date.toISOString()}
+          data-event-end-date={featured.data.endDate ? featured.data.endDate.toISOString() : ''}
+        >
+          <span class:list={['sub-next-label inline-flex items-center', { 'text-emerald-300': isLiveBadge }]}>
+            {isLiveBadge && <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 align-middle"></span>}
+            {initialBadge} · {initialDateText}
+          </span>
           <span class="truncate">{featured.data.title.split(':')[0]}</span>
           <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
         </a>
@@ -108,11 +135,37 @@ const featured = next ?? latest;
   onScroll();
   addEventListener('scroll', onScroll, { passive: true });
 
-  // The site is static: once the "Next" event's day has passed, call it "Latest" until the next rebuild
+  // Dynamic client-side event status:
+  // Evaluates live in the visitor's browser whether the featured event is TODAY, LIVE, NEXT, or LATEST,
+  // without needing daily rebuilds or code pushes.
   const nextLink = document.querySelector<HTMLElement>('.sub-next[data-event-date]');
   const label = nextLink?.querySelector('.sub-next-label');
-  if (nextLink && label && Date.now() > Date.parse(nextLink.dataset.eventDate!) + 864e5) {
-    label.textContent = label.textContent!.replace(/^Next/, 'Latest');
+  if (nextLink && label && nextLink.dataset.eventDate) {
+    const start = new Date(nextLink.dataset.eventDate);
+    const end = nextLink.dataset.eventEndDate ? new Date(nextLink.dataset.eventEndDate) : null;
+    const now = new Date();
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const todayYMD = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const startYMD = `${start.getUTCFullYear()}-${pad(start.getUTCMonth() + 1)}-${pad(start.getUTCDate())}`;
+    const endYMD = end ? `${end.getUTCFullYear()}-${pad(end.getUTCMonth() + 1)}-${pad(end.getUTCDate())}` : startYMD;
+
+    const startMonthDay = start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }).toUpperCase();
+    const endMonthDay = end ? end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }).toUpperCase() : '';
+
+    if (todayYMD === startYMD) {
+      label.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 align-middle"></span>TODAY · ${startMonthDay}`;
+      label.classList.add('text-emerald-300');
+    } else if (todayYMD > startYMD && todayYMD <= endYMD) {
+      label.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 align-middle"></span>LIVE · UNTIL ${endMonthDay}`;
+      label.classList.add('text-emerald-300');
+    } else if (todayYMD < startYMD) {
+      label.textContent = `NEXT · ${startMonthDay}`;
+      label.classList.remove('text-emerald-300');
+    } else {
+      label.textContent = `LATEST · ${endMonthDay || startMonthDay}`;
+      label.classList.remove('text-emerald-300');
+    }
   }
 
   const btn = document.getElementById('menu-btn') as HTMLButtonElement;
