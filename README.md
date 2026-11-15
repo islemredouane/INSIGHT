@@ -13,7 +13,7 @@
 [![Vercel Edge](https://img.shields.io/badge/Vercel-Production-000000?style=for-the-badge&logo=vercel&logoColor=white&labelColor=0B1120)](https://insight-club.vercel.app)
 [![Astro](https://img.shields.io/badge/Astro-5.0-FF5D01?style=for-the-badge&logo=astro&logoColor=white&labelColor=0B1120)](https://astro.build)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=0B1120)](https://tailwindcss.com)
-[![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2_CDN-F38020?style=for-the-badge&logo=cloudflare&logoColor=white&labelColor=0B1120)](https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev)
+[![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2_CDN-F38020?style=for-the-badge&logo=cloudflare&logoColor=white&labelColor=0B1120)](https://developers.cloudflare.com/r2/)
 [![ESTIN](https://img.shields.io/badge/ESTIN-Béjaïa-059669?style=for-the-badge&logo=academia&logoColor=white&labelColor=0B1120)](https://estin.dz)
 [![Instagram](https://img.shields.io/badge/Instagram-@insight.estin-E4405F?style=for-the-badge&logo=instagram&logoColor=white&labelColor=0B1120)](https://www.instagram.com/insight.estin/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-INSIGHT-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=0B1120)](https://www.linkedin.com/company/insight0)
@@ -119,7 +119,7 @@ flowchart TB
 
     subgraph Edge["☁️ Global Edge Delivery"]
         Vercel["▲ Vercel Production Network<br>Static HTML · CSS · JS Bundles<br><code>https://insight.estin.dz</code>"]
-        R2["⚡ Cloudflare R2 CDN<br>Zero-Egress Object Storage<br><code>https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev</code>"]
+        R2["⚡ Cloudflare R2 CDN<br>Zero-Egress Object Storage<br>Global Media Edge Delivery"]
     end
 
     subgraph Core["⚙️ Astro 5 Architecture (INSIGHT)"]
@@ -247,10 +247,9 @@ Every page injects a rich JSON-LD graph linking organizational entities:
 
 ## ✦ Cloudflare R2 Asset Pipeline
 
-To maintain a lean Git repository without bloating it with gigabytes of raw event photography, media is decoupled into an automated **Cloudflare R2 Object Storage CDN**:
+To maintain a lean Git repository without bloating it with gigabytes of raw event photography, media is decoupled into a high-performance **Cloudflare R2 Object Storage CDN**:
 
-- **R2 Public CDN Endpoint:** `https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev`
-- **Zero Egress Bandwidth:** Eliminates bandwidth bills while streaming high-resolution imagery through Cloudflare's global edge cache.
+- **Zero Egress Bandwidth:** Eliminates egress bandwidth costs while streaming high-resolution photography through Cloudflare's global edge network.
 - **Smart Fallback Pipeline (`src/lib/assets.ts`):**
   ```typescript
   // Resolves to Cloudflare R2 CDN automatically, with public/ local fallback
@@ -385,18 +384,16 @@ npm run preview
 npm run sync-r2
 ```
 
-### Environment Configuration (`.env.local`)
-Create a `.env.local` file in the root directory (already git-ignored):
+### Environment Variables (Optional)
+The project runs out of the box with zero environment variables required for local development.
+
+For local preview testing or custom CDN endpoints, create an untracked `.env.local` file:
 ```env
-# Optional review mode: set true to preview draft items
+# Optional: Set to true to preview draft placeholders locally
 PUBLIC_REVIEW_MODE=false
 
-# Cloudflare R2 Storage & CDN Configuration
-PUBLIC_CDN_URL=https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev
-R2_ACCOUNT_ID=your_cloudflare_account_id
-R2_BUCKET_NAME=insight-images
-R2_ACCESS_KEY_ID=your_access_key_id
-R2_SECRET_ACCESS_KEY=your_secret_access_key
+# Optional: Custom CDN base URL (defaults to local public/ assets)
+PUBLIC_CDN_URL=
 ```
 
 <br>

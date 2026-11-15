@@ -338,8 +338,12 @@ const schemaGraph: Record<string, any> = {
     )}
 
     <!-- Preconnect CDN for Edge Media Delivery -->
-    <link rel="preconnect" href="https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev" crossorigin />
-    <link rel="dns-prefetch" href="https://pub-554f8a45acb54090af55ec98805e7e60.r2.dev" />
+    {site.cdnUrl && (
+      <>
+        <link rel="preconnect" href={site.cdnUrl} crossorigin />
+        <link rel="dns-prefetch" href={site.cdnUrl} />
+      </>
+    )}
 
     <!-- Mobile & PWA -->
     <meta name="theme-color" content="#0B1120" />
