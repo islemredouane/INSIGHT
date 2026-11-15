@@ -2,9 +2,22 @@
 // Full-screen mobile menu (home-v3): drops from the navbar, staggered links, CTA + contact at the bottom.
 // Lives outside <header>: the header's backdrop blur would otherwise trap a position:fixed child.
 import Icon from '../ui/Icon.astro';
-import { mainNav, secondaryNav, site, registrations } from '../../data/site';
+import { mainNav, site, registrations } from '../../data/site';
 import { isActive } from '../../lib/nav';
 const path = Astro.url.pathname;
+
+// Secondary action tiles dynamically adapt to avoid duplicating the primary CTA button:
+// When registrations are open: bottom CTA is "Join the crew" -> tiles are Collaborate & Contact.
+// When registrations are closed: bottom CTA is "Collaborate with our crew" -> tiles are Join the crew & Contact.
+const secondaryLinks = registrations.open
+  ? [
+      { href: '/collaborate', label: 'Collaborate' },
+      { href: '/contact', label: 'Contact' },
+    ]
+  : [
+      { href: '/join', label: 'Join the crew' },
+      { href: '/contact', label: 'Contact' },
+    ];
 ---
 <div id="menu" class="lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
   <div class="absolute inset-0 dots opacity-25 pointer-events-none"></div>
@@ -25,7 +38,7 @@ const path = Astro.url.pathname;
           ))}
         </ul>
         <ul class="mm-item mt-6 grid grid-cols-2 gap-3" style={`--i:${mainNav.length + 1}`}>
-          {secondaryNav.map((item) => (
+          {secondaryLinks.map((item) => (
             <li>
               <a href={item.href} class:list={['mm-sub', { active: isActive(path, item.href) }]} aria-current={isActive(path, item.href) ? 'page' : undefined}>
                 {item.label}
