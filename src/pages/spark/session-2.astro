@@ -60,6 +60,47 @@ const steps = [
   <main id="game" class="bg-paper text-ink py-10 sm:py-14 min-h-[70vh]">
     <div class="max-w-[760px] mx-auto px-5">
 
+      <!-- Team Check-In & Connection Card -->
+      <div id="team-banner" class="mb-8 p-5 sm:p-6 bg-white border border-navy/10 rounded-xl shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-start gap-3.5">
+            <span class="text-2xl leading-none">👥</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 id="banner-team-name" class="font-display font-bold text-ink text-base">Working with a team?</h3>
+                <span id="banner-status-badge" class="px-2 py-0.5 text-[11px] font-mono rounded bg-paper text-muted border border-navy/10">No code connected</span>
+              </div>
+              <p id="banner-team-members" class="text-[13px] text-muted mt-0.5">
+                Have a team code from Session 1? Enter it below. New to SPARK? Register a team in 1 minute!
+              </p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <div id="code-input-wrap" class="flex items-center gap-1.5">
+              <input
+                id="inline-team-code"
+                class="field !w-28 uppercase text-center font-mono tracking-widest text-[14px] !py-1.5"
+                maxlength="6"
+                placeholder="K7P2QX"
+              />
+              <button type="button" id="inline-connect-btn" class="btn btn-sm btn-primary">
+                Connect Code
+              </button>
+            </div>
+            <a href="/spark/join?next=/spark/session-2" id="inline-register-btn" class="btn btn-sm btn-secondary btn-on-light">
+              Register New Team +
+            </a>
+            <button type="button" id="inline-disconnect-btn" class="hidden btn btn-sm btn-secondary btn-on-light">
+              Switch Team
+            </button>
+          </div>
+        </div>
+        <p id="inline-code-error" class="hidden text-[13px] text-signal mt-3"></p>
+        <p id="inline-code-success" class="hidden text-[13px] text-emerald-700 font-semibold mt-3">✓ Team connected successfully!</p>
+      </div>
+
       <!-- =========================================================================
            STEP 0 · BACK TO YACINE (3 min)
            ========================================================================= -->
@@ -1026,17 +1067,136 @@ const steps = [
 
 <script>
   import { sparkSession2 } from '../../data/spark';
+  import { getTeam, getStoredTeamCode, storeTeamCode, clearTeamCode, friendlyError } from '../../lib/spark/api';
 
   // Team handling
-  const TEAM_KEY = 'spark-team-code';
-  let teamCode = localStorage.getItem(TEAM_KEY) || 'DEMO';
-  const STORAGE_KEY = `spark-s2-${teamCode}`;
+  let teamCode = getStoredTeamCode() || 'DEMO';
+  let STORAGE_KEY = `spark-s2-${teamCode}`;
 
+  const bannerName = document.getElementById('banner-team-name');
+  const bannerMembers = document.getElementById('banner-team-members');
+  const bannerBadge = document.getElementById('banner-status-badge');
+  const inputWrap = document.getElementById('code-input-wrap');
+  const registerBtn = document.getElementById('inline-register-btn');
+  const disconnectBtn = document.getElementById('inline-disconnect-btn');
+  const codeError = document.getElementById('inline-code-error');
+  const codeSuccess = document.getElementById('inline-code-success');
   const teamLabel = document.getElementById('team-label');
   const teamBadge = document.getElementById('team-badge');
-  if (teamBadge) {
-    teamBadge.textContent = teamCode === 'DEMO' ? 'Explorer Mode' : `Team ${teamCode}`;
+
+  async function syncTeamInfo() {
+    teamCode = getStoredTeamCode() || 'DEMO';
+    STORAGE_KEY = `spark-s2-${teamCode}`;
+
+    if (teamCode && teamCode !== 'DEMO') {
+      try {
+        const data = await getTeam(teamCode);
+        if (data && data.team) {
+          if (teamLabel) teamLabel.textContent = `Team ${data.team.name}`;
+          if (teamBadge) teamBadge.textContent = `${data.team.code} · ${data.team.members.length} Members`;
+          if (bannerName) bannerName.textContent = `Team ${data.team.name}`;
+          if (bannerMembers) bannerMembers.textContent = `Members: ${data.team.members.join(', ')}`;
+          if (bannerBadge) {
+            bannerBadge.textContent = `✓ Code: ${data.team.code}`;
+            bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold';
+          }
+          inputWrap?.classList.add('hidden');
+          registerBtn?.classList.add('hidden');
+          disconnectBtn?.classList.remove('hidden');
+          return;
+        }
+      } catch (err) {
+        console.warn('Backend sync warning:', err);
+      }
+
+      // Offline fallback with code
+      if (teamLabel) teamLabel.textContent = `Team ${teamCode}`;
+      if (teamBadge) teamBadge.textContent = `Code: ${teamCode}`;
+      if (bannerName) bannerName.textContent = `Team ${teamCode}`;
+      if (bannerBadge) {
+        bannerBadge.textContent = `Code: ${teamCode}`;
+        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-blue/10 text-blue font-semibold';
+      }
+      inputWrap?.classList.add('hidden');
+      registerBtn?.classList.add('hidden');
+      disconnectBtn?.classList.remove('hidden');
+    } else {
+      // Explorer / Guest mode
+      if (teamLabel) teamLabel.textContent = 'The Music Case · Part 2';
+      if (teamBadge) teamBadge.textContent = 'Explorer Mode';
+      if (bannerName) bannerName.textContent = 'Working with a team?';
+      if (bannerMembers) bannerMembers.textContent = 'Have a team code from Session 1? Enter it below. New to SPARK? Register a team in 1 minute!';
+      if (bannerBadge) {
+        bannerBadge.textContent = 'No code connected';
+        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-paper text-muted border border-navy/10';
+      }
+      inputWrap?.classList.remove('hidden');
+      registerBtn?.classList.remove('hidden');
+      disconnectBtn?.classList.add('hidden');
+    }
   }
+
+  // Connect button click
+  const inlineInput = document.getElementById('inline-team-code') as HTMLInputElement | null;
+  const inlineBtn = document.getElementById('inline-connect-btn') as HTMLButtonElement | null;
+
+  async function handleConnectCode() {
+    if (!inlineInput) return;
+    const raw = inlineInput.value.trim().toUpperCase();
+    if (!raw || raw.length < 4) {
+      if (codeError) {
+        codeError.textContent = 'Please enter your 6-character team code.';
+        codeError.classList.remove('hidden');
+      }
+      return;
+    }
+    if (inlineBtn) inlineBtn.disabled = true;
+    codeError?.classList.add('hidden');
+    codeSuccess?.classList.add('hidden');
+
+    try {
+      const data = await getTeam(raw);
+      if (!data || !data.team) {
+        throw new Error("That code wasn't found. Check the letters or register a new team.");
+      }
+      storeTeamCode(raw);
+      teamCode = raw;
+      STORAGE_KEY = `spark-s2-${teamCode}`;
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) state = { ...defaultState, ...JSON.parse(stored) };
+      } catch {}
+      await syncTeamInfo();
+      if (codeSuccess) {
+        codeSuccess.textContent = `✓ Connected as Team ${data.team.name}!`;
+        codeSuccess.classList.remove('hidden');
+        setTimeout(() => codeSuccess.classList.add('hidden'), 4000);
+      }
+    } catch (err: any) {
+      if (codeError) {
+        codeError.textContent = friendlyError(err);
+        codeError.classList.remove('hidden');
+      }
+    } finally {
+      if (inlineBtn) inlineBtn.disabled = false;
+    }
+  }
+
+  inlineBtn?.addEventListener('click', handleConnectCode);
+  inlineInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleConnectCode();
+    }
+  });
+
+  disconnectBtn?.addEventListener('click', async () => {
+    clearTeamCode();
+    await syncTeamInfo();
+  });
+
+  // Run on load
+  syncTeamInfo();
 
   // Load existing state from localStorage
   interface Session2State {

@@ -13,7 +13,8 @@ import Icon from '../../components/ui/Icon.astro';
       <div id="already-in" class="hidden rv  bg-white border border-navy/10 p-6 sm:p-8 mb-6 text-center">
         <p class="text-[15px] text-body">You're already signed in as <strong id="already-name"></strong>.</p>
         <div class="mt-5 flex flex-wrap justify-center gap-3">
-          <a href="/spark/case" class="btn btn-sm btn-primary">Continue to the game →</a>
+          <a href="/spark/session-2" class="btn btn-sm btn-primary">Enter Session 2 (Current) →</a>
+          <a href="/spark/case" class="btn btn-sm btn-secondary btn-on-light">Session 1 Archive →</a>
           <button type="button" id="switch-team" class="btn btn-sm btn-secondary btn-on-light">Not your team</button>
         </div>
       </div>
@@ -55,7 +56,8 @@ import Icon from '../../components/ui/Icon.astro';
         <p class="mt-4 text-[14px] text-silver/70">Write this code down — you'll need it next session.</p>
         <div class="mt-5 flex flex-wrap justify-center gap-3">
           <button type="button" id="copy-code" class="btn btn-sm btn-secondary"><Icon name="copy" /><span>Copy</span></button>
-          <a href="/spark/case" class="btn btn-sm btn-primary">Start the investigation →</a>
+          <a href="/spark/session-2" class="btn btn-sm btn-primary">Go to Session 2 (Current) →</a>
+          <a href="/spark/case" class="btn btn-sm btn-secondary btn-on-light">Session 1 Archive →</a>
         </div>
       </div>
     </div>
@@ -139,7 +141,9 @@ import Icon from '../../components/ui/Icon.astro';
       const team = await getTeam(code);
       if (!team) throw new Error("That code doesn't match a team. Check it and try again.");
       storeTeamCode(code);
-      location.href = '/spark/case';
+      const params = new URLSearchParams(location.search);
+      const next = params.get('next') || (params.get('session') === '1' ? '/spark/case' : '/spark/session-2');
+      location.href = next;
     } catch (err) {
       codeError.textContent = friendlyError(err);
       codeError.classList.remove('hidden');
