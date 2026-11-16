@@ -11,6 +11,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "build:og": "python scripts/make-og.py",
+    "build:assets": "python scripts/render-readme-assets.py",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",

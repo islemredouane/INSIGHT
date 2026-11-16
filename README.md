@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://insight.estin.dz">
-  <img src="public/brand/og-default.jpg" alt="INSIGHT Research Club — ESTIN Béjaïa · Where curiosity meets clarity" width="100%">
+  <img src=".github/assets/banner.webp" alt="INSIGHT Research Club — ESTIN Béjaïa · Where curiosity meets clarity" width="100%">
 </a>
 
 <br><br>
@@ -39,6 +39,10 @@ Engineered for ultra-fast edge delivery, accessible academic publishing, and nat
 
 <br>
 
+<img src=".github/assets/stats.webp" alt="INSIGHT By the numbers: 4 research poles, 7 departments, 30 crew members, 18 welcome day highlights, 100% open science, ESTIN campus base" width="100%">
+
+<br><br>
+
 ---
 
 ## ✦ Platform Overview
@@ -52,6 +56,12 @@ Built on **Astro 5** and **Tailwind CSS v4**, this website operates as a 100% pr
 
 <br>
 
+<div align="center">
+  <img src=".github/assets/preview.webp" alt="The INSIGHT digital platform on desktop browser and mobile device" width="100%">
+</div>
+
+<br>
+
 ---
 
 ## ✦ Key Pillars & Platform Features
@@ -62,7 +72,7 @@ Built on **Astro 5** and **Tailwind CSS v4**, this website operates as a 100% pr
 
 ### 🧭 01 · Nautical Voyage & Home
 - **Maritime Scientific Narrative:** Leads students from initial curiosity to scientific publishing, outlining the Helm, live event dispatches, and active tracks.
-- **Editorial Metrics Band:** Verified counters for the 4 research poles, 7 departments, 29 crew members, and scientific milestones.
+- **Editorial Metrics Band:** Verified counters for the 4 research poles, 7 departments, 30 crew members, and scientific milestones.
 - **Interactive FAQ Accordion:** Accessible accordion pre-compiled into Schema.org `FAQPage` rich results for Google search.
 <br><sub>Route: <code>/</code></sub>
 
@@ -271,6 +281,13 @@ The script (`scripts/sync-r2.mjs`) scans `public/` media directories (`events`, 
 
 ```text
 insight-website/
+├── .github/
+│   └── assets/                         # High-res README showcases & optimized WebP assets
+│       ├── banner.webp                 # Editorial brand banner (1760x605)
+│       ├── preview.webp                # Mac browser + iPhone mockup (1760x1018)
+│       ├── stats.webp                  # "By the numbers" metric card (1760x412)
+│       └── src/                        # HTML stages & headless screen capture source
+│
 ├── public/                             # Root static assets & discovery files
 │   ├── brand/                          # Official logos, icons (192, 512, maskable)
 │   ├── crew/                           # Verified headshots of Helm & department managers
@@ -285,6 +302,7 @@ insight-website/
 │
 ├── scripts/                            # Operational & automation tooling
 │   ├── make-og.py                      # Headless Chrome/Edge social card generator
+│   ├── render-readme-assets.py         # Headless 2x mockup renderer (banner, stats, preview)
 │   ├── sync-r2.mjs                     # Automated Cloudflare R2 asset sync engine
 │   └── audit-site.py                   # Automated health, link, and JSON-LD auditor
 │
@@ -370,17 +388,20 @@ npm run dev
 # 4. Generate high-resolution social preview cards (optional)
 npm run build:og
 
-# 5. Build static production bundle
+# 5. Render README showcase mockups (optional)
+npm run build:assets
+
+# 6. Build static production bundle
 npm run build
 # -> Outputs 23 optimized static routes into dist/
 
-# 6. Audit build health (0 broken links, JSON-LD check)
+# 7. Audit build health (0 broken links, JSON-LD check)
 python scripts/audit-site.py
 
-# 7. Preview production build locally
+# 8. Preview production build locally
 npm run preview
 
-# 8. Sync assets to Cloudflare R2
+# 9. Sync assets to Cloudflare R2
 npm run sync-r2
 ```
 

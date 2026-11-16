@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Helper for scripts/render-readme-assets.py: renders a page inside an exact phone-size frame with optional scroll. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; background: #070B14; overflow: hidden; }
+  iframe { display: block; border: 0; }
+</style>
+</head>
+<body>
+<script>
+  const p = new URLSearchParams(location.search);
+  const f = document.createElement("iframe");
+  f.width = p.get("w") || 390;
+  f.height = p.get("h") || 844;
+  f.src = p.get("u") || "/";
+  const scrollY = parseInt(p.get("y") || "0", 10);
+  if (scrollY > 0) {
+    f.addEventListener("load", () => {
+      setTimeout(() => {
+        try {
+          f.contentDocument.documentElement.scrollTop = scrollY;
+          f.contentWindow.scrollTo(0, scrollY);
+        } catch (e) {}
+      }, 500);
+    });
+  }
+  document.body.append(f);
+</script>
+</body>
+</html>
