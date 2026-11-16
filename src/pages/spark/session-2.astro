@@ -32,9 +32,37 @@ const steps = [
           </span>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-[13px]">
+      <div class="flex items-center gap-3 text-[13px]">
+        <!-- Mentor Reveal Controls -->
+        <div class="relative">
+          <button
+            type="button"
+            id="mentor-controls-toggle"
+            class="px-2.5 py-1 text-[11px] font-mono font-semibold rounded bg-white/10 hover:bg-white/20 text-silver transition flex items-center gap-1.5 border border-white/15"
+          >
+            <span>👑 Mentor Reveal:</span>
+            <span id="unlocked-step-indicator" class="text-peri">Step 0/5</span>
+          </button>
+          <div
+            id="mentor-controls-menu"
+            class="hidden absolute right-0 mt-2 w-56 bg-white text-ink border border-navy/10 rounded-lg shadow-xl p-3 z-30 space-y-2 text-left"
+          >
+            <p class="font-mono text-[10px] uppercase text-muted tracking-wider">Room Reveal Controls</p>
+            <button type="button" id="btn-reveal-next" class="btn btn-sm btn-primary w-full text-left justify-start">
+              🔓 Unlock Next Step
+            </button>
+            <button type="button" id="btn-reveal-all" class="btn btn-sm btn-secondary w-full text-left justify-start btn-on-light">
+              ⚡ Unlock All Steps
+            </button>
+            <button type="button" id="btn-lock-all" class="btn btn-sm btn-secondary w-full text-left justify-start text-signal border-signal/20 hover:bg-signal/5">
+              🔒 Reset Locks (Step 0)
+            </button>
+          </div>
+        </div>
+
+        <span class="text-white/20">|</span>
         <a href="/spark/case" class="text-silver/70 hover:text-white transition-colors flex items-center gap-1.5">
-          <span>← Revisit Session 1</span>
+          <span>← Session 1</span>
         </a>
         <span class="text-white/20">|</span>
         <a href="/spark/join" id="switch-link" class="text-silver/70 hover:text-white transition-colors">
@@ -44,13 +72,14 @@ const steps = [
     </div>
   </section>
 
-  <!-- Sticky Progress Bar (All 6 steps unlocked) -->
+  <!-- Sticky Progress Bar with Lock indicators -->
   <nav id="progress" class="sticky top-[72px] xl:top-[116px] z-20 bg-white border-b border-navy/10 overflow-x-auto shadow-sm" aria-label="Session 2 progress">
     <div class="max-w-[1100px] mx-auto px-5 flex gap-1 py-3 min-w-max">
       {steps.map((label, i) => (
         <button type="button" class="step-tab" data-step={i}>
           <span class="step-num">{i}</span>
-          <span>{label}</span>
+          <span class="step-label">{label}</span>
+          <span class="step-lock-icon text-[11px] ml-1 hidden">🔒</span>
         </button>
       ))}
     </div>
@@ -1028,6 +1057,16 @@ const steps = [
     border-color: #3F66B0;
     font-weight: 600;
   }
+  .step-tab.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .step-tab.locked:hover {
+    color: #8A94A8;
+  }
+  .step-tab.locked .step-num {
+    border-style: dashed;
+  }
   .choice-btn {
     flex: 1;
     height: 40px;
@@ -1201,6 +1240,7 @@ const steps = [
   // Load existing state from localStorage
   interface Session2State {
     step: number;
+    unlockedStep: number;
     hw_q1: string;
     hw_q2: string;
     pages: Record<string, number>;
@@ -1224,6 +1264,7 @@ const steps = [
 
   const defaultState: Session2State = {
     step: 0,
+    unlockedStep: 0,
     hw_q1: '',
     hw_q2: '',
     pages: {},
@@ -1288,32 +1329,65 @@ const steps = [
     }
   }
 
-  // Navigation between panels
+  // Navigation & Progressive Locks
   let activePanel = 0;
+
+  function renderLocks() {
+    const indicator = document.getElementById('unlocked-step-indicator');
+    if (indicator) {
+      indicator.textContent = `Step ${state.unlockedStep}/5`;
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
+      const n = Number(btn.dataset.step);
+      const isLocked = n > state.unlockedStep;
+      btn.classList.toggle('locked', isLocked);
+      btn.classList.toggle('active', n === activePanel);
+      btn.disabled = isLocked;
+      const lockIcon = btn.querySelector('.step-lock-icon');
+      if (lockIcon) {
+        lockIcon.classList.toggle('hidden', !isLocked);
+      }
+    });
+
+    document.querySelectorAll<HTMLElement>('.panel').forEach((p) => {
+      const n = Number(p.dataset.panel);
+      p.classList.toggle('hidden', n !== activePanel);
+    });
+  }
+
+  function unlockToStep(n: number) {
+    if (n > state.unlockedStep) {
+      state.unlockedStep = Math.min(5, n);
+      saveState();
+      renderLocks();
+    }
+  }
+
   function showPanel(n: number) {
+    if (n > state.unlockedStep) {
+      return;
+    }
     activePanel = n;
     state.step = n;
     saveState();
-
-    document.querySelectorAll<HTMLElement>('.panel').forEach((p) => {
-      p.classList.toggle('hidden', Number(p.dataset.panel) !== n);
-    });
-
-    document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
-      const stepIdx = Number(btn.dataset.step);
-      btn.classList.toggle('active', stepIdx === n);
-    });
-
+    renderLocks();
     window.scrollTo({ top: 180, behavior: 'smooth' });
   }
 
   document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
-    btn.addEventListener('click', () => showPanel(Number(btn.dataset.step)));
+    btn.addEventListener('click', () => {
+      const n = Number(btn.dataset.step);
+      if (n <= state.unlockedStep) {
+        showPanel(n);
+      }
+    });
   });
 
   document.querySelectorAll<HTMLButtonElement>('.next-panel-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const next = Number(btn.dataset.next);
+      unlockToStep(next);
       showPanel(next);
     });
   });
@@ -1323,6 +1397,41 @@ const steps = [
       const prev = Number(btn.dataset.prev);
       showPanel(prev);
     });
+  });
+
+  // Mentor Reveal Controls Dropdown
+  const mentorMenu = document.getElementById('mentor-controls-menu');
+  const mentorToggle = document.getElementById('mentor-controls-toggle');
+  mentorToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mentorMenu?.classList.toggle('hidden');
+  });
+  document.addEventListener('click', () => {
+    mentorMenu?.classList.add('hidden');
+  });
+  mentorMenu?.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  document.getElementById('btn-reveal-next')?.addEventListener('click', () => {
+    unlockToStep(state.unlockedStep + 1);
+    showPanel(state.unlockedStep);
+    mentorMenu?.classList.add('hidden');
+  });
+
+  document.getElementById('btn-reveal-all')?.addEventListener('click', () => {
+    state.unlockedStep = 5;
+    saveState();
+    renderLocks();
+    mentorMenu?.classList.add('hidden');
+  });
+
+  document.getElementById('btn-lock-all')?.addEventListener('click', () => {
+    state.unlockedStep = 0;
+    saveState();
+    showPanel(0);
+    renderLocks();
+    mentorMenu?.classList.add('hidden');
   });
 
   // ==================== STEP 0 ====================
@@ -1660,8 +1769,11 @@ const steps = [
     window.print();
   });
 
-  // Restore active step if saved
-  if (state.step && state.step > 0 && state.step < 6) {
+  // Initial setup: render locks and show active step
+  renderLocks();
+  if (state.step && state.step > 0 && state.step <= state.unlockedStep) {
     showPanel(state.step);
+  } else {
+    showPanel(0);
   }
 </script>
