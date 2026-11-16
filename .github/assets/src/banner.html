@@ -3,145 +3,277 @@
      Rendered to ../banner.webp by scripts/render-readme-assets.py (1280x440 at 2x).
      Designed 1:1 with the landing page hero section. -->
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Lora:ital,wght@1,500;1,600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #0B1120;
-    --ink-2: #121A2E;
-    --ink-deep: #080E1D;
-    --navy: #1B2A55;
-    --blue: #3F66B0;
-    --peri: #7F97C7;
-    --peri-light: #AEC6FF;
-    --silver: #DDE3EC;
-    --silver-muted: rgba(221, 227, 236, 0.75);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 1280px; height: 440px; background: transparent; }
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Lora:ital,wght@1,500;1,600&family=Space+Grotesk:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0B1120;
+      --ink-2: #121A2E;
+      --ink-deep: #080E1D;
+      --navy: #1B2A55;
+      --blue: #3F66B0;
+      --peri: #7F97C7;
+      --peri-light: #AEC6FF;
+      --silver: #DDE3EC;
+      --silver-muted: rgba(221, 227, 236, 0.75);
+    }
 
-  .banner {
-    position: relative; width: 1280px; height: 440px; overflow: hidden; border-radius: 24px;
-    background: var(--ink); border: 1px solid rgba(221, 227, 236, 0.12);
-    font-family: 'Inter', system-ui, sans-serif; color: #fff;
-    box-shadow: 0 40px 80px rgba(8, 14, 29, 0.7);
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* Soft ambient blue glow directly from Hero.astro */
-  .glow {
-    position: absolute; border-radius: 50%; pointer-events: none;
-  }
-  .glow.a {
-    width: 600px; height: 600px; right: 120px; top: -140px;
-    background: radial-gradient(circle, rgba(63, 102, 176, 0.28) 0%, transparent 68%);
-  }
-  .glow.b {
-    width: 480px; height: 480px; left: -100px; bottom: -180px;
-    background: radial-gradient(circle, rgba(127, 151, 199, 0.12) 0%, transparent 65%);
-  }
+    html,
+    body {
+      width: 1280px;
+      height: 440px;
+      background: transparent;
+    }
 
-  /* Exact landing page hero dot grid (points, not lines) */
-  .dots {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image: radial-gradient(circle, rgba(221, 227, 236, 0.16) 1.2px, transparent 1.2px);
-    background-size: 24px 24px;
-  }
+    .banner {
+      position: relative;
+      width: 1280px;
+      height: 440px;
+      overflow: hidden;
+      border-radius: 24px;
+      background: var(--ink);
+      border: 1px solid rgba(221, 227, 236, 0.12);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #fff;
+      box-shadow: 0 40px 80px rgba(8, 14, 29, 0.7);
+    }
 
-  /* Canvas particle beam */
-  canvas#beam {
-    position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
-  }
+    /* Soft ambient blue glow directly from Hero.astro */
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
 
-  /* Content area */
-  .content {
-    position: absolute; left: 64px; top: 0; bottom: 0; width: 700px;
-    display: flex; flex-direction: column; justify-content: center; z-index: 2;
-  }
+    .glow.a {
+      width: 600px;
+      height: 600px;
+      right: 120px;
+      top: -140px;
+      background: radial-gradient(circle, rgba(63, 102, 176, 0.28) 0%, transparent 68%);
+    }
 
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--peri-light);
-  }
-  .eyebrow .ping {
-    position: relative; display: flex; width: 8px; height: 8px;
-  }
-  .eyebrow .ping-wave {
-    position: absolute; inset: 0; border-radius: 50%; background: var(--peri-light); opacity: 0.75;
-  }
-  .eyebrow .ping-core {
-    position: relative; display: inline-flex; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--peri-light); box-shadow: 0 0 10px var(--peri-light);
-  }
+    .glow.b {
+      width: 480px;
+      height: 480px;
+      left: -100px;
+      bottom: -180px;
+      background: radial-gradient(circle, rgba(127, 151, 199, 0.12) 0%, transparent 65%);
+    }
 
-  h1 {
-    margin-top: 18px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-    font-size: 58px; line-height: 1.05; letter-spacing: -0.035em; color: #FFFFFF;
-  }
-  h1 .clarity {
-    color: var(--peri-light);
-  }
+    /* Exact landing page hero dot grid (points, not lines) */
+    .dots {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(221, 227, 236, 0.16) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+    }
 
-  .quote {
-    margin-top: 18px; max-width: 580px; border-left: 2px solid rgba(63, 102, 176, 0.75);
-    padding-left: 18px; font-family: 'Lora', Georgia, serif; font-style: italic;
-    font-size: 18px; line-height: 1.5; color: var(--silver-muted);
-  }
+    /* Canvas particle beam */
+    canvas#beam {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
 
-  .tags {
-    margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px;
-  }
-  .tag {
-    display: inline-flex; align-items: center; height: 32px; padding: 0 14px;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
-    letter-spacing: 0.04em; text-transform: uppercase;
-    background: rgba(18, 26, 46, 0.75); border: 1px solid rgba(127, 151, 199, 0.3);
-    color: var(--silver);
-  }
-  .tag.active {
-    background: var(--blue); border-color: var(--blue); color: #fff;
-    box-shadow: 0 0 16px rgba(63, 102, 176, 0.45);
-  }
+    /* Content area */
+    .content {
+      position: absolute;
+      left: 64px;
+      top: 0;
+      bottom: 0;
+      width: 680px;
+      position: absolute;
+      left: 64px;
+      top: 0;
+      bottom: 0;
+      width: 700px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 2;
+    }
 
-  /* Right Showcase Area */
-  .hero-right {
-    position: absolute; right: 80px; top: 0; bottom: 0; width: 440px;
-    display: flex; align-items: center; justify-content: center; z-index: 2;
-  }
-  .logo-wrap {
-    position: relative; width: 340px; height: 240px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .logo-wrap img {
-    position: relative; z-index: 2; width: 280px; height: auto;
-    filter: drop-shadow(0 0 22px rgba(127, 151, 199, 0.45)) drop-shadow(0 0 4px rgba(221, 227, 236, 0.5));
-  }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--peri-light);
+    }
 
-  /* Technical badges matching the website's .rbadge token */
-  .badge {
-    position: absolute; z-index: 3; display: flex; flex-direction: column;
-    padding: 8px 14px; background: rgba(11, 17, 32, 0.92);
-    border: 1px solid rgba(127, 151, 199, 0.35); box-shadow: 0 14px 28px rgba(8, 14, 29, 0.6);
-  }
-  .badge.top {
-    top: 60px; right: 0;
-  }
-  .badge.bottom {
-    bottom: 60px; left: -10px;
-  }
-  .badge small {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--peri);
-  }
-  .badge b {
-    margin-top: 2px; font-family: 'Space Grotesk', sans-serif; font-size: 14px;
-    font-weight: 700; color: #FFFFFF; letter-spacing: -0.01em;
-  }
-</style>
+    .eyebrow .ping {
+      position: relative;
+      display: flex;
+      width: 8px;
+      height: 8px;
+    }
+
+    .eyebrow .ping-wave {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--peri-light);
+      opacity: 0.75;
+    }
+
+    .eyebrow .ping-core {
+      position: relative;
+      display: inline-flex;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--peri-light);
+      box-shadow: 0 0 10px var(--peri-light);
+    }
+
+    h1 {
+      margin-top: 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 58px;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      color: #FFFFFF;
+    }
+
+    h1 .clarity {
+      color: var(--peri-light);
+    }
+
+    .quote {
+      margin-top: 18px;
+      max-width: 580px;
+      border-left: 2px solid rgba(63, 102, 176, 0.75);
+      padding-left: 18px;
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: 18px;
+      line-height: 1.5;
+      color: var(--silver-muted);
+    }
+
+    .tags {
+      margin-top: 26px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(18, 26, 46, 0.75);
+      border: 1px solid rgba(127, 151, 199, 0.3);
+      color: var(--silver);
+    }
+
+    .tag.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(63, 102, 176, 0.45);
+    }
+
+    /* Right Showcase Area */
+    .hero-right {
+      position: absolute;
+      right: 80px;
+      top: 0;
+      bottom: 0;
+      width: 440px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .logo-wrap {
+      position: relative;
+      width: 340px;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-wrap img {
+      position: relative;
+      z-index: 2;
+      width: 280px;
+      height: auto;
+      filter: drop-shadow(0 0 22px rgba(127, 151, 199, 0.45)) drop-shadow(0 0 4px rgba(221, 227, 236, 0.5));
+    }
+
+    /* Technical badges matching the website's .rbadge token */
+    .badge {
+      position: absolute;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 14px;
+      background: rgba(11, 17, 32, 0.92);
+      border: 1px solid rgba(127, 151, 199, 0.35);
+      box-shadow: 0 14px 28px rgba(8, 14, 29, 0.6);
+    }
+
+    .badge.top {
+      top: 60px;
+      right: 0;
+    }
+
+    .badge.bottom {
+      bottom: 60px;
+      left: -10px;
+    }
+
+    .badge small {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--peri);
+    }
+
+    .badge b {
+      margin-top: 2px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+  </style>
 </head>
+
 <body>
   <div class="banner">
     <div class="glow a"></div>
@@ -152,6 +284,7 @@
     <div class="content">
       <div class="eyebrow">
         <span class="ping"><span class="ping-wave"></span><span class="ping-core"></span></span>
+        ESTIN Research Club · Est. 2026
         INSIGHT · ESTIN Research Club · Est. 2026
       </div>
       <h1>Where curiosity<br>meets <span class="clarity">clarity.</span></h1>
@@ -161,6 +294,7 @@
         <span class="tag">Cybersecurity</span>
         <span class="tag">Software Systems</span>
         <span class="tag">Networks &amp; IoT</span>
+        <span class="tag">SPARK</span>
         <span class="tag">SPARK Casework</span>
         <span class="tag">Open Science</span>
       </div>
@@ -183,7 +317,7 @@
 
   <script>
     // Particle beam simulation matching Hero.astro
-    (function() {
+    (function () {
       const canvas = document.getElementById('beam');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -226,4 +360,5 @@
     })();
   </script>
 </body>
+
 </html>
