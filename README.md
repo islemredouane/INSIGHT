@@ -32,7 +32,7 @@ Engineered for ultra-fast edge delivery, accessible academic publishing, and nat
 [**Visual Identity**](#-visual-identity--design-tokens) &nbsp;✦&nbsp;
 [**Social Previews & OG**](#-open-graph--social-preview-fleet) &nbsp;✦&nbsp;
 [**SEO & AEO Engine**](#-seo-aeo--knowledge-graph) &nbsp;✦&nbsp;
-[**Local Setup**](#-local-development) &nbsp;✦&nbsp;
+[**Contributing**](CONTRIBUTING.md) &nbsp;✦&nbsp;
 [**The Helm**](#-the-helm--leadership)
 
 </div>
@@ -358,63 +358,6 @@ insight-website/
 ├── astro.config.mjs                    # Astro configuration with @astrojs/sitemap & Tailwind
 ├── package.json                        # Node dependencies & automation scripts
 └── vercel.json                         # Vercel rewrites, A+ security & caching headers
-```
-
-<br>
-
----
-
-## ✦ Local Development
-
-### Prerequisites
-- **Node.js:** `v22.12.0` or higher
-- **Package Manager:** `npm` (bundled with Node)
-- **Python:** `3.10+` with `Pillow` (for OG card rendering)
-
-### Quick Start Commands
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/islemredouane/INSIGHT.git
-cd "insight's website"
-
-# 2. Install dependencies
-npm install
-
-# 3. Start local development server
-npm run dev
-# -> Local server live at http://localhost:4321
-
-# 4. Generate high-resolution social preview cards (optional)
-npm run build:og
-
-# 5. Render README showcase mockups (optional)
-npm run build:assets
-
-# 6. Build static production bundle
-npm run build
-# -> Outputs 23 optimized static routes into dist/
-
-# 7. Audit build health (0 broken links, JSON-LD check)
-python scripts/audit-site.py
-
-# 8. Preview production build locally
-npm run preview
-
-# 9. Sync assets to Cloudflare R2
-npm run sync-r2
-```
-
-### Environment Variables (Optional)
-The project runs out of the box with zero environment variables required for local development.
-
-For local preview testing or custom CDN endpoints, create an untracked `.env.local` file:
-```env
-# Optional: Set to true to preview draft placeholders locally
-PUBLIC_REVIEW_MODE=false
-
-# Optional: Custom CDN base URL (defaults to local public/ assets)
-PUBLIC_CDN_URL=
 ```
 
 <br>
