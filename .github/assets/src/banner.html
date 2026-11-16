@@ -1,177 +1,229 @@
 <!doctype html>
 <!-- INSIGHT README Banner.
-     Rendered to ../banner.webp by scripts/render-readme-assets.py (1280x440 at 2x). -->
+     Rendered to ../banner.webp by scripts/render-readme-assets.py (1280x440 at 2x).
+     Designed 1:1 with the landing page hero section. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Lora:ital,wght@1,500;1,600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-base: #070B14;
-    --primary: #3B82F6;
-    --primary-light: #93C5FD;
-    --cyan: #38BDF8;
-    --navy-card: #0B1120;
-    --text-white: #F8FAFC;
-    --text-dim: #94A3B8;
+    --ink: #0B1120;
+    --ink-2: #121A2E;
+    --ink-deep: #080E1D;
+    --navy: #1B2A55;
+    --blue: #3F66B0;
+    --peri: #7F97C7;
+    --peri-light: #AEC6FF;
+    --silver: #DDE3EC;
+    --silver-muted: rgba(221, 227, 236, 0.75);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 1280px; height: 440px; background: transparent; }
 
   .banner {
-    position: relative; width: 1280px; height: 440px; overflow: hidden; border-radius: 28px;
-    background: var(--bg-base); border: 1px solid rgba(255, 255, 255, 0.10);
-    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; color: #fff;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+    position: relative; width: 1280px; height: 440px; overflow: hidden; border-radius: 24px;
+    background: var(--ink); border: 1px solid rgba(221, 227, 236, 0.12);
+    font-family: 'Inter', system-ui, sans-serif; color: #fff;
+    box-shadow: 0 40px 80px rgba(8, 14, 29, 0.7);
   }
 
-  /* Deep maritime radial glows */
-  .glow { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
-  .glow.a { width: 540px; height: 540px; left: -140px; top: -200px; background: rgba(37, 99, 235, 0.32); }
-  .glow.b { width: 460px; height: 460px; right: 50px; top: 20px; background: rgba(56, 189, 248, 0.20); }
-  .glow.c { width: 320px; height: 320px; left: 450px; bottom: -180px; background: rgba(30, 58, 138, 0.35); }
+  /* Soft ambient blue glow directly from Hero.astro */
+  .glow {
+    position: absolute; border-radius: 50%; pointer-events: none;
+  }
+  .glow.a {
+    width: 600px; height: 600px; right: 120px; top: -140px;
+    background: radial-gradient(circle, rgba(63, 102, 176, 0.28) 0%, transparent 68%);
+  }
+  .glow.b {
+    width: 480px; height: 480px; left: -100px; bottom: -180px;
+    background: radial-gradient(circle, rgba(127, 151, 199, 0.12) 0%, transparent 65%);
+  }
 
-  /* Blueprint grid */
-  .grid {
+  /* Exact landing page hero dot grid (points, not lines) */
+  .dots {
     position: absolute; inset: 0; pointer-events: none;
-    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-    background-size: 36px 36px;
-    -webkit-mask-image: radial-gradient(ellipse at 35% 50%, #000 20%, transparent 75%);
-    mask-image: radial-gradient(ellipse at 35% 50%, #000 20%, transparent 75%);
+    background-image: radial-gradient(circle, rgba(221, 227, 236, 0.16) 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
   }
 
+  /* Canvas particle beam */
+  canvas#beam {
+    position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
+  }
+
+  /* Content area */
   .content {
-    position: absolute; left: 70px; top: 0; bottom: 0; width: 720px;
+    position: absolute; left: 64px; top: 0; bottom: 0; width: 700px;
     display: flex; flex-direction: column; justify-content: center; z-index: 2;
   }
+
   .eyebrow {
-    display: inline-flex; align-self: flex-start; align-items: center; gap: 10px;
-    padding: 7px 16px; border-radius: 999px;
-    background: rgba(37, 99, 235, 0.12); border: 1px solid rgba(59, 130, 246, 0.35);
-    color: var(--primary-light); font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--peri-light);
   }
-  .eyebrow .dot {
-    width: 7px; height: 7px; border-radius: 50%; background: #38BDF8;
-    box-shadow: 0 0 10px #38BDF8;
+  .eyebrow .ping {
+    position: relative; display: flex; width: 8px; height: 8px;
   }
-  .brand {
-    display: flex; align-items: center; gap: 20px; margin-top: 18px;
+  .eyebrow .ping-wave {
+    position: absolute; inset: 0; border-radius: 50%; background: var(--peri-light); opacity: 0.75;
   }
-  .brand img {
-    width: 76px; height: 76px; object-fit: contain;
-    filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.6));
-  }
-  h1 {
-    font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 78px;
-    line-height: 1; letter-spacing: -2px;
-  }
-  h1 .gradient {
-    background: linear-gradient(135deg, #FFFFFF 20%, #93C5FD 50%, #38BDF8 85%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .motto {
-    margin-top: 16px; font-size: 23px; font-weight: 700; letter-spacing: -0.3px;
-    color: rgba(255, 255, 255, 0.95);
-  }
-  .motto span { color: #60A5FA; }
-  .sub {
-    margin-top: 6px; font-size: 15px; font-weight: 500; color: var(--text-dim); line-height: 1.5;
-  }
-  .chips {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px;
-  }
-  .chip {
-    padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
-    background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.85); font-family: 'Space Grotesk', sans-serif;
-  }
-  .chip.on {
-    background: rgba(37, 99, 235, 0.25); border-color: rgba(59, 130, 246, 0.6);
-    color: #93C5FD; box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+  .eyebrow .ping-core {
+    position: relative; display: inline-flex; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--peri-light); box-shadow: 0 0 10px var(--peri-light);
   }
 
-  /* Right Side: Emblem showcase */
-  .showcase {
-    position: absolute; right: 80px; top: 50%; transform: translateY(-50%);
-    width: 380px; height: 380px; z-index: 2;
+  h1 {
+    margin-top: 18px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 58px; line-height: 1.05; letter-spacing: -0.035em; color: #FFFFFF;
   }
-  .showcase .card {
-    position: absolute; inset: 25px; border-radius: 36px;
-    background: radial-gradient(circle at 45% 40%, rgba(37, 99, 235, 0.22), rgba(11, 17, 32, 0.85) 75%);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.6), inset 0 0 40px rgba(56, 189, 248, 0.08);
-    transform: rotate(4deg);
+  h1 .clarity {
+    color: var(--peri-light);
   }
-  .showcase .logo-wrap {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+
+  .quote {
+    margin-top: 18px; max-width: 580px; border-left: 2px solid rgba(63, 102, 176, 0.75);
+    padding-left: 18px; font-family: 'Lora', Georgia, serif; font-style: italic;
+    font-size: 18px; line-height: 1.5; color: var(--silver-muted);
   }
-  .showcase .logo-wrap img {
-    width: 220px; height: 220px; object-fit: contain;
-    filter: drop-shadow(0 0 35px rgba(37, 99, 235, 0.75)) drop-shadow(0 0 15px rgba(56, 189, 248, 0.5));
+
+  .tags {
+    margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px;
   }
+  .tag {
+    display: inline-flex; align-items: center; height: 32px; padding: 0 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: rgba(18, 26, 46, 0.75); border: 1px solid rgba(127, 151, 199, 0.3);
+    color: var(--silver);
+  }
+  .tag.active {
+    background: var(--blue); border-color: var(--blue); color: #fff;
+    box-shadow: 0 0 16px rgba(63, 102, 176, 0.45);
+  }
+
+  /* Right Showcase Area */
+  .hero-right {
+    position: absolute; right: 80px; top: 0; bottom: 0; width: 440px;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+  }
+  .logo-wrap {
+    position: relative; width: 340px; height: 240px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-wrap img {
+    position: relative; z-index: 2; width: 280px; height: auto;
+    filter: drop-shadow(0 0 22px rgba(127, 151, 199, 0.45)) drop-shadow(0 0 4px rgba(221, 227, 236, 0.5));
+  }
+
+  /* Technical badges matching the website's .rbadge token */
   .badge {
-    position: absolute; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 16px;
-    background: rgba(11, 17, 32, 0.90); border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6); z-index: 4;
+    position: absolute; z-index: 3; display: flex; flex-direction: column;
+    padding: 8px 14px; background: rgba(11, 17, 32, 0.92);
+    border: 1px solid rgba(127, 151, 199, 0.35); box-shadow: 0 14px 28px rgba(8, 14, 29, 0.6);
   }
-  .badge b {
-    display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #60A5FA; font-size: 16px;
+  .badge.top {
+    top: 60px; right: 0;
+  }
+  .badge.bottom {
+    bottom: 60px; left: -10px;
   }
   .badge small {
-    display: block; color: var(--text-dim); font-size: 10px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--peri);
   }
-  .badge.t { right: -15px; top: 30px; }
-  .badge.b { left: -35px; bottom: 35px; }
+  .badge b {
+    margin-top: 2px; font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+    font-weight: 700; color: #FFFFFF; letter-spacing: -0.01em;
+  }
 </style>
 </head>
 <body>
   <div class="banner">
     <div class="glow a"></div>
     <div class="glow b"></div>
-    <div class="glow c"></div>
-    <div class="grid"></div>
+    <div class="dots"></div>
+    <canvas id="beam" width="1280" height="440"></canvas>
 
     <div class="content">
-      <span class="eyebrow"><span class="dot"></span>Scientific Research Community · ESTIN Béjaïa</span>
-      <div class="brand">
-        <img src="../../../public/brand/insight-logo.png" alt="INSIGHT Logo">
-        <h1><span class="gradient">INSIGHT</span></h1>
+      <div class="eyebrow">
+        <span class="ping"><span class="ping-wave"></span><span class="ping-core"></span></span>
+        INSIGHT · ESTIN Research Club · Est. 2026
       </div>
-      <p class="motto">Where curiosity meets <span>clarity</span>.</p>
-      <p class="sub">The official digital portal: 4 research poles, rookie-to-captain voyage, SPARK casework, and open science.</p>
-      <div class="chips">
-        <span class="chip on">Artificial Intelligence</span>
-        <span class="chip">Cybersecurity</span>
-        <span class="chip">Software Systems</span>
-        <span class="chip">Networks &amp; IoT</span>
-        <span class="chip">SPARK Casework</span>
+      <h1>Where curiosity<br>meets <span class="clarity">clarity.</span></h1>
+      <p class="quote">“somewhere, something incredible is waiting to be known”</p>
+      <div class="tags">
+        <span class="tag active">Artificial Intelligence</span>
+        <span class="tag">Cybersecurity</span>
+        <span class="tag">Software Systems</span>
+        <span class="tag">Networks &amp; IoT</span>
+        <span class="tag">SPARK Casework</span>
+        <span class="tag">Open Science</span>
       </div>
     </div>
 
-    <div class="showcase">
-      <div class="card"></div>
+    <div class="hero-right">
       <div class="logo-wrap">
-        <img src="../../../public/brand/insight-logo.png" alt="INSIGHT Emblem">
-      </div>
-      <div class="badge t">
-        <div>
+        <img id="hero-logo" src="../../../public/brand/insight-logo.webp" alt="INSIGHT Research Club official logo">
+        <div class="badge top">
           <small>Campus Base</small>
           <b>ESTIN Béjaïa</b>
         </div>
-      </div>
-      <div class="badge b">
-        <div>
+        <div class="badge bottom">
           <small>Crew 2026/27</small>
           <b>30 Members</b>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    // Particle beam simulation matching Hero.astro
+    (function() {
+      const canvas = document.getElementById('beam');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = 1280, H = 440;
+      // Coordinates of the rays of the logo on the right
+      const ox = 1000, oy = 222;
+      const colors = ['#DDE3EC', '#DDE3EC', '#AEC6FF', '#7F97C7', '#FFFFFF'];
+
+      // Soft light shaft
+      const g = ctx.createLinearGradient(ox, oy, W, oy);
+      g.addColorStop(0, 'rgba(174, 198, 255, 0.30)');
+      g.addColorStop(0.35, 'rgba(127, 151, 199, 0.12)');
+      g.addColorStop(1, 'rgba(11, 17, 32, 0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy - 4);
+      ctx.lineTo(W, oy - H * 0.28);
+      ctx.lineTo(W, oy + H * 0.28);
+      ctx.lineTo(ox, oy + 4);
+      ctx.closePath();
+      ctx.fill();
+
+      // Render 450 stardust points
+      for (let i = 0; i < 450; i++) {
+        const dist = Math.random();
+        const angle = (Math.random() - 0.5) * 0.38 + (Math.random() < 0.5 ? -0.04 : 0.04);
+        const speed = Math.random() * (W - ox) * 0.95;
+        const x = ox + Math.cos(angle) * speed;
+        const y = oy + Math.sin(angle) * speed + (Math.random() - 0.5) * 8;
+        if (x > W) continue;
+        const r = Math.random() * 1.5 + 0.5;
+        const d = (x - ox) / (W - ox);
+        const alpha = Math.max(0, Math.min(1, d * 5)) * (1 - d * 0.7);
+        ctx.fillStyle = colors[(Math.random() * colors.length) | 0];
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    })();
+  </script>
 </body>
 </html>

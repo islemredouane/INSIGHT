@@ -1,45 +1,59 @@
 <!doctype html>
-<!-- INSIGHT README Preview: Desktop Homepage + Mobile Welcome Day Gallery.
+<!-- INSIGHT README Preview: Desktop Homepage + Mobile Research Compass.
      Rendered to .github/assets/preview.webp by scripts/render-readme-assets.py -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --ink: #0B1120;
+    --ink-2: #121A2E;
+    --ink-deep: #080E1D;
+    --blue: #3F66B0;
+    --peri: #7F97C7;
+    --peri-light: #AEC6FF;
+    --silver: #DDE3EC;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 1280px; height: 740px; background: transparent; }
+
   .stage {
-    position: relative; width: 1280px; height: 740px; border-radius: 28px; overflow: hidden;
-    background: radial-gradient(circle at 20% 20%, rgba(37,99,235,.28), transparent 55%),
-                radial-gradient(circle at 85% 85%, rgba(147,197,253,.15), transparent 50%),
-                #070B14;
-    border: 1px solid rgba(255,255,255,.10);
+    position: relative; width: 1280px; height: 740px; border-radius: 24px; overflow: hidden;
+    background: radial-gradient(circle at 20% 25%, rgba(63, 102, 176, 0.26), transparent 55%),
+                radial-gradient(circle at 85% 80%, rgba(127, 151, 199, 0.14), transparent 50%),
+                var(--ink);
+    border: 1px solid rgba(221, 227, 236, 0.12);
   }
+
+  /* Exact landing page hero dot grid (points, not lines) */
   .stage::after {
     content: ""; position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-    background-size: 36px 36px; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(221, 227, 236, 0.16) 1.2px, transparent 1.2px);
+    background-size: 24px 24px; pointer-events: none;
   }
 
   /* Desktop Browser Mockup */
   .browser {
-    position: absolute; left: 50px; top: 60px; width: 930px; border-radius: 16px; overflow: hidden; z-index: 1;
-    background: #0B1120; border: 1px solid rgba(255,255,255,.16);
-    box-shadow: 0 40px 90px rgba(0,0,0,.75), 0 0 70px rgba(37,99,235,.16);
+    position: absolute; left: 50px; top: 60px; width: 930px; border-radius: 14px; overflow: hidden; z-index: 1;
+    background: var(--ink); border: 1px solid rgba(221, 227, 236, 0.14);
+    box-shadow: 0 40px 90px rgba(8, 14, 29, 0.8), 0 0 60px rgba(63, 102, 176, 0.15);
   }
   .bar {
     height: 42px; display: flex; align-items: center; gap: 8px; padding: 0 18px;
-    background: #0F172A; border-bottom: 1px solid rgba(255,255,255,.08);
+    background: var(--ink-2); border-bottom: 1px solid rgba(221, 227, 236, 0.08);
   }
-  .bar i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .bar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
   .bar i:nth-child(1) { background: #ff5f57; }
   .bar i:nth-child(2) { background: #febc2e; }
   .bar i:nth-child(3) { background: #28c840; }
   .url {
-    margin-left: 20px; flex: 1; height: 26px; border-radius: 999px;
-    background: #070B14; border: 1px solid rgba(255,255,255,.10);
-    color: #94A3B8; font: 500 12px/24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    padding: 0 16px; display: flex; align-items: center; gap: 8px;
+    margin-left: 20px; flex: 1; height: 26px; border-radius: 4px;
+    background: var(--ink-deep); border: 1px solid rgba(221, 227, 236, 0.10);
+    color: var(--peri); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    padding: 0 14px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.02em;
   }
   .url svg { width: 12px; height: 12px; fill: #10B981; }
   .url b { color: #FFFFFF; font-weight: 600; }
@@ -48,12 +62,12 @@
   /* Mobile Phone Mockup */
   .phone {
     position: absolute; right: 55px; top: 35px; width: 310px; height: 660px;
-    border-radius: 48px; padding: 12px; z-index: 2;
-    background: #050810; border: 1px solid rgba(255,255,255,.20);
-    box-shadow: 0 45px 100px rgba(0,0,0,.85), 0 0 0 6px #1E293B, 0 0 60px rgba(37,99,235,.22);
+    border-radius: 46px; padding: 10px; z-index: 2;
+    background: var(--ink-deep); border: 1px solid rgba(221, 227, 236, 0.18);
+    box-shadow: 0 45px 100px rgba(8, 14, 29, 0.9), 0 0 0 5px var(--ink-2), 0 0 60px rgba(63, 102, 176, 0.22);
   }
   .phone .screen {
-    position: relative; width: 100%; height: 100%; border-radius: 38px; overflow: hidden; background: #0B1120;
+    position: relative; width: 100%; height: 100%; border-radius: 38px; overflow: hidden; background: var(--ink);
   }
   .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
   .dynamic-island {
@@ -81,7 +95,7 @@
     <div class="phone">
       <div class="screen">
         <div class="dynamic-island"></div>
-        <img src="shots/mobile-gallery.png" alt="INSIGHT Mobile Research Compass">
+        <img src="shots/mobile-home.png" alt="INSIGHT Mobile Landing Page">
         <div class="home-indicator"></div>
       </div>
     </div>

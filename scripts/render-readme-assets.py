@@ -126,10 +126,10 @@ def main() -> None:
         desktop_shot = shots_dir / "desktop-home.png"
         shoot(f"{SITE}/", desktop_shot, 1440, 900, delay_ms=5000)
 
-        # 2. Mobile Research Compass
-        mobile_shot = shots_dir / "mobile-gallery.png"
+        # 2. Mobile Landing Page
+        mobile_shot = shots_dir / "mobile-home.png"
         shoot(
-            f"{SITE}/.github/assets/src/shot-frame.html?u=/research/&w=390&h=844",
+            f"{SITE}/.github/assets/src/shot-frame.html?u=/#&w=390&h=844",
             mobile_shot,
             500,
             844,
