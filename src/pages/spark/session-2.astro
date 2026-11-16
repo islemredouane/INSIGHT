@@ -1,0 +1,1507 @@
+---
+// SPARK · The Music Case (Part 2) — Session 2 Game (Steps 0-5).
+// Open the key paper · Perham & Currie (2014) · Evidence-based reading & prediction.
+// No red ✗, no blocking states, responsive and designed to the INSIGHT design system.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { sparkSession2, sparkStory } from '../../data/spark';
+
+const steps = [
+  '00 · Yacine & Homework',
+  '01 · Map the Paper',
+  '02 · Highlighter Hunt',
+  '03 · Predict & Check',
+  '04 · Reading Card',
+  '05 · Case File #2',
+];
+---
+<BaseLayout
+  title="The Music Case (Part 2) · SPARK"
+  description="SPARK 2026 Session 2: The Music Case. Deep reading, empirical predictions, highlighter hunt, and Case File #2."
+  noindex
+>
+  <!-- Top Bar -->
+  <section class="bg-ink text-white pt-24 xl:pt-32 pb-8 border-b border-white/10">
+    <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="eyebrow text-peri">SPARK 2026 · Session 2</p>
+        <div class="flex items-center gap-3 mt-1">
+          <h1 id="team-label" class="font-display text-xl sm:text-2xl font-bold">The Music Case · Part 2</h1>
+          <span id="team-badge" class="px-2.5 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-wider rounded bg-blue/20 text-peri border border-blue/40">
+            Team Loading…
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-[13px]">
+        <a href="/spark/case" class="text-silver/70 hover:text-white transition-colors flex items-center gap-1.5">
+          <span>← Revisit Session 1</span>
+        </a>
+        <span class="text-white/20">|</span>
+        <a href="/spark/join" id="switch-link" class="text-silver/70 hover:text-white transition-colors">
+          Switch team
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky Progress Bar (All 6 steps unlocked) -->
+  <nav id="progress" class="sticky top-[72px] xl:top-[116px] z-20 bg-white border-b border-navy/10 overflow-x-auto shadow-sm" aria-label="Session 2 progress">
+    <div class="max-w-[1100px] mx-auto px-5 flex gap-1 py-3 min-w-max">
+      {steps.map((label, i) => (
+        <button type="button" class="step-tab" data-step={i}>
+          <span class="step-num">{i}</span>
+          <span>{label}</span>
+        </button>
+      ))}
+    </div>
+  </nav>
+
+  <!-- Main Game Panels Container -->
+  <main id="game" class="bg-paper text-ink py-10 sm:py-14 min-h-[70vh]">
+    <div class="max-w-[760px] mx-auto px-5">
+
+      <!-- =========================================================================
+           STEP 0 · BACK TO YACINE (3 min)
+           ========================================================================= -->
+      <section data-panel="0" class="panel">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 0 · 3 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">Back to Yacine</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">Skill: Read with a question</span>
+        </div>
+
+        <!-- Mentor Cue Banner -->
+        <div class="mt-6 p-4 sm:p-5 bg-ink text-white rounded-lg flex items-start gap-3.5 border border-white/10">
+          <span class="text-2xl leading-none">🗣️</span>
+          <div>
+            <p class="font-mono text-[11px] uppercase tracking-wider text-peri">Mentor briefing</p>
+            <p class="mt-1 text-[15px] text-white/95 leading-relaxed font-serif italic">
+              “{sparkSession2.mentorCue}”
+            </p>
+          </div>
+        </div>
+
+        <!-- Story Recap -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <h3 class="font-display text-lg font-bold text-ink">The Case So Far</h3>
+          <div class="mt-3 text-[15px] leading-relaxed text-body space-y-3">
+            <p>
+              <strong>Yacine</strong> is a first-year student. Every evening, he studies with his headphones on and his favourite songs playing.
+              <em>“Music helps me focus,”</em> he says.
+            </p>
+            <p>
+              His sister doesn’t agree: <em>“Your grades went down since you started doing that. The music is distracting you.”</em>
+            </p>
+            <p>
+              In Session 1, your team followed the research trail and discovered the landmark study:
+              <strong>Perham & Currie (2014)</strong>. Today, you open the paper and uncover what science actually found.
+            </p>
+          </div>
+        </div>
+
+        <!-- Team's 2 Homework Questions -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="font-display text-lg font-bold text-ink">Our Team’s 2 Homework Questions</h3>
+              <p class="text-[13px] text-muted mt-0.5">From your Case File #1 homework, or add them now.</p>
+            </div>
+            <span class="text-[12px] text-blue font-mono font-medium">Case File #1</span>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            <div>
+              <label for="hw-q1" class="field-label">Question 1</label>
+              <input
+                id="hw-q1"
+                class="field mt-1"
+                maxlength="200"
+                placeholder="e.g. Did they test songs people actually like, or music they hate?"
+              />
+            </div>
+            <div>
+              <label for="hw-q2" class="field-label">Question 2</label>
+              <input
+                id="hw-q2"
+                class="field mt-1"
+                maxlength="200"
+                placeholder="e.g. Was it real study material, like reading textbooks or taking tests?"
+              />
+            </div>
+          </div>
+
+          <!-- Quick suggestion chips -->
+          <div class="mt-4 pt-4 border-t border-navy/10">
+            <p class="text-[11px] font-mono uppercase text-muted tracking-wider">Need ideas? Click to use one:</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              {sparkSession2.sampleHomeworkQuestions.map((q) => (
+                <button
+                  type="button"
+                  class="hw-chip text-[12px] bg-paper hover:bg-blue/10 text-body hover:text-blue border border-navy/10 px-3 py-1.5 rounded transition text-left"
+                  data-suggestion={q}
+                >
+                  + {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Resource Launch Card -->
+        <div class="mt-6 p-6 bg-gradient-to-r from-navy/5 via-blue/5 to-transparent border border-navy/10 rounded-lg">
+          <h4 class="font-display font-bold text-ink">Get Your Paper Ready</h4>
+          <p class="text-[14px] text-body mt-1">Open the paper in a new tab so your team can highlight and read along:</p>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href={sparkSession2.paper.pdfPath}
+              target="_blank"
+              rel="noopener"
+              class="btn btn-primary"
+            >
+              📄 Open Student Copy (PDF) ↗
+            </a>
+            <a
+              href={sparkSession2.paper.doiLink}
+              target="_blank"
+              rel="noopener"
+              class="btn btn-secondary btn-on-light"
+            >
+              🌐 Official DOI Page ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Next Action -->
+        <div class="mt-8 flex justify-between items-center">
+          <span id="s0-saved" class="save-status"></span>
+          <button type="button" class="btn btn-primary next-panel-btn" data-next="1">
+            Pass 1: Map the Paper →
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           STEP 1 · PASS 1: MAP THE PAPER (10 min)
+           ========================================================================= -->
+      <section data-panel="1" class="panel hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 1 · 10 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">Pass 1: Map the Paper</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">Skill: Reading Order & Abstract</span>
+        </div>
+
+        <!-- Notice Banner -->
+        <div class="mt-6 p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg flex items-start gap-3 text-[14px]">
+          <span class="text-amber-600 text-lg">💡</span>
+          <div>
+            <strong>Notice:</strong> Your PDF student copy starts directly at the Introduction and has no abstract.
+            Use the <a href={sparkSession2.paper.doiLink} target="_blank" rel="noopener" class="underline font-semibold text-blue">Official DOI Page ↗</a> to read the abstract for Task B!
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="mt-4 flex flex-wrap gap-2">
+          <a href={sparkSession2.paper.pdfPath} target="_blank" rel="noopener" class="btn btn-sm btn-secondary btn-on-light">
+            📄 Open Student Copy (PDF) ↗
+          </a>
+          <a href={sparkSession2.paper.doiLink} target="_blank" rel="noopener" class="btn btn-sm btn-secondary btn-on-light">
+            🌐 Open DOI Page (Abstract) ↗
+          </a>
+        </div>
+
+        <!-- Task A: Find the parts -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <h3 class="font-display text-lg font-bold text-ink">Task A: Find the 5 Parts</h3>
+          <p class="text-[14px] text-body mt-1">
+            Skim the PDF and type the page number where each major part begins:
+          </p>
+
+          <div class="mt-4 space-y-3">
+            {sparkSession2.paperParts.map((part) => (
+              <div class="p-3.5 border border-navy/10 rounded-md bg-paper/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex-1">
+                  <p class="font-semibold text-ink text-[14px]">{part.name}</p>
+                  <p class="text-[12px] text-muted leading-tight mt-0.5">{part.description}</p>
+                </div>
+                <div class="flex items-center gap-2 sm:w-48 shrink-0">
+                  <span class="text-[12px] font-mono text-muted">Page #:</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="300"
+                    class="field !w-20 text-center font-mono page-part-input"
+                    data-part={part.id}
+                    placeholder="—"
+                  />
+                  <span class="page-feedback text-[12px] font-medium" data-feedback={part.id}></span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div class="mt-3 text-right">
+            <button type="button" id="check-pages-btn" class="btn btn-sm btn-primary">Check Pages</button>
+          </div>
+        </div>
+
+        <!-- Task B: The Four-Part Trick -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="font-display text-lg font-bold text-ink">Task B: The Four-Part Trick</h3>
+              <p class="text-[14px] text-body mt-0.5">
+                From the abstract (on DOI page) and introduction, complete the 4 criteria:
+              </p>
+            </div>
+            <a href={sparkSession2.paper.doiLink} target="_blank" rel="noopener" class="text-[12px] text-blue underline font-medium">
+              Read Abstract on DOI Page ↗
+            </a>
+          </div>
+
+          <div class="mt-4 border border-navy/10 rounded overflow-hidden divide-y divide-navy/10 bg-white">
+            <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+              <div class="bg-paper/70 p-3.5 text-[13px] font-semibold text-ink flex items-center">
+                Who?
+              </div>
+              <div class="p-2">
+                <input
+                  id="trick-who"
+                  class="field !border-0 focus:!ring-1"
+                  maxlength="150"
+                  placeholder={sparkSession2.fourPartTrick.who.placeholder}
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+              <div class="bg-paper/70 p-3.5 text-[13px] font-semibold text-ink flex items-center">
+                What are they testing?
+              </div>
+              <div class="p-2">
+                <input
+                  id="trick-what"
+                  class="field !border-0 focus:!ring-1"
+                  maxlength="150"
+                  placeholder={sparkSession2.fourPartTrick.what.placeholder}
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+              <div class="bg-paper/70 p-3.5 text-[13px] font-semibold text-ink flex items-center">
+                Compared to what?
+              </div>
+              <div class="p-2">
+                <input
+                  id="trick-compared"
+                  class="field !border-0 focus:!ring-1"
+                  maxlength="150"
+                  placeholder={sparkSession2.fourPartTrick.comparedTo.placeholder}
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-[170px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-navy/10">
+              <div class="bg-paper/70 p-3.5 text-[13px] font-semibold text-ink flex items-center">
+                Measured how?
+              </div>
+              <div class="p-2">
+                <input
+                  id="trick-measured"
+                  class="field !border-0 focus:!ring-1"
+                  maxlength="150"
+                  placeholder={sparkSession2.fourPartTrick.measuredHow.placeholder}
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Reveal Mentor Expected Answers Toggle -->
+          <details class="mt-4 text-[13px]">
+            <summary class="cursor-pointer text-blue font-semibold hover:underline">
+              Mentor's Guide: Expected Answers
+            </summary>
+            <div class="mt-3 p-4 bg-paper/70 border border-navy/10 rounded space-y-2 text-body">
+              <p><strong>Who:</strong> {sparkSession2.fourPartTrick.who.expected}</p>
+              <p><strong>What:</strong> {sparkSession2.fourPartTrick.what.expected}</p>
+              <p><strong>Compared to what:</strong> {sparkSession2.fourPartTrick.comparedTo.expected}</p>
+              <p><strong>Measured how:</strong> {sparkSession2.fourPartTrick.measuredHow.expected}</p>
+              <p class="text-[12px] text-muted italic mt-2">
+                Tip: If someone wrote “Measured how: their grades”, ask: Did they use real university grades, or SAT exam questions? Check Materials on page 2 / page 6!
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- Next Action -->
+        <div class="mt-8 flex justify-between items-center">
+          <button type="button" class="btn btn-secondary btn-on-light prev-panel-btn" data-prev="0">
+            ← Back to Step 0
+          </button>
+          <div class="flex items-center gap-3">
+            <span id="s1-saved" class="save-status"></span>
+            <button type="button" class="btn btn-primary next-panel-btn" data-next="2">
+              Proceed to Highlighter Hunt →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           STEP 2 · HIGHLIGHTER HUNT (10 min)
+           ========================================================================= -->
+      <section data-panel="2" class="panel hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 2 · 10 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">Highlighter Hunt</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">Skill: Method vs Results</span>
+        </div>
+
+        <!-- 3 Colors Guide Bar -->
+        <div class="mt-6 grid sm:grid-cols-3 gap-3">
+          <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-md">
+            <span class="font-bold text-amber-900 text-[13px] flex items-center gap-1.5">
+              <span>🟡</span> Yellow: Method
+            </span>
+            <p class="text-[12px] text-amber-800 mt-1 leading-tight">
+              What they did: participants, task, sound conditions.
+            </p>
+          </div>
+          <div class="p-3.5 bg-blue/10 border border-blue/30 rounded-md">
+            <span class="font-bold text-blue text-[13px] flex items-center gap-1.5">
+              <span>🔵</span> Blue: Results
+            </span>
+            <p class="text-[12px] text-body mt-1 leading-tight">
+              What they found: scores, differences, ratings.
+            </p>
+          </div>
+          <div class="p-3.5 bg-pink-50 border border-pink-200 rounded-md">
+            <span class="font-bold text-pink-900 text-[13px] flex items-center gap-1.5">
+              <span>🩷</span> Pink: Word Jar
+            </span>
+            <p class="text-[12px] text-pink-800 mt-1 leading-tight">
+              Words we don’t understand for the mentor to explain.
+            </p>
+          </div>
+        </div>
+
+        <!-- Yellow Facts (Method) -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-lg font-bold text-ink flex items-center gap-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block"></span>
+              3 Yellow Facts: What They Did (Method)
+            </h3>
+            <span class="text-[12px] font-mono text-muted">Own words</span>
+          </div>
+          <p class="text-[13px] text-muted mt-1">
+            Golden rule: Could the researchers know this before running the study? If yes, it's yellow!
+          </p>
+
+          <div class="mt-4 space-y-3">
+            <div>
+              <label for="yellow-1" class="field-label">Yellow Fact 1</label>
+              <input id="yellow-1" class="field mt-1" maxlength="250" placeholder="e.g. 30 university students in Wales, aged 19 to 65" />
+            </div>
+            <div>
+              <label for="yellow-2" class="field-label">Yellow Fact 2</label>
+              <input id="yellow-2" class="field mt-1" maxlength="250" placeholder="e.g. Every student did all 4 conditions (within-subject design)" />
+            </div>
+            <div>
+              <label for="yellow-3" class="field-label">Yellow Fact 3</label>
+              <input id="yellow-3" class="field mt-1" maxlength="250" placeholder="e.g. Liked music was chosen by students; disliked music was Death Angel thrash metal" />
+            </div>
+          </div>
+
+          <details class="mt-3 text-[13px]">
+            <summary class="cursor-pointer text-blue font-medium hover:underline">Show accepted yellow facts</summary>
+            <ul class="mt-2 pl-4 list-disc space-y-1 text-muted">
+              {sparkSession2.highlighterGuide.yellow.acceptedFacts.map((f) => <li>{f}</li>)}
+            </ul>
+          </details>
+        </div>
+
+        <!-- Blue Facts (Results) -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-lg font-bold text-ink flex items-center gap-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-blue inline-block"></span>
+              2 Blue Facts: What They Found (Results)
+            </h3>
+            <span class="text-[12px] font-mono text-muted">Own words</span>
+          </div>
+          <p class="text-[13px] text-muted mt-1">
+            Golden rule: Could anyone know this before looking at the test sheets? If no, it's blue!
+          </p>
+
+          <div class="mt-4 space-y-3">
+            <div>
+              <label for="blue-1" class="field-label">Blue Fact 1</label>
+              <input id="blue-1" class="field mt-1" maxlength="250" placeholder="e.g. Quiet and music without lyrics had the highest reading scores (tied)" />
+            </div>
+            <div>
+              <label for="blue-2" class="field-label">Blue Fact 2</label>
+              <input id="blue-2" class="field mt-1" maxlength="250" placeholder="e.g. Songs with lyrics caused the worst scores, whether students liked them or hated them" />
+            </div>
+          </div>
+
+          <details class="mt-3 text-[13px]">
+            <summary class="cursor-pointer text-blue font-medium hover:underline">Show accepted blue facts</summary>
+            <ul class="mt-2 pl-4 list-disc space-y-1 text-muted">
+              {sparkSession2.highlighterGuide.blue.acceptedFacts.map((f) => <li>{f}</li>)}
+            </ul>
+          </details>
+        </div>
+
+        <!-- Pink Words: The Interactive Word Jar -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="font-display text-lg font-bold text-ink flex items-center gap-2">
+                <span>🏺</span> The Word Jar (Pink Words)
+              </h3>
+              <p class="text-[13px] text-muted mt-0.5">
+                Add any scientific words you find confusing. Click any term to see its plain-English explanation!
+              </p>
+            </div>
+            <span class="text-[12px] font-mono text-pink-700 bg-pink-50 border border-pink-200 px-2 py-0.5 rounded">
+              Interactive Glossary
+            </span>
+          </div>
+
+          <!-- Add Word to Jar -->
+          <div class="mt-4 flex gap-2">
+            <input
+              id="new-pink-word"
+              class="field"
+              maxlength="60"
+              placeholder="Type an unfamiliar word (e.g. counterbalanced, ANOVA, effect size)…"
+            />
+            <button type="button" id="add-pink-btn" class="btn btn-sm btn-primary shrink-0">
+              Add to Jar +
+            </button>
+          </div>
+
+          <!-- Our Team's Jar Collection -->
+          <div class="mt-4 p-4 bg-pink-50/60 border border-pink-200 rounded-lg">
+            <p class="text-[12px] font-mono uppercase text-pink-900 tracking-wider font-semibold">
+              Our Team's Added Words:
+            </p>
+            <div id="jar-words-list" class="mt-2 flex flex-wrap gap-2">
+              <!-- Dynamically populated or default terms -->
+            </div>
+          </div>
+
+          <!-- Mentor Spotlight: Top 2 Terms -->
+          <div class="mt-5 p-4 bg-ink text-white rounded-lg">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-peri">Mentor Spotlight: The 2 Essential Terms</p>
+            <div class="mt-3 grid sm:grid-cols-2 gap-3 text-[13px]">
+              <div class="p-3 bg-white/5 border border-white/10 rounded">
+                <span class="font-bold text-peri font-mono">1. Within design</span>
+                <p class="mt-1 text-silver leading-relaxed">
+                  Every participant does all 4 conditions. Each person is compared with themself, so natural smartness or reading speed doesn't skew results.
+                </p>
+              </div>
+              <div class="p-3 bg-white/5 border border-white/10 rounded">
+                <span class="font-bold text-peri font-mono">2. Significant (p &lt; .05)</span>
+                <p class="mt-1 text-silver leading-relaxed">
+                  The difference is probably real and not just random luck (&lt;5% chance). It does <em>not</em> mean "large" (effect size tells you size).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expandable Paper Glossary -->
+          <details class="mt-4 text-[13px]">
+            <summary class="cursor-pointer text-blue font-semibold hover:underline">
+              Browse All 12 Curated Paper Terms & Hover Notes
+            </summary>
+            <div class="mt-3 grid sm:grid-cols-2 gap-2">
+              {sparkSession2.wordJar.map((w) => (
+                <div class="p-3 bg-paper border border-navy/10 rounded hover:border-blue/30 transition text-[13px]">
+                  <div class="flex items-center justify-between">
+                    <strong class="text-ink">{w.term}</strong>
+                    <span class="font-mono text-[10px] text-muted">{w.pageHint}</span>
+                  </div>
+                  <p class="mt-1 text-body text-[12px] leading-relaxed">{w.definition}</p>
+                </div>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        <!-- Next Action -->
+        <div class="mt-8 flex justify-between items-center">
+          <button type="button" class="btn btn-secondary btn-on-light prev-panel-btn" data-prev="1">
+            ← Back to Step 1
+          </button>
+          <div class="flex items-center gap-3">
+            <span id="s2-saved" class="save-status"></span>
+            <button type="button" class="btn btn-primary next-panel-btn" data-next="3">
+              Predict, Then Check →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           STEP 3 · PREDICT, THEN CHECK (12 min): THE FUN PART
+           ========================================================================= -->
+      <section data-panel="3" class="panel hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 3 · 12 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">Predict, Then Check</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">The Fun Part!</span>
+        </div>
+
+        <!-- Phase 1: Team Prediction -->
+        <div id="predict-phase-1" class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="font-display text-lg font-bold text-ink">1. Rank the 4 Situations</h3>
+              <p class="text-[14px] text-body mt-0.5">
+                Before reading the results, rank these from <strong>1st (Best for reading)</strong> to <strong>4th (Worst for reading)</strong>.
+              </p>
+            </div>
+            <span class="px-2.5 py-0.5 bg-paper text-[11px] font-mono text-muted border border-navy/10 rounded">
+              Use ▲ ▼ to order
+            </span>
+          </div>
+
+          <!-- Sortable Cards Container -->
+          <div id="conditions-sortable" class="mt-5 space-y-3">
+            {sparkSession2.conditions.map((c, idx) => (
+              <div
+                class="condition-card p-4 border border-navy/10 rounded-lg bg-paper/40 flex items-center justify-between gap-3 transition-shadow hover:shadow-sm"
+                data-id={c.id}
+              >
+                <div class="flex items-center gap-3">
+                  <span class="rank-badge w-7 h-7 rounded-full bg-ink text-white font-mono font-bold text-[13px] flex items-center justify-center shrink-0">
+                    {idx + 1}
+                  </span>
+                  <span class="text-2xl">{c.icon}</span>
+                  <div>
+                    <h4 class="font-display font-bold text-ink text-[15px]">{c.title}</h4>
+                    <p class="text-[12px] text-muted">{c.shortDesc}</p>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1 shrink-0">
+                  <button type="button" class="rank-up text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" title="Move Up">
+                    ▲
+                  </button>
+                  <button type="button" class="rank-down text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" title="Move Down">
+                    ▼
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-navy/10">
+            <p class="text-[13px] text-muted italic">
+              Once you lock your prediction, you cannot change it!
+            </p>
+            <button type="button" id="lock-prediction-btn" class="btn btn-primary">
+              🔒 Lock Our Prediction
+            </button>
+          </div>
+        </div>
+
+        <!-- Phase 2: Read Results Input (Shown after lock or toggle) -->
+        <div id="predict-phase-2" class="hidden mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+          <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-md text-[13px] flex items-center gap-2">
+            <span>🔒</span>
+            <span class="font-semibold">Prediction Locked!</span>
+            <span>Now open Results (page 3 / page 8) in the paper to check what really happened.</span>
+          </div>
+
+          <div class="mt-5">
+            <label for="results-real-text" class="field-label">What did the paper really find?</label>
+            <textarea
+              id="results-real-text"
+              class="field mt-1"
+              rows="3"
+              placeholder="In your own words: which conditions did best, which did worst, and did liking the song make any difference?"
+            ></textarea>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between">
+            <a href={sparkSession2.paper.pdfPath} target="_blank" rel="noopener" class="text-[13px] text-blue underline font-medium">
+              📄 Check Results on Page 3 / Page 8 ↗
+            </a>
+            <button type="button" id="reveal-comparison-btn" class="btn btn-primary">
+              Reveal the Science & Compare →
+            </button>
+          </div>
+        </div>
+
+        <!-- Phase 3: Side-by-side Empirical Comparison (Revealed) -->
+        <div id="predict-phase-3" class="hidden mt-6 space-y-6">
+          <div class="bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+            <h3 class="font-display text-xl font-bold text-ink">Prediction vs. Empirical Reality</h3>
+            <p class="text-[14px] text-body mt-1">Here is how your prediction matches what science measured:</p>
+
+            <div class="mt-6 grid sm:grid-cols-2 gap-4">
+              <!-- Team Prediction Display -->
+              <div class="p-4 bg-paper/60 border border-navy/10 rounded-lg">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-semibold">Your Locked Prediction</span>
+                <ol id="locked-prediction-list" class="mt-3 space-y-2 text-[14px]">
+                  <!-- Populated from JS -->
+                </ol>
+              </div>
+
+              <!-- Real Empirical Result Display -->
+              <div class="p-4 bg-blue/10 border border-blue/30 rounded-lg">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-blue font-semibold">Real Experimental Result</span>
+                <div class="mt-3 space-y-2 text-[14px]">
+                  <div class="p-2 bg-white rounded border border-blue/20">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-ink">1st (Tie) · 🤫 Quiet</span>
+                      <span class="font-mono text-[12px] font-semibold text-emerald-700">61.1% score</span>
+                    </div>
+                  </div>
+                  <div class="p-2 bg-white rounded border border-blue/20">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-ink">1st (Tie) · 🎸 Music without lyrics</span>
+                      <span class="font-mono text-[12px] font-semibold text-emerald-700">60.0% score</span>
+                    </div>
+                  </div>
+                  <div class="p-2 bg-white rounded border border-blue/20">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-ink">3rd (Tie) · ❤️ Liked songs</span>
+                      <span class="font-mono text-[12px] font-semibold text-signal">37.8% score</span>
+                    </div>
+                  </div>
+                  <div class="p-2 bg-white rounded border border-blue/20">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-ink">3rd (Tie) · 💔 Disliked songs</span>
+                      <span class="font-mono text-[12px] font-semibold text-signal">36.7% score</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- The Big Surprise Callouts -->
+            <div class="mt-6 space-y-3">
+              <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <span class="font-bold text-amber-900 text-[14px]">💥 The Expected Surprise: Liking Did NOT Help!</span>
+                <p class="text-[13px] text-amber-800 mt-1 leading-relaxed">
+                  Most people believe listening to their favourite music helps them focus. But students scored almost identically in liked songs (37.8%) and disliked thrash metal (36.7%)! Liking the music offers <strong>zero protection</strong> against the distraction of lyrics.
+                </p>
+              </div>
+
+              <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <span class="font-bold text-emerald-900 text-[14px]">🎸 The Second Twist: Thrash Metal Without Lyrics Was Fine!</span>
+                <p class="text-[13px] text-emerald-800 mt-1 leading-relaxed">
+                  The instrumental music wasn't calm Mozart—it was loud, aggressive thrash metal (<em>Death Angel</em>)! Yet comprehension was <strong>statistically equivalent to pure silence</strong> (60.0% vs 61.1%). This proves it is the <strong>words/lyrics</strong> that impair reading, not the sound or beat itself!
+                </p>
+              </div>
+            </div>
+
+            <!-- Table 1 Ratings Explorer -->
+            <div class="mt-6 pt-6 border-t border-navy/10">
+              <h4 class="font-display font-bold text-ink text-[15px]">Table 1: Did Students Realise What Was Happening?</h4>
+              <p class="text-[13px] text-muted mt-0.5">Students rated each condition on a scale of 0 to 100 after the test:</p>
+
+              <div class="mt-3 overflow-x-auto">
+                <table class="w-full text-left text-[13px] border border-navy/10 rounded overflow-hidden">
+                  <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
+                    <tr>
+                      <th class="p-2.5">Measure (0–100)</th>
+                      <th class="p-2.5">Quiet</th>
+                      <th class="p-2.5">No lyrics</th>
+                      <th class="p-2.5">Liked songs</th>
+                      <th class="p-2.5">Disliked songs</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-navy/10 bg-white">
+                    <tr>
+                      <td class="p-2.5 font-medium">How distracting it felt</td>
+                      <td class="p-2.5 font-mono text-emerald-700">10.4</td>
+                      <td class="p-2.5 font-mono text-body">46.4</td>
+                      <td class="p-2.5 font-mono text-signal font-semibold">75.3</td>
+                      <td class="p-2.5 font-mono text-signal font-semibold">78.7</td>
+                    </tr>
+                    <tr>
+                      <td class="p-2.5 font-medium">How well I thought I did</td>
+                      <td class="p-2.5 font-mono text-emerald-700">67.3</td>
+                      <td class="p-2.5 font-mono text-body">52.8</td>
+                      <td class="p-2.5 font-mono text-signal">35.7</td>
+                      <td class="p-2.5 font-mono text-signal">35.8</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-[12px] text-muted mt-2">
+                <strong>Insight:</strong> Yes! Students felt songs were ~75/100 distracting and predicted they did worst with them.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Action -->
+        <div class="mt-8 flex justify-between items-center">
+          <button type="button" class="btn btn-secondary btn-on-light prev-panel-btn" data-prev="2">
+            ← Back to Step 2
+          </button>
+          <div class="flex items-center gap-3">
+            <span id="s3-saved" class="save-status"></span>
+            <button type="button" class="btn btn-primary next-panel-btn" data-next="4">
+              Proceed to Reading Card →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           STEP 4 · THE READING CARD (12 min)
+           ========================================================================= -->
+      <section data-panel="4" class="panel hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 4 · 12 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">The Reading Card</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">Skill: Scientific Synthesis</span>
+        </div>
+
+        <p class="mt-4 text-[14px] text-body leading-relaxed">
+          Synthesize <strong>Perham & Currie (2014)</strong> across the 8 standard boxes. Use your own words:
+        </p>
+
+        <!-- 8 Boxes Form -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm space-y-5">
+          {sparkSession2.readingCardBoxes.map((box) => (
+            <div>
+              <div class="flex items-center justify-between">
+                <label for={`card-${box.id}`} class="field-label">{box.title}</label>
+                <span class="text-[11px] text-muted font-mono">{box.prompt}</span>
+              </div>
+              {box.id === 'reference' ? (
+                <textarea
+                  id={`card-${box.id}`}
+                  class="field mt-1.5 font-serif text-[13px]"
+                  rows="2"
+                  placeholder={box.placeholder}
+                >{box.defaultValue}</textarea>
+              ) : (
+                <textarea
+                  id={`card-${box.id}`}
+                  class="field mt-1.5"
+                  rows={box.id === 'what_done' || box.id === 'explanation' || box.id === 'limits' ? 3 : 2}
+                  placeholder={box.placeholder}
+                ></textarea>
+              )}
+            </div>
+          ))}
+
+          <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+            <button type="button" id="send-card-mentor-btn" class="btn btn-primary">
+              Send Reading Card to Mentor ✓
+            </button>
+            <span id="s4-card-status" class="text-[13px] text-muted">Ready to submit</span>
+          </div>
+
+          <!-- Non-blocking Mentor Approval Banner -->
+          <div id="card-mentor-approved" class="hidden mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 flex items-start gap-3">
+            <span class="text-2xl leading-none text-emerald-600 font-bold">✓</span>
+            <div>
+              <p class="font-bold text-emerald-900 text-[14px]">Reading Card Approved by Mentor!</p>
+              <p class="text-[13px] text-emerald-800 mt-1 leading-relaxed">
+                Excellent synthesis! You clearly identified that songs with lyrics cause semantic interference, while quiet and music without words allow peak reading comprehension.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Action -->
+        <div class="mt-8 flex justify-between items-center">
+          <button type="button" class="btn btn-secondary btn-on-light prev-panel-btn" data-prev="3">
+            ← Back to Step 3
+          </button>
+          <div class="flex items-center gap-3">
+            <span id="s4-saved" class="save-status"></span>
+            <button type="button" class="btn btn-primary next-panel-btn" data-next="5">
+              Proceed to Case File #2 →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           STEP 5 · CASE FILE #2 (8 min)
+           ========================================================================= -->
+      <section data-panel="5" class="panel hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 5 · 8 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">Case File #2: Closing the Case</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">Skill: Critical Reading</span>
+        </div>
+
+        <!-- 3 Closing Questions -->
+        <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm space-y-6">
+
+          <!-- Q1: Did paper answer homework? -->
+          <div>
+            <label class="field-label">1. Our homework questions: Did the paper answer them?</label>
+            <div class="mt-2 flex gap-3">
+              <button type="button" class="hw-ans-choice choice-btn" data-choice="yes">Yes</button>
+              <button type="button" class="hw-ans-choice choice-btn" data-choice="partly">Partly</button>
+              <button type="button" class="hw-ans-choice choice-btn" data-choice="no">No</button>
+            </div>
+            <textarea
+              id="cf2-hw-explanation"
+              class="field mt-3"
+              rows="2"
+              placeholder="Add one line explaining why it answered or didn't answer your questions…"
+            ></textarea>
+          </div>
+
+          <!-- Q2: One sentence for Yacine -->
+          <div>
+            <label for="cf2-sentence-yacine" class="field-label">2. What would you tell Yacine now? (One sentence)</label>
+            <p class="text-[12px] text-muted mt-0.5">Based on the paper's findings. Mention the specific kind of music!</p>
+            <textarea
+              id="cf2-sentence-yacine"
+              class="field mt-2"
+              rows="2"
+              placeholder="e.g. If you need to read and understand your material, turn off songs with lyrics—even your favourites—and study in silence or with instrumental music."
+            ></textarea>
+          </div>
+
+          <!-- Q3: One reason to be careful -->
+          <div>
+            <label for="cf2-reason-careful" class="field-label">3. One reason to be careful before applying this everywhere:</label>
+            <p class="text-[12px] text-muted mt-0.5">e.g. A small group of 30 students, a short lab test, not real multi-hour study.</p>
+            <textarea
+              id="cf2-reason-careful"
+              class="field mt-2"
+              rows="2"
+              placeholder="e.g. This was a single lab study with 30 students reading short SAT passages, not real multi-hour revision, and one study is not the final answer."
+            ></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 border-t border-navy/10">
+            <button type="button" id="save-cf2-btn" class="btn btn-primary">
+              Save Case File #2
+            </button>
+            <span id="s5-saved" class="save-status"></span>
+          </div>
+        </div>
+
+        <!-- Official Case Dossier Summary -->
+        <div id="cf2-summary-card" class="mt-8 bg-ink text-white p-6 sm:p-8 rounded-xl border border-white/15 relative overflow-hidden shadow-xl">
+          <div class="flex items-center justify-between border-b border-white/15 pb-4">
+            <div>
+              <p class="font-mono text-[11px] uppercase tracking-wider text-peri">SPARK 2026 · Official Investigation Record</p>
+              <h3 class="font-display text-2xl font-bold mt-1">Case File #2: The Music Case Closed</h3>
+            </div>
+            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 font-mono text-[12px] font-bold rounded border border-emerald-500/40">
+              ✓ COMPLETED
+            </span>
+          </div>
+
+          <div class="mt-6 space-y-4 text-[14px]">
+            <div>
+              <span class="text-peri font-mono text-[11px] uppercase">The Key Paper</span>
+              <p class="font-serif italic text-white/95 mt-0.5">{sparkSession2.paper.citation}</p>
+            </div>
+
+            <div>
+              <span class="text-peri font-mono text-[11px] uppercase">The Core Finding</span>
+              <p class="text-silver mt-0.5">
+                Quiet and music without lyrics produce optimal reading comprehension (~61%). Songs with lyrics cause severe cognitive impairment (~37%), regardless of whether the listener loves or hates the music.
+              </p>
+            </div>
+
+            <div>
+              <span class="text-peri font-mono text-[11px] uppercase">Our Verdict for Yacine</span>
+              <p id="summary-sentence-yacine" class="text-white font-medium mt-0.5 italic">
+                “If you need to read and understand what you study, turn off songs with lyrics—even your favourites—and study in silence or with instrumental music.”
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center justify-between">
+            <button type="button" id="print-case-btn" class="btn btn-sm btn-secondary">
+              🖨️ Print / Save PDF
+            </button>
+            <div class="flex items-center gap-3">
+              <a href="/spark/case" class="text-[13px] text-peri hover:text-white underline">
+                Session 1 Archive
+              </a>
+              <a href="/spark" class="btn btn-sm btn-primary">
+                Return to SPARK Hub →
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .step-tab {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #8A94A8;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  .step-tab:hover {
+    color: #3F66B0;
+  }
+  .step-tab .step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+  }
+  .step-tab.active {
+    color: #3F66B0;
+    border-color: #3F66B0;
+    font-weight: 600;
+  }
+  .choice-btn {
+    flex: 1;
+    height: 40px;
+    border: 1px solid rgba(27,42,85,.2);
+    font-size: 14px;
+    color: #3A4458;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .choice-btn:hover {
+    border-color: #3F66B0;
+  }
+  .choice-btn.chosen {
+    background: #3F66B0;
+    color: #fff;
+    border-color: #3F66B0;
+    font-weight: 600;
+  }
+  .save-status {
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 1.2em;
+  }
+  .save-status.status-saving {
+    color: #8A94A8;
+    font-weight: 400;
+  }
+  .save-status.status-saved {
+    color: #3F66B0;
+  }
+  .save-status.status-error {
+    color: #C2463A;
+  }
+</style>
+
+<script>
+  import { sparkSession2 } from '../../data/spark';
+
+  // Team handling
+  const TEAM_KEY = 'spark-team-code';
+  let teamCode = localStorage.getItem(TEAM_KEY) || 'DEMO';
+  const STORAGE_KEY = `spark-s2-${teamCode}`;
+
+  const teamLabel = document.getElementById('team-label');
+  const teamBadge = document.getElementById('team-badge');
+  if (teamBadge) {
+    teamBadge.textContent = teamCode === 'DEMO' ? 'Explorer Mode' : `Team ${teamCode}`;
+  }
+
+  // Load existing state from localStorage
+  interface Session2State {
+    step: number;
+    hw_q1: string;
+    hw_q2: string;
+    pages: Record<string, number>;
+    trick: { who: string; what: string; compared: string; measured: string };
+    yellow: string[];
+    blue: string[];
+    jarWords: string[];
+    prediction: string[]; // condition ids in ranked order
+    predictionLocked: boolean;
+    resultsRealText: string;
+    resultsRevealed: boolean;
+    readingCard: Record<string, string>;
+    cardApproved: boolean;
+    cf2: {
+      choice: string;
+      explanation: string;
+      sentenceYacine: string;
+      reasonCareful: string;
+    };
+  }
+
+  const defaultState: Session2State = {
+    step: 0,
+    hw_q1: '',
+    hw_q2: '',
+    pages: {},
+    trick: { who: '', what: '', compared: '', measured: '' },
+    yellow: ['', '', ''],
+    blue: ['', ''],
+    jarWords: ['Within design', 'Significant (p < .05)', 'Counterbalanced', 'Pilot study', 'Likert scale'],
+    prediction: ['quiet', 'liked', 'no_lyrics', 'disliked'],
+    predictionLocked: false,
+    resultsRealText: '',
+    resultsRevealed: false,
+    readingCard: {
+      reference: sparkSession2.paper.citation,
+      question: '',
+      who: '',
+      what_done: '',
+      main_result: '',
+      explanation: '',
+      limits: '',
+      our_questions: '',
+    },
+    cardApproved: false,
+    cf2: {
+      choice: 'yes',
+      explanation: '',
+      sentenceYacine: '',
+      reasonCareful: '',
+    },
+  };
+
+  let state: Session2State = defaultState;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = { ...defaultState, ...JSON.parse(raw) };
+  } catch (e) {
+    console.error('Failed to load session 2 state', e);
+  }
+
+  function saveState(statusElId?: string) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (statusElId) markStatus(statusElId, 'saved');
+    } catch (e) {
+      console.error('Save failed', e);
+      if (statusElId) markStatus(statusElId, 'Save error');
+    }
+  }
+
+  function markStatus(id: string, st: 'saving' | 'saved' | string) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('status-saving', 'status-saved', 'status-error');
+    if (st === 'saving') {
+      el.textContent = 'Saving…';
+      el.classList.add('status-saving');
+    } else if (st === 'saved') {
+      el.textContent = '✓ Saved';
+      el.classList.add('status-saved');
+    } else {
+      el.textContent = st;
+      el.classList.add('status-error');
+    }
+  }
+
+  // Navigation between panels
+  let activePanel = 0;
+  function showPanel(n: number) {
+    activePanel = n;
+    state.step = n;
+    saveState();
+
+    document.querySelectorAll<HTMLElement>('.panel').forEach((p) => {
+      p.classList.toggle('hidden', Number(p.dataset.panel) !== n);
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
+      const stepIdx = Number(btn.dataset.step);
+      btn.classList.toggle('active', stepIdx === n);
+    });
+
+    window.scrollTo({ top: 180, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
+    btn.addEventListener('click', () => showPanel(Number(btn.dataset.step)));
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.next-panel-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = Number(btn.dataset.next);
+      showPanel(next);
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.prev-panel-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const prev = Number(btn.dataset.prev);
+      showPanel(prev);
+    });
+  });
+
+  // ==================== STEP 0 ====================
+  const hwQ1 = document.getElementById('hw-q1') as HTMLInputElement | null;
+  const hwQ2 = document.getElementById('hw-q2') as HTMLInputElement | null;
+  if (hwQ1) {
+    hwQ1.value = state.hw_q1;
+    hwQ1.addEventListener('input', () => {
+      state.hw_q1 = hwQ1.value;
+      saveState('s0-saved');
+    });
+  }
+  if (hwQ2) {
+    hwQ2.value = state.hw_q2;
+    hwQ2.addEventListener('input', () => {
+      state.hw_q2 = hwQ2.value;
+      saveState('s0-saved');
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('.hw-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const text = chip.dataset.suggestion || '';
+      if (hwQ1 && !hwQ1.value.trim()) {
+        hwQ1.value = text;
+        state.hw_q1 = text;
+      } else if (hwQ2) {
+        hwQ2.value = text;
+        state.hw_q2 = text;
+      }
+      saveState('s0-saved');
+    });
+  });
+
+  // ==================== STEP 1 ====================
+  // Check parts pages
+  function checkPages() {
+    sparkSession2.paperParts.forEach((part) => {
+      const input = document.querySelector<HTMLInputElement>(`.page-part-input[data-part="${part.id}"]`);
+      const fb = document.querySelector<HTMLElement>(`.page-feedback[data-feedback="${part.id}"]`);
+      if (!input || !fb) return;
+      const val = Number(input.value);
+      if (!val) {
+        fb.textContent = '';
+        return;
+      }
+      if (part.validPages.includes(val)) {
+        fb.textContent = '✓ Correct';
+        fb.className = 'page-feedback text-[12px] font-semibold text-emerald-700';
+      } else {
+        fb.textContent = `Hint: check around ${part.expectedPageDisplay}`;
+        fb.className = 'page-feedback text-[12px] text-body';
+      }
+      state.pages[part.id] = val;
+    });
+    saveState('s1-saved');
+  }
+
+  document.querySelectorAll<HTMLInputElement>('.page-part-input').forEach((input) => {
+    const part = input.dataset.part;
+    if (part && state.pages[part]) {
+      input.value = String(state.pages[part]);
+    }
+    input.addEventListener('change', checkPages);
+  });
+  document.getElementById('check-pages-btn')?.addEventListener('click', checkPages);
+
+  // 4-part trick inputs
+  const trickInputs: Record<keyof typeof state.trick, HTMLInputElement | null> = {
+    who: document.getElementById('trick-who') as HTMLInputElement | null,
+    what: document.getElementById('trick-what') as HTMLInputElement | null,
+    compared: document.getElementById('trick-compared') as HTMLInputElement | null,
+    measured: document.getElementById('trick-measured') as HTMLInputElement | null,
+  };
+  Object.entries(trickInputs).forEach(([key, input]) => {
+    if (!input) return;
+    const k = key as keyof typeof state.trick;
+    input.value = state.trick[k] || '';
+    input.addEventListener('input', () => {
+      state.trick[k] = input.value;
+      saveState('s1-saved');
+    });
+  });
+
+  // ==================== STEP 2 ====================
+  // Yellow facts
+  ['yellow-1', 'yellow-2', 'yellow-3'].forEach((id, idx) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    if (!el) return;
+    el.value = state.yellow[idx] || '';
+    el.addEventListener('input', () => {
+      state.yellow[idx] = el.value;
+      saveState('s2-saved');
+    });
+  });
+
+  // Blue facts
+  ['blue-1', 'blue-2'].forEach((id, idx) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    if (!el) return;
+    el.value = state.blue[idx] || '';
+    el.addEventListener('input', () => {
+      state.blue[idx] = el.value;
+      saveState('s2-saved');
+    });
+  });
+
+  // Word Jar
+  const jarContainer = document.getElementById('jar-words-list');
+  function renderJar() {
+    if (!jarContainer) return;
+    jarContainer.innerHTML = '';
+    state.jarWords.forEach((word, idx) => {
+      const pill = document.createElement('span');
+      pill.className =
+        'inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-pink-200 text-pink-900 rounded-full text-[12px] font-medium shadow-2xs';
+      pill.innerHTML = `<span>🩷 ${word}</span><button type="button" class="text-pink-400 hover:text-pink-700 ml-1 font-bold text-[14px] leading-none" data-idx="${idx}">×</button>`;
+      jarContainer.appendChild(pill);
+    });
+
+    jarContainer.querySelectorAll('button[data-idx]').forEach((b) => {
+      b.addEventListener('click', (e) => {
+        const i = Number((e.currentTarget as HTMLElement).dataset.idx);
+        state.jarWords.splice(i, 1);
+        renderJar();
+        saveState('s2-saved');
+      });
+    });
+  }
+  renderJar();
+
+  const pinkInput = document.getElementById('new-pink-word') as HTMLInputElement | null;
+  document.getElementById('add-pink-btn')?.addEventListener('click', () => {
+    if (!pinkInput) return;
+    const w = pinkInput.value.trim();
+    if (w && !state.jarWords.includes(w)) {
+      state.jarWords.push(w);
+      pinkInput.value = '';
+      renderJar();
+      saveState('s2-saved');
+    }
+  });
+
+  // ==================== STEP 3: PREDICT & CHECK ====================
+  const sortContainer = document.getElementById('conditions-sortable');
+  function renderSortable() {
+    if (!sortContainer) return;
+    sortContainer.innerHTML = '';
+    state.prediction.forEach((cid, idx) => {
+      const cond = sparkSession2.conditions.find((c) => c.id === cid);
+      if (!cond) return;
+      const el = document.createElement('div');
+      el.className =
+        'condition-card p-4 border border-navy/10 rounded-lg bg-paper/40 flex items-center justify-between gap-3 transition-shadow hover:shadow-sm';
+      el.dataset.id = cond.id;
+      el.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="rank-badge w-7 h-7 rounded-full bg-ink text-white font-mono font-bold text-[13px] flex items-center justify-center shrink-0">
+            ${idx + 1}
+          </span>
+          <span class="text-2xl">${cond.icon}</span>
+          <div>
+            <h4 class="font-display font-bold text-ink text-[15px]">${cond.title}</h4>
+            <p class="text-[12px] text-muted">${cond.shortDesc}</p>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1 shrink-0">
+          <button type="button" class="rank-up text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Up">▲</button>
+          <button type="button" class="rank-down text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Down">▼</button>
+        </div>
+      `;
+      sortContainer.appendChild(el);
+    });
+
+    sortContainer.querySelectorAll('.rank-up').forEach((b) => {
+      b.addEventListener('click', (e) => {
+        const i = Number((e.currentTarget as HTMLElement).dataset.idx);
+        if (i > 0) {
+          const temp = state.prediction[i];
+          state.prediction[i] = state.prediction[i - 1];
+          state.prediction[i - 1] = temp;
+          renderSortable();
+          saveState('s3-saved');
+        }
+      });
+    });
+
+    sortContainer.querySelectorAll('.rank-down').forEach((b) => {
+      b.addEventListener('click', (e) => {
+        const i = Number((e.currentTarget as HTMLElement).dataset.idx);
+        if (i < state.prediction.length - 1) {
+          const temp = state.prediction[i];
+          state.prediction[i] = state.prediction[i + 1];
+          state.prediction[i + 1] = temp;
+          renderSortable();
+          saveState('s3-saved');
+        }
+      });
+    });
+  }
+  renderSortable();
+
+  const phase1El = document.getElementById('predict-phase-1');
+  const phase2El = document.getElementById('predict-phase-2');
+  const phase3El = document.getElementById('predict-phase-3');
+  const lockedList = document.getElementById('locked-prediction-list');
+
+  function renderLockedList() {
+    if (!lockedList) return;
+    lockedList.innerHTML = '';
+    state.prediction.forEach((cid, idx) => {
+      const cond = sparkSession2.conditions.find((c) => c.id === cid);
+      if (!cond) return;
+      const li = document.createElement('li');
+      li.className = 'p-2 bg-white rounded border border-navy/10 flex items-center justify-between';
+      li.innerHTML = `<span><strong>${idx + 1}.</strong> ${cond.icon} ${cond.title}</span>`;
+      lockedList.appendChild(li);
+    });
+  }
+
+  function updatePredictionUI() {
+    if (state.predictionLocked) {
+      phase2El?.classList.remove('hidden');
+      if (state.resultsRevealed) {
+        phase3El?.classList.remove('hidden');
+        renderLockedList();
+      }
+    }
+  }
+  updatePredictionUI();
+
+  document.getElementById('lock-prediction-btn')?.addEventListener('click', () => {
+    state.predictionLocked = true;
+    saveState('s3-saved');
+    phase2El?.classList.remove('hidden');
+    phase2El?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  const resultsRealText = document.getElementById('results-real-text') as HTMLTextAreaElement | null;
+  if (resultsRealText) {
+    resultsRealText.value = state.resultsRealText;
+    resultsRealText.addEventListener('input', () => {
+      state.resultsRealText = resultsRealText.value;
+      saveState('s3-saved');
+    });
+  }
+
+  document.getElementById('reveal-comparison-btn')?.addEventListener('click', () => {
+    state.resultsRevealed = true;
+    saveState('s3-saved');
+    phase3El?.classList.remove('hidden');
+    renderLockedList();
+    phase3El?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // ==================== STEP 4: READING CARD ====================
+  sparkSession2.readingCardBoxes.forEach((box) => {
+    const el = document.getElementById(`card-${box.id}`) as HTMLTextAreaElement | null;
+    if (!el) return;
+    if (state.readingCard[box.id]) {
+      el.value = state.readingCard[box.id];
+    }
+    el.addEventListener('input', () => {
+      state.readingCard[box.id] = el.value;
+      saveState('s4-saved');
+    });
+  });
+
+  const cardApprovedBox = document.getElementById('card-mentor-approved');
+  const cardStatus = document.getElementById('s4-card-status');
+  if (state.cardApproved) {
+    cardApprovedBox?.classList.remove('hidden');
+    if (cardStatus) cardStatus.textContent = '✓ Approved by mentor';
+  }
+
+  document.getElementById('send-card-mentor-btn')?.addEventListener('click', () => {
+    state.cardApproved = true;
+    saveState('s4-saved');
+    cardApprovedBox?.classList.remove('hidden');
+    if (cardStatus) cardStatus.textContent = '✓ Approved by mentor';
+    cardApprovedBox?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // ==================== STEP 5: CASE FILE #2 ====================
+  // Homework check choice
+  document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((b) => {
+    const choice = b.dataset.choice || 'yes';
+    b.classList.toggle('chosen', choice === state.cf2.choice);
+    b.addEventListener('click', () => {
+      document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((btn) => btn.classList.remove('chosen'));
+      b.classList.add('chosen');
+      state.cf2.choice = choice;
+      saveState('s5-saved');
+    });
+  });
+
+  const cf2Explanation = document.getElementById('cf2-hw-explanation') as HTMLTextAreaElement | null;
+  if (cf2Explanation) {
+    cf2Explanation.value = state.cf2.explanation;
+    cf2Explanation.addEventListener('input', () => {
+      state.cf2.explanation = cf2Explanation.value;
+      saveState('s5-saved');
+    });
+  }
+
+  const sentenceYacine = document.getElementById('cf2-sentence-yacine') as HTMLTextAreaElement | null;
+  const summarySentence = document.getElementById('summary-sentence-yacine');
+  if (sentenceYacine) {
+    sentenceYacine.value = state.cf2.sentenceYacine;
+    if (state.cf2.sentenceYacine && summarySentence) {
+      summarySentence.textContent = `“${state.cf2.sentenceYacine}”`;
+    }
+    sentenceYacine.addEventListener('input', () => {
+      state.cf2.sentenceYacine = sentenceYacine.value;
+      if (summarySentence) {
+        summarySentence.textContent = sentenceYacine.value ? `“${sentenceYacine.value}”` : '“If you need to read and understand what you study, turn off songs with lyrics—even your favourites—and study in silence or with instrumental music.”';
+      }
+      saveState('s5-saved');
+    });
+  }
+
+  const reasonCareful = document.getElementById('cf2-reason-careful') as HTMLTextAreaElement | null;
+  if (reasonCareful) {
+    reasonCareful.value = state.cf2.reasonCareful;
+    reasonCareful.addEventListener('input', () => {
+      state.cf2.reasonCareful = reasonCareful.value;
+      saveState('s5-saved');
+    });
+  }
+
+  document.getElementById('save-cf2-btn')?.addEventListener('click', () => {
+    saveState('s5-saved');
+  });
+
+  document.getElementById('print-case-btn')?.addEventListener('click', () => {
+    window.print();
+  });
+
+  // Restore active step if saved
+  if (state.step && state.step > 0 && state.step < 6) {
+    showPanel(state.step);
+  }
+</script>

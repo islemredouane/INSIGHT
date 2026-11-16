@@ -1,23 +1,32 @@
 ---
-// SPARK · The Music Case — public landing page for the Session 1 game.
+// SPARK · The Music Case — public landing page for the scientific game.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
 import SectionHeader from '../../components/ui/SectionHeader.astro';
 
-const steps = [
-  { num: '00', title: 'The Story', desc: 'Read the briefing: A student argues that listening to upbeat music helps them study better, while another insists total silence is superior. Your mission starts here.' },
-  { num: '01', title: 'Question Lab', desc: 'Formulate your team’s empirical question and break it down across 4 criteria: Who? · What are you testing? · Compared to what? · Measured how?' },
-  { num: '02', title: 'Keyword Builder', desc: 'Translate your question into Boolean search terms (AND/OR operators), refine queries, and locate relevant academic literature.' },
-  { num: '03', title: 'Paper Cards', desc: 'Review 8 peer-reviewed research papers. Critically triage each study into Keep, Maybe, or Not for us with scientific rationale.' },
-  { num: '04', title: 'Follow the Trail', desc: 'Analyze backward citation trees and bibliographic references to hunt down the hidden landmark paper.' },
-  { num: '05', title: 'Case File', desc: 'Synthesize your evidence, document surprising insights, and lock your team’s permanent Case File for Session 2.' },
+const session1Steps = [
+  { num: '00', title: 'The Story', desc: 'Read the briefing: A student argues that listening to upbeat music helps them study, while another insists silence is superior.' },
+  { num: '01', title: 'Question Lab', desc: 'Formulate your team’s empirical question across 4 criteria: Who? · What? · Compared to what? · Measured how?' },
+  { num: '02', title: 'Keyword Builder', desc: 'Translate your question into Boolean search terms (AND/OR operators) to locate relevant scientific literature.' },
+  { num: '03', title: 'Paper Cards', desc: 'Review 8 peer-reviewed research papers. Critically triage each study into Keep, Maybe, or Not for us.' },
+  { num: '04', title: 'Follow the Trail', desc: 'Analyze backward citation trees and bibliographic references to hunt down the landmark paper.' },
+  { num: '05', title: 'Case File #1', desc: 'Synthesize your evidence, document surprising insights, and lock your team’s permanent Case File.' },
+];
+
+const session2Steps = [
+  { num: '00', title: 'Back to Yacine', desc: 'Re-read the story and revisit your team’s 2 homework questions from Case File #1.' },
+  { num: '01', title: 'Pass 1: Map the Paper', desc: 'Locate the 5 core parts of Perham & Currie (2014) and extract the four-part trick from the abstract.' },
+  { num: '02', title: 'Highlighter Hunt', desc: 'Read Method in yellow, Results in blue, and populate the interactive Word Jar with hard terms.' },
+  { num: '03', title: 'Predict, Then Check', desc: 'Rank the 4 situations (quiet, liked songs, disliked metal, instrumental), lock predictions, and discover the empirical surprise.' },
+  { num: '04', title: 'The Reading Card', desc: 'Fill the 8 standard scientific synthesis boxes for Perham & Currie and submit to your mentor.' },
+  { num: '05', title: 'Case File #2', desc: 'Answer homework questions, formulate your verdict for Yacine, note crucial limitations, and close the case.' },
 ];
 
 const sparkSchema = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
-  name: 'SPARK Session 1: The Music Case',
-  description: 'Interactive scientific research game where student teams investigate the cognitive effects of background music on studying through paper triage and citation tracing.',
+  name: 'SPARK: The Music Case',
+  description: 'Interactive scientific research game where student teams investigate the cognitive effects of background music on studying through paper triage, citation tracing, deep reading, and empirical predictions.',
   educationalLevel: 'Undergraduate / Preparatory',
   learningResourceType: 'Simulated Research Investigation',
   provider: {
@@ -29,27 +38,81 @@ const sparkSchema = {
 ---
 <BaseLayout
   title="The Music Case · SPARK"
-  description="SPARK 2026 Session 1: The Music Case. Student teams investigate whether music helps or hurts studying through real peer-reviewed papers."
+  description="SPARK 2026: The Music Case. Student teams investigate whether music helps or hurts studying through real peer-reviewed scientific papers."
   image="/og/spark.jpg"
   schemaExtra={[sparkSchema]}
 >
   <PageHeader
-    eyebrow="SPARK 2026 · Session 1"
+    eyebrow="SPARK 2026 · Scientific Investigation"
     title="The Music Case."
-    lead="Does listening to music while studying help or hurt? Your team investigates like real researchers across 6 interactive steps."
+    lead="Does listening to music while studying help or hurt? Your team investigates like real researchers across two interactive sessions."
   >
     <div class="hero-in mt-8 flex flex-wrap gap-4" style="--hd:.8s">
-      <a href="/spark/join" class="btn btn-primary">Join your team →</a>
+      <a href="/spark/session-2" class="btn btn-primary">Enter Session 2 (New!) →</a>
+      <a href="/spark/case" class="btn btn-secondary">Play Session 1 →</a>
       <a href="/events/spark-2026" class="btn btn-secondary">SPARK 2026 overview →</a>
     </div>
   </PageHeader>
 
-  <!-- Roadmap -->
+  <!-- Session Selector Banner -->
+  <section class="bg-paper text-ink py-16 sm:py-20 border-b border-navy/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+      <SectionHeader eyebrow="Choose Your Stage" title="Two sessions of empirical discovery." />
+      
+      <div class="mt-12 grid md:grid-cols-2 gap-8">
+        <!-- Session 1 Card -->
+        <article class="p-8 sm:p-10 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition flex flex-col justify-between">
+          <div>
+            <span class="font-mono text-xs uppercase tracking-wider text-muted font-semibold">Session 1 · Hour 1</span>
+            <h3 class="font-display text-2xl font-bold text-ink mt-2">Part 1: Find the Papers</h3>
+            <p class="mt-3 text-[15px] text-body leading-relaxed">
+              Explore the research question, build Boolean search queries, triage 8 peer-reviewed paper cards, and follow backward citations to find the landmark 2014 study.
+            </p>
+            <ul class="mt-6 space-y-2 text-[14px] text-body">
+              <li class="flex items-center gap-2">✓ Question Lab & 4-part breakdown</li>
+              <li class="flex items-center gap-2">✓ 8 Paper Cards triage (Keep / Maybe / Not for us)</li>
+              <li class="flex items-center gap-2">✓ The Citation Trail & Key paper discovery</li>
+            </ul>
+          </div>
+          <div class="mt-8 pt-6 border-t border-navy/10 flex items-center justify-between">
+            <span class="text-[13px] font-mono text-muted">Steps 00 – 05</span>
+            <a href="/spark/case" class="btn btn-sm btn-secondary btn-on-light">Open Session 1 →</a>
+          </div>
+        </article>
+
+        <!-- Session 2 Card -->
+        <article class="p-8 sm:p-10 bg-white border-2 border-blue/40 rounded-2xl shadow-md hover:border-blue transition flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-blue text-white text-[11px] font-mono uppercase tracking-wider font-bold py-1 px-3 rounded-bl-lg">
+            Current Session
+          </div>
+          <div>
+            <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Session 2 · Hour 2</span>
+            <h3 class="font-display text-2xl font-bold text-ink mt-2">Part 2: Open the Key Paper</h3>
+            <p class="mt-3 text-[15px] text-body leading-relaxed">
+              Open <em>Perham & Currie (2014)</em>, hunt for method and results with 3 highlighters, rank conditions, discover the empirical surprise, and synthesize Case File #2.
+            </p>
+            <ul class="mt-6 space-y-2 text-[14px] text-body">
+              <li class="flex items-center gap-2">✓ Paper Mapping & Four-Part Trick</li>
+              <li class="flex items-center gap-2">✓ Highlighter Hunt & Interactive Word Jar</li>
+              <li class="flex items-center gap-2">✓ Condition Ranking & Reality Comparison</li>
+              <li class="flex items-center gap-2">✓ 8-Box Reading Card & Verdict for Yacine</li>
+            </ul>
+          </div>
+          <div class="mt-8 pt-6 border-t border-navy/10 flex items-center justify-between">
+            <span class="text-[13px] font-mono text-blue font-semibold">Steps 00 – 05</span>
+            <a href="/spark/session-2" class="btn btn-sm btn-primary">Enter Session 2 →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Session 2 Step Breakdown -->
   <section class="bg-paper text-ink py-20 sm:py-28">
     <div class="max-w-[1240px] mx-auto px-6 md:px-12">
-      <SectionHeader eyebrow="The Investigation" title="Six steps from question to discovery." />
+      <SectionHeader eyebrow="Session 2 Roadmap" title="Six steps from opening the paper to the verdict." />
       <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {steps.map((s) => (
+        {session2Steps.map((s) => (
           <article class="p-8 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition">
             <span class="font-mono text-sm font-semibold text-blue">{s.num}</span>
             <h3 class="mt-4 font-display text-xl font-bold text-ink">{s.title}</h3>
@@ -59,7 +122,7 @@ const sparkSchema = {
       </div>
 
       <div class="mt-16 text-center">
-        <a href="/spark/join" class="btn btn-lg btn-primary inline-flex">Enter the Game →</a>
+        <a href="/spark/session-2" class="btn btn-lg btn-primary inline-flex">Launch Session 2 Game →</a>
       </div>
     </div>
   </section>
