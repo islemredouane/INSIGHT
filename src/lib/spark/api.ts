@@ -491,6 +491,9 @@ export const mentorS2ApproveCard = (
 export const mentorS2Export = (token: string) =>
   rpc<Record<string, unknown>[]>('spark_mentor_s2_export', { p_token: token });
 
+export const adminS2Reset = (token: string) =>
+  rpc<void>('spark_admin_s2_reset', { p_token: token });
+
 export function watchSession2State(onChange: (s: Session2RoomState) => void): () => void {
   let stopped = false;
   const poll = async () => {

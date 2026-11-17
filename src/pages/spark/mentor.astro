@@ -88,6 +88,9 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
 
               <div class="flex flex-wrap items-center gap-2">
                 <button type="button" id="s2-unlock-next" class="btn btn-sm btn-primary">Unlock next step →</button>
+                <button type="button" id="s2-admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light text-signal border-signal/40 hover:bg-signal/5">
+                  Reset Session 2 (Admin)
+                </button>
               </div>
 
               <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
@@ -376,7 +379,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     mentorSetStep, mentorRevealMission, mentorNotes, mentorExport,
     mentorS2Overview, mentorS2SetStep, mentorS2SetReveal, mentorS2ApproveCard,
     mentorS2Export, mentorSession2Key,
-    adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError, escapeHtml,
+    adminReset, adminS2Reset, getStoredMentor, storeMentor, clearMentor, friendlyError, escapeHtml,
     type MentorOverview, type MentorSession, type MentorQuestionItem,
     type MentorS2Overview, type MentorS2TeamRow, type Session2AnswerKey,
   } from '../../lib/spark/api';
@@ -556,6 +559,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
 
     if (mentor.role === 'admin') {
       document.getElementById('admin-reset')?.classList.remove('hidden');
+      document.getElementById('s2-admin-reset')?.classList.remove('hidden');
     }
 
     await refreshAll();
@@ -1053,6 +1057,18 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     try {
       await mentorS2SetReveal(mentor.token, -1, false);
       await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s2-admin-reset')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    if (!confirm('ADMIN RESET (Session 2): Clear all teams\' Session 2 answers, lock Session 2 back to Step 0, and hide all answer keys?\n\n(Registered teams & Session 1 data are kept intact.)')) return;
+    try {
+      await adminS2Reset(mentor.token);
+      await refreshAll();
+      alert('Session 2 reset cleanly to Step 0.');
     } catch (e) {
       alert(friendlyError(e));
     }
