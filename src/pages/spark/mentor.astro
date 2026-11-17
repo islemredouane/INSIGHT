@@ -352,17 +352,17 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
 
   <!-- Session 2 Team Inspect Modal -->
   <div id="s2-inspect-modal" class="hidden fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
+    <div class="bg-white text-ink rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
       <div class="px-6 py-4 bg-ink text-white flex items-center justify-between gap-4">
         <div>
-          <h3 id="s2-inspect-title" class="font-display font-bold text-lg">Team Details</h3>
+          <h3 id="s2-inspect-title" class="font-display font-bold text-lg text-white">Team Details</h3>
           <p id="s2-inspect-subtitle" class="text-[12px] text-silver/80 font-mono mt-0.5"></p>
         </div>
         <button type="button" id="s2-inspect-close" class="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-sm font-semibold">
           Close ✕
         </button>
       </div>
-      <div id="s2-inspect-body" class="p-6 overflow-y-auto space-y-5 text-[13px]"></div>
+      <div id="s2-inspect-body" class="p-6 overflow-y-auto space-y-5 text-[14px] text-ink"></div>
     </div>
   </div>
 </BaseLayout>
