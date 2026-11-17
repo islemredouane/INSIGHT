@@ -142,8 +142,11 @@ import Icon from '../../components/ui/Icon.astro';
       if (!team) throw new Error("That code doesn't match a team. Check it and try again.");
       storeTeamCode(code);
       const params = new URLSearchParams(location.search);
-      const next = params.get('next') || (params.get('session') === '1' ? '/spark/case' : '/spark/session-2');
-      location.href = next;
+      const rawNext = params.get('next') || '';
+      const safeNext = rawNext.startsWith('/') && !rawNext.startsWith('//')
+        ? rawNext
+        : (params.get('session') === '1' ? '/spark/case' : '/spark/session-2');
+      location.href = safeNext;
     } catch (err) {
       codeError.textContent = friendlyError(err);
       codeError.classList.remove('hidden');
@@ -152,9 +155,18 @@ import Icon from '../../components/ui/Icon.astro';
     }
   });
 
-  document.getElementById('copy-code')?.addEventListener('click', async () => {
+  document.getElementById('copy-code')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const label = btn.querySelector('span');
     const code = document.getElementById('revealed-code')!.textContent || '';
-    try { await navigator.clipboard.writeText(code); } catch {}
+    try {
+      await navigator.clipboard.writeText(code);
+      if (label) {
+        const prev = label.textContent;
+        label.textContent = '✓ Copied!';
+        setTimeout(() => { label.textContent = prev; }, 2000);
+      }
+    } catch {}
   });
 </script>
 

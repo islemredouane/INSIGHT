@@ -136,7 +136,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   import {
     mentorLogin, mentorOverview, mentorQuestions, mentorApproveStep1,
     mentorSetStep, mentorRevealMission, mentorNotes, mentorExport,
-    adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError,
+    adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError, escapeHtml,
     type MentorOverview, type MentorSession, type MentorQuestionItem,
   } from '../../lib/spark/api';
 
@@ -207,7 +207,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     const notes = await mentorNotes(mentor.token).catch(() => []);
     const list = document.getElementById('notes-list')!;
     list.innerHTML = notes
-      .map((n) => `<li class="border-b border-navy/5 pb-1"><strong class="text-blue">${n.card}</strong> — <span class="font-semibold text-ink">${n.fit}</span>: <span class="text-muted">${n.why}</span></li>`)
+      .map((n) => `<li class="border-b border-navy/5 pb-1"><strong class="text-blue">${escapeHtml(n.card)}</strong> — <span class="font-semibold text-ink">${escapeHtml(n.fit)}</span>: <span class="text-muted">${escapeHtml(n.why)}</span></li>`)
       .join('');
   }
 
@@ -248,22 +248,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           qStatusBadge = '<span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold text-[11px]">⏳ Pending</span>';
         }
 
+        const safeId = encodeURIComponent(t.id);
         return `
           <tr class="hover:bg-paper/70 transition-colors">
             <td class="p-3.5 font-semibold text-ink">
-              <a href="/spark/mentor/team?id=${t.id}" class="hover:text-blue hover:underline">
-                ${t.name} <span class="text-muted font-mono text-[11px] block font-normal">${t.code}</span>
+              <a href="/spark/mentor/team?id=${safeId}" class="hover:text-blue hover:underline">
+                ${escapeHtml(t.name)} <span class="text-muted font-mono text-[11px] block font-normal">${escapeHtml(t.code)}</span>
               </a>
             </td>
-            <td class="p-3.5 text-body">${t.members.join(', ')}</td>
-            <td class="p-3.5 text-muted">${t.assigned_mentor || '<span class="text-muted/60">—</span>'}</td>
+            <td class="p-3.5 text-body">${escapeHtml(t.members.join(', '))}</td>
+            <td class="p-3.5 text-muted">${t.assigned_mentor ? escapeHtml(t.assigned_mentor) : '<span class="text-muted/60">—</span>'}</td>
             <td class="p-3.5">${qStatusBadge}</td>
-            <td class="p-3.5 font-mono">${t.cards_sorted} / 8</td>
+            <td class="p-3.5 font-mono">${Number(t.cards_sorted) || 0} / 8</td>
             <td class="p-3.5">${t.key_paper_found ? '<span class="text-emerald-600 font-bold">Yes ★</span>' : '<span class="text-muted">—</span>'}</td>
-            <td class="p-3.5 font-mono">${t.hints_opened}</td>
-            <td class="p-3.5 text-muted text-[12px]">${new Date(t.last_activity).toLocaleTimeString()}</td>
+            <td class="p-3.5 font-mono">${Number(t.hints_opened) || 0}</td>
+            <td class="p-3.5 text-muted text-[12px]">${escapeHtml(new Date(t.last_activity).toLocaleTimeString())}</td>
             <td class="p-3.5 text-right">
-              <a href="/spark/mentor/team?id=${t.id}" class="btn btn-sm btn-secondary btn-on-light !py-1 !px-2.5 !text-[12px]">
+              <a href="/spark/mentor/team?id=${safeId}" class="btn btn-sm btn-secondary btn-on-light !py-1 !px-2.5 !text-[12px]">
                 Details →
               </a>
             </td>
@@ -302,39 +303,40 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
         let badge = '<span class="text-muted bg-navy/5 px-2.5 py-1 rounded text-[12px]">Draft</span>';
         if (isApproved) {
-          badge = `<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded text-[12px] flex items-center gap-1">✓ Approved ${q.approved_by ? `by ${q.approved_by}` : ''}</span>`;
+          badge = `<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded text-[12px] flex items-center gap-1">✓ Approved ${q.approved_by ? `by ${escapeHtml(q.approved_by)}` : ''}</span>`;
         } else if (isPending) {
           badge = '<span class="bg-amber-100 text-amber-900 font-semibold px-2.5 py-1 rounded text-[12px] animate-pulse">⏳ Pending Review</span>';
         }
 
+        const safeTeamId = encodeURIComponent(q.team_id);
         return `
-          <div class="bg-white border ${isPending ? 'border-amber-300 ring-1 ring-amber-200' : 'border-navy/10'} rounded-lg p-5 shadow-sm space-y-4" data-team-id="${q.team_id}">
+          <div class="bg-white border ${isPending ? 'border-amber-300 ring-1 ring-amber-200' : 'border-navy/10'} rounded-lg p-5 shadow-sm space-y-4" data-team-id="${escapeHtml(q.team_id)}">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-navy/10 pb-3">
               <div>
-                <a href="/spark/mentor/team?id=${q.team_id}" class="font-display font-bold text-lg text-ink hover:text-blue hover:underline">
-                  ${q.team_name}
+                <a href="/spark/mentor/team?id=${safeTeamId}" class="font-display font-bold text-lg text-ink hover:text-blue hover:underline">
+                  ${escapeHtml(q.team_name)}
                 </a>
-                <span class="text-muted font-mono text-[12px] ml-2">${q.team_code}</span>
-                <span class="text-muted text-[13px] block sm:inline sm:ml-3">(${q.members.join(', ')})</span>
+                <span class="text-muted font-mono text-[12px] ml-2">${escapeHtml(q.team_code)}</span>
+                <span class="text-muted text-[13px] block sm:inline sm:ml-3">(${escapeHtml(q.members.join(', '))})</span>
               </div>
               <div class="flex items-center gap-2">
                 ${badge}
-                <a href="/spark/mentor/team?id=${q.team_id}" class="text-[12px] text-blue hover:underline ml-2">Team page →</a>
+                <a href="/spark/mentor/team?id=${safeTeamId}" class="text-[12px] text-blue hover:underline ml-2">Team page →</a>
               </div>
             </div>
 
             <!-- Question text -->
             <div>
               <p class="font-mono text-[11px] uppercase tracking-wider text-muted">Research question</p>
-              <p class="text-[16px] font-medium text-ink mt-1 font-serif">${q.question_text || '<span class="text-muted italic">Not written yet</span>'}</p>
+              <p class="text-[16px] font-medium text-ink mt-1 font-serif">${q.question_text ? escapeHtml(q.question_text) : '<span class="text-muted italic">Not written yet</span>'}</p>
             </div>
 
             <!-- 4 breakdown fields -->
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[13px] bg-paper p-3 rounded border border-navy/10">
-              <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${q.who || '—'}</span></div>
-              <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${q.what || '—'}</span></div>
-              <div><span class="font-semibold text-ink">Compared to:</span> <span class="text-body">${q.compared_to || '—'}</span></div>
-              <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${q.measured_how || '—'}</span></div>
+              <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${q.who ? escapeHtml(q.who) : '—'}</span></div>
+              <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${q.what ? escapeHtml(q.what) : '—'}</span></div>
+              <div><span class="font-semibold text-ink">Compared to:</span> <span class="text-body">${q.compared_to ? escapeHtml(q.compared_to) : '—'}</span></div>
+              <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${q.measured_how ? escapeHtml(q.measured_how) : '—'}</span></div>
             </div>
 
             <!-- Action bar -->
@@ -355,7 +357,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               isApproved && q.mentor_comment
                 ? `
               <p class="text-[12px] text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded border border-emerald-200">
-                <strong>Mentor note:</strong> "${q.mentor_comment}"
+                <strong>Mentor note:</strong> "${escapeHtml(q.mentor_comment)}"
               </p>
             `
                 : ''

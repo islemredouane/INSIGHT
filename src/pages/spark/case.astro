@@ -291,7 +291,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   import {
     getStoredTeamCode, getTeam, saveStep1Draft, submitStep1, saveStep2, chooseCard,
     getTrail, openHint, checkTrail, saveStep5, getPaperSignedUrl,
-    watchSessionState, watchTeamStep1, friendlyError,
+    watchSessionState, watchTeamStep1, friendlyError, escapeHtml,
     type TeamCaseFile, type SessionState, type Step1Answers,
   } from '../../lib/spark/api';
   import { sparkCardById } from '../../data/spark';
@@ -852,8 +852,8 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
           <p class="font-mono text-[11px] uppercase tracking-wider text-muted">Your research question</p>
           ${qBadge}
         </div>
-        <p class="text-[15px] font-medium text-ink">${s1?.question_text || '—'}</p>
-        ${s1?.mentor_comment ? `<p class="text-[12px] text-emerald-700 mt-1">Mentor note: "${s1.mentor_comment}"</p>` : ''}
+        <p class="text-[15px] font-medium text-ink">${s1?.question_text ? escapeHtml(s1.question_text) : '—'}</p>
+        ${s1?.mentor_comment ? `<p class="text-[12px] text-emerald-700 mt-1">Mentor note: "${escapeHtml(s1.mentor_comment)}"</p>` : ''}
       </div>
     `);
 
@@ -861,7 +861,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     parts.push(`
       <div class="border-b border-navy/10 pb-4">
         <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Official mission question</p>
-        <p class="text-[15px] text-ink font-serif italic">${sparkMissionQuestion}</p>
+        <p class="text-[15px] text-ink font-serif italic">${escapeHtml(sparkMissionQuestion)}</p>
       </div>
     `);
 
@@ -870,10 +870,10 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       <div class="border-b border-navy/10 pb-4">
         <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-2">Question breakdown</p>
         <div class="grid grid-cols-2 gap-2 text-[13px] bg-paper p-3 rounded border border-navy/10">
-          <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${s1?.who || '—'}</span></div>
-          <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${s1?.what || '—'}</span></div>
-          <div><span class="font-semibold text-ink">Compared to:</span> <span class="text-body">${s1?.compared_to || '—'}</span></div>
-          <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${s1?.measured_how || '—'}</span></div>
+          <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${s1?.who ? escapeHtml(s1.who) : '—'}</span></div>
+          <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${s1?.what ? escapeHtml(s1.what) : '—'}</span></div>
+          <div><span class="font-semibold text-ink">Compared to:</span> <span class="text-body">${s1?.compared_to ? escapeHtml(s1.compared_to) : '—'}</span></div>
+          <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${s1?.measured_how ? escapeHtml(s1.measured_how) : '—'}</span></div>
         </div>
       </div>
     `);
@@ -883,7 +883,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       parts.push(`
         <div class="border-b border-navy/10 pb-4">
           <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Your Google Scholar search</p>
-          <code class="font-mono text-[13px] bg-paper px-2 py-1 rounded text-ink block sm:inline-block">${caseFile.step2.search_line}</code>
+          <code class="font-mono text-[13px] bg-paper px-2 py-1 rounded text-ink block sm:inline-block">${escapeHtml(caseFile.step2.search_line)}</code>
         </div>
       `);
     }
@@ -897,7 +897,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
     const renderCardList = (list: [string, { choice: string; reason: string }][]) => {
       if (!list.length) return '<p class="text-[12px] text-muted italic">None</p>';
       return `<ul class="space-y-1 text-[13px] pl-3 list-disc">${list
-        .map(([id, v]) => `<li><strong>${sparkCardById[id as keyof typeof sparkCardById]?.title || id}</strong><br><span class="text-muted text-[12px]">Reason: ${v.reason}</span></li>`)
+        .map(([id, v]) => `<li><strong>${escapeHtml(sparkCardById[id as keyof typeof sparkCardById]?.title || id)}</strong><br><span class="text-muted text-[12px]">Reason: ${escapeHtml(v.reason)}</span></li>`)
         .join('')}</ul>`;
     };
 
@@ -926,8 +926,8 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       parts.push(`
         <div class="border-b border-navy/10 pb-4">
           <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">Key paper discovered</p>
-          <p class="text-[14px] font-semibold text-blue">${caseFile.key_card.title} (${caseFile.key_card.year})</p>
-          <p class="text-[13px] text-body mt-0.5">${caseFile.key_card.authors} · ${caseFile.key_card.journal}</p>
+          <p class="text-[14px] font-semibold text-blue">${escapeHtml(caseFile.key_card.title)} (${escapeHtml(caseFile.key_card.year)})</p>
+          <p class="text-[13px] text-body mt-0.5">${escapeHtml(caseFile.key_card.authors)} · ${escapeHtml(caseFile.key_card.journal)}</p>
         </div>
       `);
     }
@@ -938,7 +938,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
       parts.push(`
         <div>
           <p class="font-mono text-[11px] uppercase tracking-wider text-muted mb-1">What surprised us today</p>
-          <p class="text-[14px] text-body italic">"${surprised}"</p>
+          <p class="text-[14px] text-body italic">"${escapeHtml(surprised)}"</p>
         </div>
       `);
     }
@@ -975,7 +975,7 @@ const steps = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
         if (view === 4) loadTrail();
       });
     } catch (e) {
-      waitingEl.innerHTML = `<p class="text-signal">${friendlyError(e)}</p>`;
+      waitingEl.innerHTML = `<p class="text-signal">${escapeHtml(friendlyError(e))}</p>`;
     }
   }
 

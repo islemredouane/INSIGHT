@@ -344,8 +344,53 @@ export const mentorRevealMission = (token: string, revealed: boolean) =>
 export const mentorCaseFile = (token: string, teamId: string) =>
   rpc<TeamCaseFile>('spark_mentor_case_file', { p_token: token, p_team_id: teamId });
 
+export interface Session2AnswerKey {
+  step0: {
+    sampleHomeworkQuestions: string[];
+  };
+  step1: {
+    pageMap: { name: string; expected: string }[];
+    fourPartTrick: { label: string; expected: string; where: string }[];
+    mentorTip: string;
+  };
+  step2: {
+    yellowFacts: string[];
+    blueFacts: string[];
+    commonMistake: string;
+    essentialTerms: { term: string; definition: string }[];
+    wordJar: { term: string; pageHint: string; definition: string }[];
+  };
+  step3: {
+    ranking: { rank: string; icon: string; title: string; note: string; tone: 'good' | 'bad' }[];
+    surprises: { title: string; body: string; tone: 'amber' | 'emerald' }[];
+    table1: {
+      distracting: { disliked: string; liked: string; noLyrics: string; quiet: string };
+      perceived: { disliked: string; liked: string; noLyrics: string; quiet: string };
+      bonusAnswer: string;
+    };
+  };
+  step4: {
+    boxes: { title: string; answer: string }[];
+    approvalRule: string;
+  };
+  step5: {
+    typicalHomeworkAnswers: { q: string; a: string }[];
+    modelVerdict: string;
+    acceptedLimits: string[];
+    bonusChallenge: {
+      title: string;
+      prompt: string;
+      answer: string;
+      detectiveExtra: string;
+    };
+  };
+}
+
 export const mentorNotes = (token: string) =>
   rpc<{ card: string; fit: string; why: string }[]>('spark_mentor_notes', { p_token: token });
+
+export const mentorSession2Key = (token: string) =>
+  rpc<Session2AnswerKey>('spark_session2_answer_key', { p_token: token });
 
 export const mentorExport = (token: string) =>
   rpc<Record<string, unknown>[]>('spark_mentor_export', { p_token: token });
@@ -435,3 +480,13 @@ export function watchTeamStep1(
 /** Friendly text for RPC errors (they already carry plain-English messages from the database). */
 export const friendlyError = (e: unknown) =>
   e instanceof Error ? e.message : 'Something went wrong. Try again.';
+
+/** Escape untrusted text before interpolating into HTML strings (prevents Stored XSS). */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}

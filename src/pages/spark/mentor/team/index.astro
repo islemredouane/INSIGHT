@@ -289,7 +289,7 @@ import Icon from '../../../../components/ui/Icon.astro';
 <script>
   import {
     getStoredMentor, mentorTeamDetail, mentorApproveStep1, mentorAssignTeam,
-    getPaperSignedUrl, friendlyError, type MentorTeamDetail, type MentorSession,
+    getPaperSignedUrl, friendlyError, escapeHtml, type MentorTeamDetail, type MentorSession,
   } from '../../../../lib/spark/api';
 
   const mentor: MentorSession | null = getStoredMentor();
@@ -373,8 +373,8 @@ import Icon from '../../../../components/ui/Icon.astro';
         s1Pill.className = 'status-pill status-approved';
         s1Review.innerHTML = `
           <div class="p-3 bg-emerald-50 border border-emerald-200 rounded text-[13px] text-emerald-900">
-            <p class="font-semibold">✓ Approved by ${step1.approved_by || 'Mentor'}${step1.approved_at ? ` at ${new Date(step1.approved_at).toLocaleTimeString()}` : ''}</p>
-            ${step1.mentor_comment ? `<p class="mt-1 text-emerald-800">Comment: "${step1.mentor_comment}"</p>` : ''}
+            <p class="font-semibold">✓ Approved by ${escapeHtml(step1.approved_by || 'Mentor')}${step1.approved_at ? ` at ${escapeHtml(new Date(step1.approved_at).toLocaleTimeString())}` : ''}</p>
+            ${step1.mentor_comment ? `<p class="mt-1 text-emerald-800">Comment: "${escapeHtml(step1.mentor_comment)}"</p>` : ''}
           </div>
         `;
       } else if (step1.status === 'pending') {
@@ -461,20 +461,20 @@ import Icon from '../../../../components/ui/Icon.astro';
           return `
             <tr class="hover:bg-paper/50">
               <td class="p-3 font-medium text-ink max-w-[220px]">
-                <strong class="text-blue font-mono mr-1">${c.card_id}</strong>
-                ${c.title}
-                <span class="block text-[11px] text-muted font-normal">${c.authors} (${c.year})</span>
+                <strong class="text-blue font-mono mr-1">${escapeHtml(c.card_id)}</strong>
+                ${escapeHtml(c.title)}
+                <span class="block text-[11px] text-muted font-normal">${escapeHtml(c.authors)} (${escapeHtml(c.year)})</span>
               </td>
               <td class="p-3">${choiceBadge}</td>
-              <td class="p-3 text-body max-w-[200px] text-[12px]">${c.team_reason || '<span class="text-muted">—</span>'}</td>
+              <td class="p-3 text-body max-w-[200px] text-[12px]">${c.team_reason ? escapeHtml(c.team_reason) : '<span class="text-muted">—</span>'}</td>
               <td class="p-3 text-[12px]">
-                <strong class="font-semibold text-ink">${c.expected_choice}</strong>
-                <span class="block text-[11px] text-muted">${c.note_why}</span>
+                <strong class="font-semibold text-ink">${escapeHtml(c.expected_choice)}</strong>
+                <span class="block text-[11px] text-muted">${escapeHtml(c.note_why)}</span>
               </td>
               <td class="p-3">${matchBadge}</td>
               <td class="p-3">${viewsBadge}</td>
               <td class="p-3 text-right print:hidden">
-                <button type="button" class="btn btn-sm btn-secondary btn-on-light !py-1 !px-2 !text-[11px] preview-pdf-btn" data-card="${c.card_id}">
+                <button type="button" class="btn btn-sm btn-secondary btn-on-light !py-1 !px-2 !text-[11px] preview-pdf-btn" data-card="${escapeHtml(c.card_id)}">
                   PDF ↗
                 </button>
               </td>
@@ -533,8 +533,8 @@ import Icon from '../../../../components/ui/Icon.astro';
         attemptsBox.innerHTML = step4.attempts
           .map((a) => `
             <div class="flex items-center justify-between p-2 rounded ${a.ok ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-paper text-body border border-navy/10'}">
-              <span>${a.ok ? '★ ' : '✗ '}${a.title}</span>
-              <span class="text-muted font-mono text-[11px]">${new Date(a.at).toLocaleTimeString()}</span>
+              <span>${a.ok ? '★ ' : '✗ '}${escapeHtml(a.title)}</span>
+              <span class="text-muted font-mono text-[11px]">${escapeHtml(new Date(a.at).toLocaleTimeString())}</span>
             </div>
           `)
           .join('');

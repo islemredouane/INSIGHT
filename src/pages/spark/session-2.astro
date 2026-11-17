@@ -3,8 +3,7 @@
 // Open the key paper · Perham & Currie (2014) · Evidence-based reading & prediction.
 // No red ✗, no blocking states, responsive and designed to the INSIGHT design system.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/ui/Icon.astro';
-import { sparkSession2, sparkStory } from '../../data/spark';
+import { sparkSession2 } from '../../data/spark';
 
 const steps = [
   '00 · Yacine & Homework',
@@ -33,11 +32,13 @@ const steps = [
         </div>
       </div>
       <div class="flex items-center gap-3 text-[13px]">
-        <!-- Mentor Reveal Controls -->
+        <!-- Mentor Reveal Controls (Password-Protected) -->
         <div class="relative">
           <button
             type="button"
             id="mentor-controls-toggle"
+            aria-expanded="false"
+            aria-controls="mentor-controls-menu"
             class="px-2.5 py-1 text-[11px] font-mono font-semibold rounded bg-white/10 hover:bg-white/20 text-silver transition flex items-center gap-1.5 border border-white/15"
           >
             <span>👑 Mentor Reveal:</span>
@@ -45,18 +46,95 @@ const steps = [
           </button>
           <div
             id="mentor-controls-menu"
-            class="hidden absolute right-0 mt-2 w-56 bg-white text-ink border border-navy/10 rounded-lg shadow-xl p-3 z-30 space-y-2 text-left"
+            class="hidden absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white text-ink border border-navy/10 rounded-xl shadow-2xl p-4 z-30 space-y-3 text-left"
           >
-            <p class="font-mono text-[10px] uppercase text-muted tracking-wider">Room Reveal Controls</p>
-            <button type="button" id="btn-reveal-next" class="btn btn-sm btn-primary w-full text-left justify-start">
-              🔓 Unlock Next Step
-            </button>
-            <button type="button" id="btn-reveal-all" class="btn btn-sm btn-secondary w-full text-left justify-start btn-on-light">
-              ⚡ Unlock All Steps
-            </button>
-            <button type="button" id="btn-lock-all" class="btn btn-sm btn-secondary w-full text-left justify-start text-signal border-signal/20 hover:bg-signal/5">
-              🔒 Reset Locks (Step 0)
-            </button>
+            <!-- Mentor Auth Gate (visible when not logged in as mentor) -->
+            <form id="mentor-inline-login" class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <p class="font-mono text-[10px] uppercase text-blue font-bold tracking-wider">👑 Mentor Only</p>
+                <span class="text-[10px] font-mono text-muted">Password required</span>
+              </div>
+              <p class="text-[12px] text-body leading-snug">
+                Sign in with the SPARK mentor password to unlock steps and reveal answer keys after teams finish.
+              </p>
+              <input
+                id="mentor-inline-password"
+                type="password"
+                class="field !mt-0 !h-9 !py-1 !text-[13px]"
+                placeholder="Mentor password…"
+                autocomplete="current-password"
+                required
+              />
+              <p id="mentor-inline-error" class="hidden text-[12px] text-signal font-medium"></p>
+              <button type="submit" id="mentor-inline-submit" class="btn btn-sm btn-primary w-full justify-center">
+                Unlock Mentor Controls
+              </button>
+            </form>
+
+            <!-- Mentor Controls (visible ONLY once authenticated as mentor) -->
+            <div id="mentor-controls-authed" class="hidden space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-navy/10">
+                <span id="mentor-authed-badge" class="font-mono text-[10px] uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
+                  ✓ Mentor Active
+                </span>
+                <button type="button" id="btn-mentor-logout" class="text-[11px] text-muted hover:text-ink underline">
+                  Lock controls
+                </button>
+              </div>
+
+              <!-- Step Locks -->
+              <div class="space-y-1.5">
+                <p class="font-mono text-[10px] uppercase text-muted tracking-wider">1. Room Step Access</p>
+                <button type="button" id="btn-reveal-next" class="btn btn-sm btn-primary w-full text-left justify-start">
+                  🔓 Unlock Next Step
+                </button>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button type="button" id="btn-reveal-all" class="btn btn-sm btn-secondary w-full justify-center btn-on-light !px-2 !text-[11px]">
+                    ⚡ Unlock All
+                  </button>
+                  <button type="button" id="btn-lock-all" class="btn btn-sm btn-secondary w-full justify-center text-signal border-signal/20 hover:bg-signal/5 !px-2 !text-[11px]">
+                    🔒 Reset (0)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Answer Key & Examples Reveals -->
+              <div class="pt-2 border-t border-navy/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <p class="font-mono text-[10px] uppercase text-muted tracking-wider">2. Reveal Examples / Keys</p>
+                  <button type="button" id="btn-reveal-current-answers" class="text-[11px] font-semibold text-blue hover:underline">
+                    Reveal current
+                  </button>
+                </div>
+                <div class="space-y-1 text-[12px]">
+                  {[
+                    { step: 0, label: 'Step 0 · Sample HW Ideas' },
+                    { step: 1, label: 'Step 1 · Map & 4-Part Trick' },
+                    { step: 2, label: 'Step 2 · Facts & Word Jar' },
+                    { step: 3, label: 'Step 3 · Real Results & Table 1' },
+                    { step: 4, label: 'Step 4 · Reading Card & Approve' },
+                    { step: 5, label: 'Step 5 · Case File #2 & Bonus' },
+                  ].map((item) => (
+                    <label class="flex items-center justify-between gap-2 px-2 py-1.5 rounded hover:bg-paper cursor-pointer">
+                      <span class="text-ink font-medium">{item.label}</span>
+                      <input
+                        type="checkbox"
+                        class="mentor-reveal-toggle accent-blue w-4 h-4 cursor-pointer"
+                        data-reveal-step={item.step}
+                      />
+                    </label>
+                  ))}
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 pt-1">
+                  <button type="button" id="btn-reveal-all-answers" class="btn btn-sm btn-secondary btn-on-light w-full justify-center !px-2 !text-[11px]">
+                    👁️ Reveal All
+                  </button>
+                  <button type="button" id="btn-hide-all-answers" class="btn btn-sm btn-secondary btn-on-light w-full justify-center !px-2 !text-[11px]">
+                    🙈 Hide All
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -65,7 +143,7 @@ const steps = [
           <span>← Session 1</span>
         </a>
         <span class="text-white/20">|</span>
-        <a href="/spark/join" id="switch-link" class="text-silver/70 hover:text-white transition-colors">
+        <a href="/spark/join?next=/spark/session-2" id="switch-link" class="text-silver/70 hover:text-white transition-colors">
           Switch team
         </a>
       </div>
@@ -132,7 +210,7 @@ const steps = [
               <input
                 id="inline-team-code"
                 type="text"
-                class="field !h-9 !w-32 uppercase text-center font-mono tracking-widest text-[14px] !py-0"
+                class="field !mt-0 !h-9 !w-32 uppercase text-center font-mono tracking-widest text-[14px] !py-0"
                 maxlength="6"
                 placeholder="K7P2QX"
               />
@@ -217,7 +295,7 @@ const steps = [
                 id="hw-q1"
                 class="field mt-1"
                 maxlength="200"
-                placeholder="e.g. Did they test songs people actually like, or music they hate?"
+                placeholder="Write your team's first question for the paper…"
               />
             </div>
             <div>
@@ -226,25 +304,18 @@ const steps = [
                 id="hw-q2"
                 class="field mt-1"
                 maxlength="200"
-                placeholder="e.g. Was it real study material, like reading textbooks or taking tests?"
+                placeholder="Write your team's second question for the paper…"
               />
             </div>
           </div>
 
-          <!-- Quick suggestion chips -->
+          <!-- Mentor Reveal: Sample Homework Ideas (Hidden until mentor reveals Step 0) -->
           <div class="mt-4 pt-4 border-t border-navy/10">
-            <p class="text-[11px] font-mono uppercase text-muted tracking-wider">Need ideas? Click to use one:</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-              {sparkSession2.sampleHomeworkQuestions.map((q) => (
-                <button
-                  type="button"
-                  class="hw-chip text-[12px] bg-paper hover:bg-blue/10 text-body hover:text-blue border border-navy/10 px-3 py-1.5 rounded transition text-left"
-                  data-suggestion={q}
-                >
-                  + {q}
-                </button>
-              ))}
+            <div data-mentor-locked="0" class="flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
+              <span>🔒</span>
+              <span>Write your own 2 questions first. Sample question ideas can be unlocked by your mentor if needed.</span>
             </div>
+            <div id="mentor-reveal-0" data-mentor-reveal="0" class="hidden p-4 bg-blue/5 border border-blue/25 rounded-lg"></div>
           </div>
         </div>
 
@@ -326,17 +397,17 @@ const steps = [
                   <p class="font-semibold text-ink text-[14px]">{part.name}</p>
                   <p class="text-[12px] text-muted leading-tight mt-0.5">{part.description}</p>
                 </div>
-                <div class="flex items-center gap-2 sm:w-48 shrink-0">
+                <div class="flex items-center gap-2 sm:min-w-[240px] sm:justify-end shrink-0 flex-wrap">
                   <span class="text-[12px] font-mono text-muted">Page #:</span>
                   <input
                     type="number"
                     min="1"
                     max="300"
-                    class="field !w-20 text-center font-mono page-part-input"
+                    class="field !mt-0 !w-20 !h-10 !py-1 text-center font-mono page-part-input"
                     data-part={part.id}
                     placeholder="—"
                   />
-                  <span class="page-feedback text-[12px] font-medium" data-feedback={part.id}></span>
+                  <span class="page-feedback text-[12px] font-medium whitespace-nowrap" data-feedback={part.id}></span>
                 </div>
               </div>
             ))}
@@ -369,7 +440,7 @@ const steps = [
               <div class="p-2">
                 <input
                   id="trick-who"
-                  class="field !border-0 focus:!ring-1"
+                  class="field !mt-0 !border-0 focus:!ring-1"
                   maxlength="150"
                   placeholder={sparkSession2.fourPartTrick.who.placeholder}
                 />
@@ -383,7 +454,7 @@ const steps = [
               <div class="p-2">
                 <input
                   id="trick-what"
-                  class="field !border-0 focus:!ring-1"
+                  class="field !mt-0 !border-0 focus:!ring-1"
                   maxlength="150"
                   placeholder={sparkSession2.fourPartTrick.what.placeholder}
                 />
@@ -397,7 +468,7 @@ const steps = [
               <div class="p-2">
                 <input
                   id="trick-compared"
-                  class="field !border-0 focus:!ring-1"
+                  class="field !mt-0 !border-0 focus:!ring-1"
                   maxlength="150"
                   placeholder={sparkSession2.fourPartTrick.comparedTo.placeholder}
                 />
@@ -411,7 +482,7 @@ const steps = [
               <div class="p-2">
                 <input
                   id="trick-measured"
-                  class="field !border-0 focus:!ring-1"
+                  class="field !mt-0 !border-0 focus:!ring-1"
                   maxlength="150"
                   placeholder={sparkSession2.fourPartTrick.measuredHow.placeholder}
                 />
@@ -419,21 +490,14 @@ const steps = [
             </div>
           </div>
 
-          <!-- Reveal Mentor Expected Answers Toggle -->
-          <details class="mt-4 text-[13px]">
-            <summary class="cursor-pointer text-blue font-semibold hover:underline">
-              Mentor's Guide: Expected Answers
-            </summary>
-            <div class="mt-3 p-4 bg-paper/70 border border-navy/10 rounded space-y-2 text-body">
-              <p><strong>Who:</strong> {sparkSession2.fourPartTrick.who.expected}</p>
-              <p><strong>What:</strong> {sparkSession2.fourPartTrick.what.expected}</p>
-              <p><strong>Compared to what:</strong> {sparkSession2.fourPartTrick.comparedTo.expected}</p>
-              <p><strong>Measured how:</strong> {sparkSession2.fourPartTrick.measuredHow.expected}</p>
-              <p class="text-[12px] text-muted italic mt-2">
-                Tip: If someone wrote “Measured how: their grades”, ask: Did they use real university grades, or SAT exam questions? Check Materials on page 2 / page 6!
-              </p>
+          <!-- Mentor Reveal: Step 1 Answer Key (Hidden until mentor reveals Step 1) -->
+          <div class="mt-5">
+            <div data-mentor-locked="1" class="flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
+              <span>🔒</span>
+              <span>Complete Tasks A &amp; B with your team first. Expected answers &amp; page map unlock when your mentor reveals Step 1.</span>
             </div>
-          </details>
+            <div id="mentor-reveal-1" data-mentor-reveal="1" class="hidden p-5 bg-blue/5 border border-blue/25 rounded-lg space-y-4 text-[13px]"></div>
+          </div>
         </div>
 
         <!-- Next Action -->
@@ -506,24 +570,19 @@ const steps = [
           <div class="mt-4 space-y-3">
             <div>
               <label for="yellow-1" class="field-label">Yellow Fact 1</label>
-              <input id="yellow-1" class="field mt-1" maxlength="250" placeholder="e.g. 30 university students in Wales, aged 19 to 65" />
+              <input id="yellow-1" class="field mt-1" maxlength="250" placeholder="Write a Method fact in your own words (participants, task, or setup)…" />
             </div>
             <div>
               <label for="yellow-2" class="field-label">Yellow Fact 2</label>
-              <input id="yellow-2" class="field mt-1" maxlength="250" placeholder="e.g. Every student did all 4 conditions (within-subject design)" />
+              <input id="yellow-2" class="field mt-1" maxlength="250" placeholder="Write a second Method fact in your own words…" />
             </div>
             <div>
               <label for="yellow-3" class="field-label">Yellow Fact 3</label>
-              <input id="yellow-3" class="field mt-1" maxlength="250" placeholder="e.g. Liked music was chosen by students; disliked music was Death Angel thrash metal" />
+              <input id="yellow-3" class="field mt-1" maxlength="250" placeholder="Write a third Method fact in your own words…" />
             </div>
           </div>
 
-          <details class="mt-3 text-[13px]">
-            <summary class="cursor-pointer text-blue font-medium hover:underline">Show accepted yellow facts</summary>
-            <ul class="mt-2 pl-4 list-disc space-y-1 text-muted">
-              {sparkSession2.highlighterGuide.yellow.acceptedFacts.map((f) => <li>{f}</li>)}
-            </ul>
-          </details>
+          <div id="mentor-reveal-2-yellow" data-mentor-reveal="2" class="hidden mt-4 p-4 bg-amber-50/70 border border-amber-200 rounded-lg text-[13px]"></div>
         </div>
 
         <!-- Blue Facts (Results) -->
@@ -542,20 +601,15 @@ const steps = [
           <div class="mt-4 space-y-3">
             <div>
               <label for="blue-1" class="field-label">Blue Fact 1</label>
-              <input id="blue-1" class="field mt-1" maxlength="250" placeholder="e.g. Quiet and music without lyrics had the highest reading scores (tied)" />
+              <input id="blue-1" class="field mt-1" maxlength="250" placeholder="Write one result the researchers found, in your own words…" />
             </div>
             <div>
               <label for="blue-2" class="field-label">Blue Fact 2</label>
-              <input id="blue-2" class="field mt-1" maxlength="250" placeholder="e.g. Songs with lyrics caused the worst scores, whether students liked them or hated them" />
+              <input id="blue-2" class="field mt-1" maxlength="250" placeholder="Write a second result they found, in your own words…" />
             </div>
           </div>
 
-          <details class="mt-3 text-[13px]">
-            <summary class="cursor-pointer text-blue font-medium hover:underline">Show accepted blue facts</summary>
-            <ul class="mt-2 pl-4 list-disc space-y-1 text-muted">
-              {sparkSession2.highlighterGuide.blue.acceptedFacts.map((f) => <li>{f}</li>)}
-            </ul>
-          </details>
+          <div id="mentor-reveal-2-blue" data-mentor-reveal="2" class="hidden mt-4 p-4 bg-blue/5 border border-blue/25 rounded-lg text-[13px]"></div>
         </div>
 
         <!-- Pink Words: The Interactive Word Jar -->
@@ -566,21 +620,21 @@ const steps = [
                 <span>🏺</span> The Word Jar (Pink Words)
               </h3>
               <p class="text-[13px] text-muted mt-0.5">
-                Add any scientific words you find confusing. Click any term to see its plain-English explanation!
+                Add any scientific words from the paper you find confusing. Your mentor will explain the most common terms at the end of Step 2!
               </p>
             </div>
             <span class="text-[12px] font-mono text-pink-700 bg-pink-50 border border-pink-200 px-2 py-0.5 rounded">
-              Interactive Glossary
+              Team Word Jar
             </span>
           </div>
 
           <!-- Add Word to Jar -->
-          <div class="mt-4 flex gap-2">
+          <div class="mt-4 flex gap-2 items-center">
             <input
               id="new-pink-word"
-              class="field"
+              class="field !mt-0 !h-11 !py-2"
               maxlength="60"
-              placeholder="Type an unfamiliar word (e.g. counterbalanced, ANOVA, effect size)…"
+              placeholder="Type an unfamiliar word you spotted in the paper…"
             />
             <button type="button" id="add-pink-btn" class="btn btn-sm btn-primary shrink-0">
               Add to Jar +
@@ -593,46 +647,18 @@ const steps = [
               Our Team's Added Words:
             </p>
             <div id="jar-words-list" class="mt-2 flex flex-wrap gap-2">
-              <!-- Dynamically populated or default terms -->
+              <!-- Dynamically populated by team -->
             </div>
           </div>
 
-          <!-- Mentor Spotlight: Top 2 Terms -->
-          <div class="mt-5 p-4 bg-ink text-white rounded-lg">
-            <p class="font-mono text-[11px] uppercase tracking-wider text-peri">Mentor Spotlight: The 2 Essential Terms</p>
-            <div class="mt-3 grid sm:grid-cols-2 gap-3 text-[13px]">
-              <div class="p-3 bg-white/5 border border-white/10 rounded">
-                <span class="font-bold text-peri font-mono">1. Within design</span>
-                <p class="mt-1 text-silver leading-relaxed">
-                  Every participant does all 4 conditions. Each person is compared with themself, so natural smartness or reading speed doesn't skew results.
-                </p>
-              </div>
-              <div class="p-3 bg-white/5 border border-white/10 rounded">
-                <span class="font-bold text-peri font-mono">2. Significant (p &lt; .05)</span>
-                <p class="mt-1 text-silver leading-relaxed">
-                  The difference is probably real and not just random luck (&lt;5% chance). It does <em>not</em> mean "large" (effect size tells you size).
-                </p>
-              </div>
-            </div>
+          <!-- Locked Banner before Mentor Reveal -->
+          <div data-mentor-locked="2" class="mt-5 flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
+            <span>🔒</span>
+            <span>Finish your Yellow facts, Blue facts, and Pink words first. Accepted facts &amp; Word Jar explanations unlock when your mentor reveals Step 2.</span>
           </div>
 
-          <!-- Expandable Paper Glossary -->
-          <details class="mt-4 text-[13px]">
-            <summary class="cursor-pointer text-blue font-semibold hover:underline">
-              Browse All 12 Curated Paper Terms & Hover Notes
-            </summary>
-            <div class="mt-3 grid sm:grid-cols-2 gap-2">
-              {sparkSession2.wordJar.map((w) => (
-                <div class="p-3 bg-paper border border-navy/10 rounded hover:border-blue/30 transition text-[13px]">
-                  <div class="flex items-center justify-between">
-                    <strong class="text-ink">{w.term}</strong>
-                    <span class="font-mono text-[10px] text-muted">{w.pageHint}</span>
-                  </div>
-                  <p class="mt-1 text-body text-[12px] leading-relaxed">{w.definition}</p>
-                </div>
-              ))}
-            </div>
-          </details>
+          <!-- Mentor Reveal: Top 2 Terms + Full Paper Glossary (hydrated from server) -->
+          <div id="mentor-reveal-2-jar" data-mentor-reveal="2" class="hidden mt-5 space-y-4"></div>
         </div>
 
         <!-- Next Action -->
@@ -714,15 +740,15 @@ const steps = [
           </div>
         </div>
 
-        <!-- Phase 2: Read Results Input (Shown after lock or toggle) -->
-        <div id="predict-phase-2" class="hidden mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
+        <!-- Phase 2: Read Results Input (Shown after lock) -->
+        <div id="predict-phase-2" class="hidden mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm space-y-5">
           <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-md text-[13px] flex items-center gap-2">
             <span>🔒</span>
             <span class="font-semibold">Prediction Locked!</span>
-            <span>Now open Results (page 3 / page 8) in the paper to check what really happened.</span>
+            <span>Now open Results (page 3 in easy copy / page 8 in full copy) to check what really happened.</span>
           </div>
 
-          <div class="mt-5">
+          <div>
             <label for="results-real-text" class="field-label">What did the paper really find?</label>
             <textarea
               id="results-real-text"
@@ -732,120 +758,38 @@ const steps = [
             ></textarea>
           </div>
 
-          <div class="mt-4 flex items-center justify-between">
+          <div>
+            <label for="results-bonus-text" class="field-label">Bonus for fast teams: Did students know which condition hurt them?</label>
+            <p class="text-[12px] text-muted mt-0.5">Check Table 1 (Students’ ratings out of 100) at the end of the paper.</p>
+            <textarea
+              id="results-bonus-text"
+              class="field mt-1.5"
+              rows="2"
+              placeholder="Write your team's answer based on Table 1…"
+            ></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
             <a href={sparkSession2.paper.pdfPath} target="_blank" rel="noopener" class="text-[13px] text-blue underline font-medium">
               📄 Check Results on Page 3 / Page 8 ↗
             </a>
-            <button type="button" id="reveal-comparison-btn" class="btn btn-primary">
-              Reveal the Science & Compare →
-            </button>
+            <div class="flex items-center gap-3">
+              <span id="s3-findings-status" class="text-[12px] font-medium text-emerald-700"></span>
+              <button type="button" id="save-results-btn" class="btn btn-primary">
+                Save Our Findings ✓
+              </button>
+            </div>
+          </div>
+
+          <!-- Locked Banner before Mentor Reveal -->
+          <div data-mentor-locked="3" class="flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
+            <span>🔒</span>
+            <span>Official results comparison, explanation &amp; Table 1 unlock once teams finish and your mentor reveals Step 3.</span>
           </div>
         </div>
 
-        <!-- Phase 3: Side-by-side Empirical Comparison (Revealed) -->
-        <div id="predict-phase-3" class="hidden mt-6 space-y-6">
-          <div class="bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
-            <h3 class="font-display text-xl font-bold text-ink">Prediction vs. Empirical Reality</h3>
-            <p class="text-[14px] text-body mt-1">Here is how your prediction matches what science measured:</p>
-
-            <div class="mt-6 grid sm:grid-cols-2 gap-4">
-              <!-- Team Prediction Display -->
-              <div class="p-4 bg-paper/60 border border-navy/10 rounded-lg">
-                <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-semibold">Your Locked Prediction</span>
-                <ol id="locked-prediction-list" class="mt-3 space-y-2 text-[14px]">
-                  <!-- Populated from JS -->
-                </ol>
-              </div>
-
-              <!-- Real Empirical Result Display -->
-              <div class="p-4 bg-blue/10 border border-blue/30 rounded-lg">
-                <span class="font-mono text-[11px] uppercase tracking-wider text-blue font-semibold">Real Experimental Result</span>
-                <div class="mt-3 space-y-2 text-[14px]">
-                  <div class="p-2 bg-white rounded border border-blue/20">
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-ink">1st (Tie) · 🤫 Quiet</span>
-                      <span class="font-mono text-[12px] font-semibold text-emerald-700">61.1% score</span>
-                    </div>
-                  </div>
-                  <div class="p-2 bg-white rounded border border-blue/20">
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-ink">1st (Tie) · 🎸 Music without lyrics</span>
-                      <span class="font-mono text-[12px] font-semibold text-emerald-700">60.0% score</span>
-                    </div>
-                  </div>
-                  <div class="p-2 bg-white rounded border border-blue/20">
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-ink">3rd (Tie) · ❤️ Liked songs</span>
-                      <span class="font-mono text-[12px] font-semibold text-signal">37.8% score</span>
-                    </div>
-                  </div>
-                  <div class="p-2 bg-white rounded border border-blue/20">
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-ink">3rd (Tie) · 💔 Disliked songs</span>
-                      <span class="font-mono text-[12px] font-semibold text-signal">36.7% score</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- The Big Surprise Callouts -->
-            <div class="mt-6 space-y-3">
-              <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <span class="font-bold text-amber-900 text-[14px]">💥 The Expected Surprise: Liking Did NOT Help!</span>
-                <p class="text-[13px] text-amber-800 mt-1 leading-relaxed">
-                  Most people believe listening to their favourite music helps them focus. But students scored almost identically in liked songs (37.8%) and disliked thrash metal (36.7%)! Liking the music offers <strong>zero protection</strong> against the distraction of lyrics.
-                </p>
-              </div>
-
-              <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <span class="font-bold text-emerald-900 text-[14px]">🎸 The Second Twist: Thrash Metal Without Lyrics Was Fine!</span>
-                <p class="text-[13px] text-emerald-800 mt-1 leading-relaxed">
-                  The instrumental music wasn't calm Mozart—it was loud, aggressive thrash metal (<em>Death Angel</em>)! Yet comprehension was <strong>statistically equivalent to pure silence</strong> (60.0% vs 61.1%). This proves it is the <strong>words/lyrics</strong> that impair reading, not the sound or beat itself!
-                </p>
-              </div>
-            </div>
-
-            <!-- Table 1 Ratings Explorer -->
-            <div class="mt-6 pt-6 border-t border-navy/10">
-              <h4 class="font-display font-bold text-ink text-[15px]">Table 1: Did Students Realise What Was Happening?</h4>
-              <p class="text-[13px] text-muted mt-0.5">Students rated each condition on a scale of 0 to 100 after the test:</p>
-
-              <div class="mt-3 overflow-x-auto">
-                <table class="w-full text-left text-[13px] border border-navy/10 rounded overflow-hidden">
-                  <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
-                    <tr>
-                      <th class="p-2.5">Measure (0–100)</th>
-                      <th class="p-2.5">Quiet</th>
-                      <th class="p-2.5">No lyrics</th>
-                      <th class="p-2.5">Liked songs</th>
-                      <th class="p-2.5">Disliked songs</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-navy/10 bg-white">
-                    <tr>
-                      <td class="p-2.5 font-medium">How distracting it felt</td>
-                      <td class="p-2.5 font-mono text-emerald-700">10.4</td>
-                      <td class="p-2.5 font-mono text-body">46.4</td>
-                      <td class="p-2.5 font-mono text-signal font-semibold">75.3</td>
-                      <td class="p-2.5 font-mono text-signal font-semibold">78.7</td>
-                    </tr>
-                    <tr>
-                      <td class="p-2.5 font-medium">How well I thought I did</td>
-                      <td class="p-2.5 font-mono text-emerald-700">67.3</td>
-                      <td class="p-2.5 font-mono text-body">52.8</td>
-                      <td class="p-2.5 font-mono text-signal">35.7</td>
-                      <td class="p-2.5 font-mono text-signal">35.8</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="text-[12px] text-muted mt-2">
-                <strong>Insight:</strong> Yes! Students felt songs were ~75/100 distracting and predicted they did worst with them.
-              </p>
-            </div>
-          </div>
-        </div>
+        <!-- Phase 3: Side-by-side Empirical Comparison (Server-hydrated on Mentor Reveal · Step 3) -->
+        <div id="predict-phase-3" data-mentor-reveal="3" class="hidden mt-6 space-y-6"></div>
 
         <!-- Next Action -->
         <div class="mt-8 flex justify-between items-center">
@@ -874,14 +818,14 @@ const steps = [
         </div>
 
         <p class="mt-4 text-[14px] text-body leading-relaxed">
-          Synthesize <strong>Perham & Currie (2014)</strong> across the 8 standard boxes. Use your own words:
+          Synthesize <strong>Perham &amp; Currie (2014)</strong> across the 8 standard boxes. Use your own words — do not copy sentences directly from the paper:
         </p>
 
         <!-- 8 Boxes Form -->
         <div class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm space-y-5">
           {sparkSession2.readingCardBoxes.map((box) => (
             <div>
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
                 <label for={`card-${box.id}`} class="field-label">{box.title}</label>
                 <span class="text-[11px] text-muted font-mono">{box.prompt}</span>
               </div>
@@ -905,21 +849,30 @@ const steps = [
 
           <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
             <button type="button" id="send-card-mentor-btn" class="btn btn-primary">
-              Send Reading Card to Mentor ✓
+              Send Reading Card to Mentor
             </button>
-            <span id="s4-card-status" class="text-[13px] text-muted">Ready to submit</span>
+            <span id="s4-card-status" class="text-[13px] text-muted">Fill the 8 boxes, then send to your mentor</span>
           </div>
 
-          <!-- Non-blocking Mentor Approval Banner -->
-          <div id="card-mentor-approved" class="hidden mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 flex items-start gap-3">
-            <span class="text-2xl leading-none text-emerald-600 font-bold">✓</span>
+          <!-- Waiting Banner (Shown after student submits, before mentor reveals/approves Step 4) -->
+          <div id="card-mentor-waiting" class="hidden mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 flex items-start gap-3">
+            <span class="text-xl leading-none">⏳</span>
             <div>
-              <p class="font-bold text-emerald-900 text-[14px]">Reading Card Approved by Mentor!</p>
-              <p class="text-[13px] text-emerald-800 mt-1 leading-relaxed">
-                Excellent synthesis! You clearly identified that songs with lyrics cause semantic interference, while quiet and music without words allow peak reading comprehension.
+              <p class="font-bold text-amber-900 text-[14px]">Sent to Mentor — Waiting for Review</p>
+              <p class="text-[13px] text-amber-800 mt-0.5 leading-relaxed">
+                Call your mentor over (or wait for room debrief). Your mentor will approve your card with a green ✓ and reveal the official example Reading Card.
               </p>
             </div>
           </div>
+
+          <!-- Locked Banner before Mentor Reveal -->
+          <div data-mentor-locked="4" class="mt-4 flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
+            <span>🔒</span>
+            <span>Example Reading Card &amp; Mentor approval unlock after your team submits and your mentor reveals Step 4.</span>
+          </div>
+
+          <!-- Mentor Reveal: Approved Banner + Official Example Reading Card (Server-hydrated) -->
+          <div id="mentor-reveal-4" data-mentor-reveal="4" class="hidden mt-4 space-y-4"></div>
         </div>
 
         <!-- Next Action -->
@@ -963,31 +916,31 @@ const steps = [
               id="cf2-hw-explanation"
               class="field mt-3"
               rows="2"
-              placeholder="Add one line explaining why it answered or didn't answer your questions…"
+              placeholder={sparkSession2.caseFile2Questions.homeworkCheck.explanationPlaceholder}
             ></textarea>
           </div>
 
           <!-- Q2: One sentence for Yacine -->
           <div>
             <label for="cf2-sentence-yacine" class="field-label">2. What would you tell Yacine now? (One sentence)</label>
-            <p class="text-[12px] text-muted mt-0.5">Based on the paper's findings. Mention the specific kind of music!</p>
+            <p class="text-[12px] text-muted mt-0.5">{sparkSession2.caseFile2Questions.sentenceForYacine.tip}</p>
             <textarea
               id="cf2-sentence-yacine"
               class="field mt-2"
               rows="2"
-              placeholder="e.g. If you need to read and understand your material, turn off songs with lyrics—even your favourites—and study in silence or with instrumental music."
+              placeholder={sparkSession2.caseFile2Questions.sentenceForYacine.placeholder}
             ></textarea>
           </div>
 
           <!-- Q3: One reason to be careful -->
           <div>
             <label for="cf2-reason-careful" class="field-label">3. One reason to be careful before applying this everywhere:</label>
-            <p class="text-[12px] text-muted mt-0.5">e.g. A small group of 30 students, a short lab test, not real multi-hour study.</p>
+            <p class="text-[12px] text-muted mt-0.5">Think about sample size, test setting, type of music, or what wasn't tested.</p>
             <textarea
               id="cf2-reason-careful"
               class="field mt-2"
               rows="2"
-              placeholder="e.g. This was a single lab study with 30 students reading short SAT passages, not real multi-hour revision, and one study is not the final answer."
+              placeholder={sparkSession2.caseFile2Questions.reasonToBeCareful.placeholder}
             ></textarea>
           </div>
 
@@ -997,17 +950,26 @@ const steps = [
             </button>
             <span id="s5-saved" class="save-status"></span>
           </div>
+
+          <!-- Locked Banner before Mentor Reveal -->
+          <div data-mentor-locked="5" class="flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
+            <span>🔒</span>
+            <span>Finish and save Case File #2 first. Model answers, accepted limits &amp; the Bonus Detective Challenge unlock when your mentor reveals Step 5.</span>
+          </div>
         </div>
 
-        <!-- Official Case Dossier Summary -->
-        <div id="cf2-summary-card" class="mt-8 bg-ink text-white p-6 sm:p-8 rounded-xl border border-white/15 relative overflow-hidden shadow-xl">
+        <!-- Mentor Reveal: Step 5 Answer Key & Bonus Challenge (Server-hydrated) -->
+        <div id="mentor-reveal-5" data-mentor-reveal="5" class="hidden mt-6 bg-white border border-blue/30 p-6 sm:p-8 rounded-lg shadow-sm space-y-6 text-[13px]"></div>
+
+        <!-- Official Case Dossier Summary (Shown ONLY after team saves their own Case File #2) -->
+        <div id="cf2-summary-card" class="hidden mt-8 bg-ink text-white p-6 sm:p-8 rounded-xl border border-white/15 relative overflow-hidden shadow-xl">
           <div class="flex items-center justify-between border-b border-white/15 pb-4">
             <div>
               <p class="font-mono text-[11px] uppercase tracking-wider text-peri">SPARK 2026 · Official Investigation Record</p>
               <h3 class="font-display text-2xl font-bold mt-1">Case File #2: The Music Case Closed</h3>
             </div>
             <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 font-mono text-[12px] font-bold rounded border border-emerald-500/40">
-              ✓ COMPLETED
+              ✓ SAVED
             </span>
           </div>
 
@@ -1018,21 +980,22 @@ const steps = [
             </div>
 
             <div>
-              <span class="text-peri font-mono text-[11px] uppercase">The Core Finding</span>
-              <p class="text-silver mt-0.5">
-                Quiet and music without lyrics produce optimal reading comprehension (~61%). Songs with lyrics cause severe cognitive impairment (~37%), regardless of whether the listener loves or hates the music.
-              </p>
+              <span class="text-peri font-mono text-[11px] uppercase">Did It Answer Our Homework Questions?</span>
+              <p id="summary-hw-check" class="text-silver mt-0.5">—</p>
             </div>
 
             <div>
               <span class="text-peri font-mono text-[11px] uppercase">Our Verdict for Yacine</span>
-              <p id="summary-sentence-yacine" class="text-white font-medium mt-0.5 italic">
-                “If you need to read and understand what you study, turn off songs with lyrics—even your favourites—and study in silence or with instrumental music.”
-              </p>
+              <p id="summary-sentence-yacine" class="text-white font-medium mt-0.5 italic">—</p>
+            </div>
+
+            <div>
+              <span class="text-peri font-mono text-[11px] uppercase">Our Reason to Be Careful</span>
+              <p id="summary-reason-careful" class="text-silver mt-0.5">—</p>
             </div>
           </div>
 
-          <div class="mt-8 pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center justify-between">
+          <div class="mt-8 pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center justify-between print:hidden">
             <button type="button" id="print-case-btn" class="btn btn-sm btn-secondary">
               🖨️ Print / Save PDF
             </button>
@@ -1047,6 +1010,14 @@ const steps = [
           </div>
         </div>
 
+        <!-- Back Navigation -->
+        <div class="mt-8 flex justify-between items-center print:hidden">
+          <button type="button" class="btn btn-secondary btn-on-light prev-panel-btn" data-prev="4">
+            ← Back to Step 4
+          </button>
+          <span class="text-[12px] font-mono text-muted">End of Session 2</span>
+        </div>
+
       </section>
 
     </div>
@@ -1054,6 +1025,11 @@ const steps = [
 </BaseLayout>
 
 <style>
+  /* Override global 168px min-height so compact rows="2"/rows="3" fields stay crisp */
+  #game textarea.field {
+    min-height: auto;
+  }
+
   .step-tab {
     cursor: pointer;
     display: flex;
@@ -1146,11 +1122,44 @@ const steps = [
     background-color: rgba(16, 185, 129, 0.1);
     color: #059669;
   }
+
+  /* Clean Print / Save PDF mode for Case File #2 */
+  @media print {
+    :global(header#nav),
+    :global(footer),
+    #progress,
+    #mentor-controls-toggle,
+    #mentor-controls-menu,
+    #switch-link,
+    #banner-connect-panel,
+    #btn-switch-team,
+    .print\:hidden {
+      display: none !important;
+    }
+    #game {
+      background: #fff !important;
+      padding-top: 0 !important;
+    }
+    #cf2-summary-card {
+      background: #fff !important;
+      color: #0B1120 !important;
+      border: 2px solid #0B1120 !important;
+      box-shadow: none !important;
+    }
+    #cf2-summary-card * {
+      color: #0B1120 !important;
+      border-color: rgba(11, 17, 32, 0.2) !important;
+    }
+  }
 </style>
 
 <script>
   import { sparkSession2 } from '../../data/spark';
-  import { getTeam, getStoredTeamCode, storeTeamCode, clearTeamCode, friendlyError } from '../../lib/spark/api';
+  import {
+    getTeam, getStoredTeamCode, storeTeamCode, clearTeamCode,
+    mentorLogin, mentorSession2Key, getStoredMentor, storeMentor, clearMentor,
+    friendlyError, escapeHtml, type Session2AnswerKey,
+  } from '../../lib/spark/api';
 
   // Team handling
   let teamCode = getStoredTeamCode() || 'DEMO';
@@ -1293,6 +1302,7 @@ const steps = [
   interface Session2State {
     step: number;
     unlockedStep: number;
+    mentorReveals: Record<number, boolean>;
     hw_q1: string;
     hw_q2: string;
     pages: Record<string, number>;
@@ -1303,9 +1313,10 @@ const steps = [
     prediction: string[]; // condition ids in ranked order
     predictionLocked: boolean;
     resultsRealText: string;
-    resultsRevealed: boolean;
+    resultsBonusText: string;
     readingCard: Record<string, string>;
-    cardApproved: boolean;
+    cardSubmitted: boolean;
+    cf2Saved: boolean;
     cf2: {
       choice: string;
       explanation: string;
@@ -1314,20 +1325,30 @@ const steps = [
     };
   }
 
+  const defaultReveals: Record<number, boolean> = {
+    0: false,
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+  };
+
   const defaultState: Session2State = {
     step: 0,
     unlockedStep: 0,
+    mentorReveals: { ...defaultReveals },
     hw_q1: '',
     hw_q2: '',
     pages: {},
     trick: { who: '', what: '', compared: '', measured: '' },
     yellow: ['', '', ''],
     blue: ['', ''],
-    jarWords: ['Within design', 'Significant (p < .05)', 'Counterbalanced', 'Pilot study', 'Likert scale'],
+    jarWords: [],
     prediction: ['quiet', 'liked', 'no_lyrics', 'disliked'],
     predictionLocked: false,
     resultsRealText: '',
-    resultsRevealed: false,
+    resultsBonusText: '',
     readingCard: {
       reference: sparkSession2.paper.citation,
       question: '',
@@ -1338,7 +1359,8 @@ const steps = [
       limits: '',
       our_questions: '',
     },
-    cardApproved: false,
+    cardSubmitted: false,
+    cf2Saved: false,
     cf2: {
       choice: 'yes',
       explanation: '',
@@ -1347,10 +1369,35 @@ const steps = [
     },
   };
 
-  let state: Session2State = defaultState;
+  const LEGACY_JAR_JSON = JSON.stringify([
+    'Within design',
+    'Significant (p < .05)',
+    'Counterbalanced',
+    'Pilot study',
+    'Likert scale',
+  ]);
+
+  let state: Session2State = {
+    ...defaultState,
+    mentorReveals: { ...defaultReveals },
+  };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) state = { ...defaultState, ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const parsedJar = Array.isArray(parsed.jarWords)
+        ? (JSON.stringify(parsed.jarWords) === LEGACY_JAR_JSON ? [] : parsed.jarWords)
+        : [];
+      state = {
+        ...defaultState,
+        ...parsed,
+        jarWords: parsedJar,
+        mentorReveals: { ...defaultReveals, ...(parsed.mentorReveals || {}) },
+        trick: { ...defaultState.trick, ...(parsed.trick || {}) },
+        readingCard: { ...defaultState.readingCard, ...(parsed.readingCard || {}) },
+        cf2: { ...defaultState.cf2, ...(parsed.cf2 || {}) },
+      };
+    }
   } catch (e) {
     console.error('Failed to load session 2 state', e);
   }
@@ -1408,6 +1455,373 @@ const steps = [
     });
   }
 
+  // Server-verified Session 2 Answer Key (kept strictly in JS memory, never in HTML/localStorage)
+  let serverAnswerKey: Session2AnswerKey | null = null;
+  let keyLoadPromise: Promise<Session2AnswerKey | null> | null = null;
+
+  function clearMentorKeyDOM() {
+    document.querySelectorAll<HTMLElement>('[data-mentor-reveal]').forEach((el) => {
+      el.innerHTML = '';
+      el.classList.add('hidden');
+    });
+    document.querySelectorAll<HTMLElement>('[data-mentor-locked]').forEach((el) => {
+      el.classList.remove('hidden');
+    });
+    document.querySelectorAll<HTMLInputElement>('.mentor-reveal-toggle').forEach((cb) => {
+      cb.checked = false;
+    });
+  }
+
+  function hydrateMentorKeyDOM(key: Session2AnswerKey) {
+    // Step 0 · Sample HW Ideas
+    const r0 = document.getElementById('mentor-reveal-0');
+    if (r0) {
+      r0.innerHTML = `
+        <p class="text-[11px] font-mono uppercase text-blue font-bold tracking-wider">👑 Mentor Reveal · Sample Homework Questions</p>
+        <p class="text-[12px] text-muted mt-0.5">Click any example below to add it to your team’s questions:</p>
+        <div class="mt-2.5 flex flex-wrap gap-2">
+          ${key.step0.sampleHomeworkQuestions
+            .map(
+              (q) =>
+                `<button type="button" class="hw-chip text-[12px] bg-white hover:bg-blue/10 text-body hover:text-blue border border-navy/10 px-3 py-1.5 rounded transition text-left" data-suggestion="${escapeHtml(q)}">+ ${escapeHtml(q)}</button>`
+            )
+            .join('')}
+        </div>
+      `;
+      r0.querySelectorAll<HTMLButtonElement>('.hw-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const text = chip.dataset.suggestion || '';
+          if (!text) return;
+          if (hwQ1?.value.trim() === text || hwQ2?.value.trim() === text) return;
+          if (hwQ1 && !hwQ1.value.trim()) {
+            hwQ1.value = text;
+            state.hw_q1 = text;
+          } else if (hwQ2) {
+            hwQ2.value = text;
+            state.hw_q2 = text;
+          }
+          saveState('s0-saved');
+        });
+      });
+    }
+
+    // Step 1 · Map & Four-Part Trick
+    const r1 = document.getElementById('mentor-reveal-1');
+    if (r1) {
+      r1.innerHTML = `
+        <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 1 Answer Key</p>
+        <div>
+          <p class="font-semibold text-ink mb-1.5">Task A · Official Page Map</p>
+          <ul class="space-y-1 text-body text-[12px]">
+            ${key.step1.pageMap.map((p) => `<li><strong>${escapeHtml(p.name)}:</strong> ${escapeHtml(p.expected)}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="pt-3 border-t border-blue/15 space-y-1.5 text-body">
+          <p class="font-semibold text-ink">Task B · Expected Four-Part Trick Answers</p>
+          ${key.step1.fourPartTrick
+            .map(
+              (f) =>
+                `<p><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(f.expected)} <span class="text-muted text-[11px]">(${escapeHtml(f.where)})</span></p>`
+            )
+            .join('')}
+          <p class="text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5 mt-2">
+            <strong>Mentor tip:</strong> ${escapeHtml(key.step1.mentorTip)}
+          </p>
+        </div>
+      `;
+    }
+
+    // Step 2 · Yellow Facts, Blue Facts & Word Jar Glossary
+    const r2y = document.getElementById('mentor-reveal-2-yellow');
+    if (r2y) {
+      r2y.innerHTML = `
+        <p class="font-mono text-[11px] uppercase tracking-wider text-amber-900 font-bold">👑 Mentor Reveal · Accepted Yellow Facts (Any 3 are correct)</p>
+        <ul class="mt-2 pl-4 list-disc space-y-1 text-amber-950/90">
+          ${key.step2.yellowFacts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}
+        </ul>
+      `;
+    }
+    const r2b = document.getElementById('mentor-reveal-2-blue');
+    if (r2b) {
+      r2b.innerHTML = `
+        <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Accepted Blue Facts (Any 2 are correct)</p>
+        <ul class="mt-2 pl-4 list-disc space-y-1 text-body">
+          ${key.step2.blueFacts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}
+        </ul>
+        <p class="mt-2.5 text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2">
+          <strong>Most common mistake:</strong> ${escapeHtml(key.step2.commonMistake)}
+        </p>
+      `;
+    }
+    const r2j = document.getElementById('mentor-reveal-2-jar');
+    if (r2j) {
+      r2j.innerHTML = `
+        <div class="p-4 bg-ink text-white rounded-lg">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-peri">👑 Mentor Reveal · The 2 Essential Terms</p>
+          <div class="mt-3 grid sm:grid-cols-2 gap-3 text-[13px]">
+            ${key.step2.essentialTerms
+              .map(
+                (t) => `
+              <div class="p-3 bg-white/5 border border-white/10 rounded">
+                <span class="font-bold text-peri font-mono">${escapeHtml(t.term)}</span>
+                <p class="mt-1 text-silver leading-relaxed">${escapeHtml(t.definition)}</p>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+        <div class="p-4 bg-paper border border-navy/10 rounded-lg">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold mb-3">👑 Mentor Reveal · All 12 Curated Paper Terms</p>
+          <div class="grid sm:grid-cols-2 gap-2">
+            ${key.step2.wordJar
+              .map(
+                (w) => `
+              <div class="p-3 bg-white border border-navy/10 rounded text-[13px]">
+                <div class="flex items-center justify-between gap-2">
+                  <strong class="text-ink">${escapeHtml(w.term)}</strong>
+                  <span class="font-mono text-[10px] text-muted shrink-0">${escapeHtml(w.pageHint)}</span>
+                </div>
+                <p class="mt-1 text-body text-[12px] leading-relaxed">${escapeHtml(w.definition)}</p>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Step 3 · Real Results & Table 1
+    const r3 = document.getElementById('predict-phase-3');
+    if (r3) {
+      const t1 = key.step3.table1;
+      r3.innerHTML = `
+        <div class="bg-white border border-blue/30 p-6 sm:p-8 rounded-lg shadow-sm">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 3 Answer Key</p>
+          <h3 class="font-display text-xl font-bold text-ink mt-1">Prediction vs. Empirical Reality</h3>
+          <p class="text-[14px] text-body mt-1">Here is how your locked prediction matches what Perham &amp; Currie (2014) found:</p>
+
+          <div class="mt-6 grid sm:grid-cols-2 gap-4">
+            <div class="p-4 bg-paper/60 border border-navy/10 rounded-lg">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-semibold">Your Locked Prediction</span>
+              <ol id="locked-prediction-list" class="mt-3 space-y-2 text-[14px]"></ol>
+            </div>
+            <div class="p-4 bg-blue/10 border border-blue/30 rounded-lg">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-blue font-semibold">Real Result (Page 3 / Page 8)</span>
+              <div class="mt-3 space-y-2 text-[14px]">
+                ${key.step3.ranking
+                  .map(
+                    (row) => `
+                  <div class="p-2.5 bg-white rounded border border-blue/20">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="font-bold text-ink">${escapeHtml(row.rank)} · ${escapeHtml(row.icon)} ${escapeHtml(row.title)}</span>
+                      <span class="font-mono text-[11px] font-semibold ${row.tone === 'good' ? 'text-emerald-700' : 'text-signal'}">${escapeHtml(row.note)}</span>
+                    </div>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3">
+            ${key.step3.surprises
+              .map(
+                (s) => `
+              <div class="p-4 rounded-lg border ${s.tone === 'amber' ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'}">
+                <span class="font-bold text-[14px] ${s.tone === 'amber' ? 'text-amber-900' : 'text-emerald-900'}">${escapeHtml(s.title)}</span>
+                <p class="text-[13px] mt-1 leading-relaxed ${s.tone === 'amber' ? 'text-amber-800' : 'text-emerald-800'}">${escapeHtml(s.body)}</p>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-navy/10">
+            <h4 class="font-display font-bold text-ink text-[15px]">Bonus Answer · Table 1: Did Students Know Which Condition Hurt Them?</h4>
+            <p class="text-[13px] text-muted mt-0.5">Students rated each condition out of 100 after the test:</p>
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full text-left text-[13px] border border-navy/10 rounded overflow-hidden">
+                <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
+                  <tr>
+                    <th class="p-2.5">Table 1 (out of 100)</th>
+                    <th class="p-2.5">Disliked songs</th>
+                    <th class="p-2.5">Liked songs</th>
+                    <th class="p-2.5">No lyrics</th>
+                    <th class="p-2.5">Quiet</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-navy/10 bg-white">
+                  <tr>
+                    <td class="p-2.5 font-medium">How distracting it was</td>
+                    <td class="p-2.5 font-mono text-signal font-semibold">${escapeHtml(t1.distracting.disliked)}</td>
+                    <td class="p-2.5 font-mono text-signal font-semibold">${escapeHtml(t1.distracting.liked)}</td>
+                    <td class="p-2.5 font-mono text-body">${escapeHtml(t1.distracting.noLyrics)}</td>
+                    <td class="p-2.5 font-mono text-emerald-700">${escapeHtml(t1.distracting.quiet)}</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-medium">How well I think I did</td>
+                    <td class="p-2.5 font-mono text-signal">${escapeHtml(t1.perceived.disliked)}</td>
+                    <td class="p-2.5 font-mono text-signal">${escapeHtml(t1.perceived.liked)}</td>
+                    <td class="p-2.5 font-mono text-body">${escapeHtml(t1.perceived.noLyrics)}</td>
+                    <td class="p-2.5 font-mono text-emerald-700">${escapeHtml(t1.perceived.quiet)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-[12px] text-body mt-2.5 leading-relaxed">
+              <strong>Answer:</strong> ${escapeHtml(t1.bonusAnswer)}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Step 4 · Reading Card Approval + Official Key
+    const r4 = document.getElementById('mentor-reveal-4');
+    if (r4) {
+      r4.innerHTML = `
+        <div id="card-mentor-approved" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 flex items-start gap-3">
+          <span class="text-2xl leading-none text-emerald-600 font-bold">✓</span>
+          <div>
+            <p class="font-bold text-emerald-900 text-[14px]">Reading Card Approved by Mentor!</p>
+            <p class="text-[13px] text-emerald-800 mt-1 leading-relaxed">Compare your team’s 8 boxes with the official model Reading Card below.</p>
+          </div>
+        </div>
+        <div class="p-5 bg-blue/5 border border-blue/25 rounded-lg space-y-3 text-[13px]">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Example Reading Card (Official Key)</p>
+          <div class="divide-y divide-navy/10 border border-navy/10 rounded bg-white overflow-hidden">
+            ${key.step4.boxes
+              .map(
+                (b) => `
+              <div class="p-3 grid sm:grid-cols-[160px_1fr] gap-2">
+                <span class="font-semibold text-ink">${escapeHtml(b.title)}</span>
+                <span class="text-body leading-relaxed">${escapeHtml(b.answer)}</span>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+          <p class="text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5">
+            <strong>Mentor check:</strong> ${escapeHtml(key.step4.approvalRule)}
+          </p>
+        </div>
+      `;
+    }
+
+    // Step 5 · Case File #2 Official Key & Bonus
+    const r5 = document.getElementById('mentor-reveal-5');
+    if (r5) {
+      const bc = key.step5.bonusChallenge;
+      r5.innerHTML = `
+        <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 5 Official Answer Key</p>
+        <div>
+          <h4 class="font-display font-bold text-ink text-[15px]">1. Typical Homework Questions &amp; Answers</h4>
+          <div class="mt-2.5 overflow-x-auto">
+            <table class="w-full text-left border border-navy/10 rounded overflow-hidden">
+              <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
+                <tr>
+                  <th class="p-2.5">Homework Question</th>
+                  <th class="p-2.5">Answer from the Paper</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-navy/10 bg-white">
+                ${key.step5.typicalHomeworkAnswers
+                  .map(
+                    (row) => `
+                  <tr>
+                    <td class="p-2.5 font-semibold text-ink">${escapeHtml(row.q)}</td>
+                    <td class="p-2.5 text-body">${escapeHtml(row.a)}</td>
+                  </tr>
+                `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+          <h4 class="font-display font-bold text-emerald-900 text-[14px]">2. Model Sentence for Yacine</h4>
+          <p class="mt-1 font-serif italic text-[15px] text-emerald-950">${escapeHtml(key.step5.modelVerdict)}</p>
+        </div>
+        <div>
+          <h4 class="font-display font-bold text-ink text-[15px]">3. Accepted Reasons to Be Careful</h4>
+          <ul class="mt-2 pl-4 list-disc space-y-1 text-body">
+            ${key.step5.acceptedLimits.map((ex) => `<li>${escapeHtml(ex)}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="p-4 bg-ink text-white rounded-lg space-y-2">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-peri">✨ ${escapeHtml(bc.title)}</p>
+          <p class="text-silver">${escapeHtml(bc.prompt)}</p>
+          <p class="text-white font-medium pt-1"><strong>Answer:</strong> ${escapeHtml(bc.answer)}</p>
+          <p class="text-silver/90 text-[12px] pt-1 border-t border-white/10">
+            <strong>Detective extra:</strong> ${escapeHtml(bc.detectiveExtra)}
+          </p>
+        </div>
+      `;
+    }
+  }
+
+  async function ensureMentorAnswerKey(): Promise<Session2AnswerKey | null> {
+    if (serverAnswerKey) return serverAnswerKey;
+    const mentor = getStoredMentor();
+    if (!mentor?.token) return null;
+    if (!keyLoadPromise) {
+      keyLoadPromise = mentorSession2Key(mentor.token)
+        .then((key) => {
+          serverAnswerKey = key;
+          hydrateMentorKeyDOM(key);
+          return key;
+        })
+        .catch(() => {
+          // Forged or expired mentor token: reject and clear immediately
+          clearMentor();
+          serverAnswerKey = null;
+          state.mentorReveals = { ...defaultReveals };
+          saveState();
+          clearMentorKeyDOM();
+          syncMentorAuthUI();
+          return null;
+        })
+        .finally(() => {
+          keyLoadPromise = null;
+        });
+    }
+    return keyLoadPromise;
+  }
+
+  function renderMentorReveals() {
+    const canReveal = Boolean(serverAnswerKey && getStoredMentor()?.token);
+    for (let stepNum = 0; stepNum <= 5; stepNum++) {
+      const revealed = canReveal && Boolean(state.mentorReveals[stepNum]);
+      document.querySelectorAll<HTMLElement>(`[data-mentor-reveal="${stepNum}"]`).forEach((el) => {
+        el.classList.toggle('hidden', !revealed);
+      });
+      document.querySelectorAll<HTMLElement>(`[data-mentor-locked="${stepNum}"]`).forEach((el) => {
+        el.classList.toggle('hidden', revealed);
+      });
+      const checkbox = document.querySelector<HTMLInputElement>(`.mentor-reveal-toggle[data-reveal-step="${stepNum}"]`);
+      if (checkbox) {
+        checkbox.checked = revealed;
+      }
+    }
+
+    // Step 1: refresh page feedback live without flashing "Saved"
+    if (Object.keys(state.pages).length > 0) {
+      checkPages(false);
+    }
+
+    // Step 3: populate locked prediction list whenever Step 3 reveal opens
+    if (canReveal && state.mentorReveals[3]) {
+      renderLockedList();
+    }
+
+    // Step 4: sync waiting vs approved status
+    updateCardStatusUI();
+  }
+
   function unlockToStep(n: number) {
     if (n > state.unlockedStep) {
       state.unlockedStep = Math.min(5, n);
@@ -1451,39 +1865,169 @@ const steps = [
     });
   });
 
-  // Mentor Reveal Controls Dropdown
+  // Mentor Reveal Controls Dropdown & Server-Verified Auth Gate
   const mentorMenu = document.getElementById('mentor-controls-menu');
   const mentorToggle = document.getElementById('mentor-controls-toggle');
-  mentorToggle?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    mentorMenu?.classList.toggle('hidden');
+  const mentorInlineLogin = document.getElementById('mentor-inline-login') as HTMLFormElement | null;
+  const mentorInlinePassword = document.getElementById('mentor-inline-password') as HTMLInputElement | null;
+  const mentorInlineError = document.getElementById('mentor-inline-error');
+  const mentorInlineSubmit = document.getElementById('mentor-inline-submit') as HTMLButtonElement | null;
+  const mentorControlsAuthed = document.getElementById('mentor-controls-authed');
+  const mentorAuthedBadge = document.getElementById('mentor-authed-badge');
+
+  function syncMentorAuthUI() {
+    const mentor = getStoredMentor();
+    const isAuthed = Boolean(mentor && mentor.token && serverAnswerKey);
+    mentorInlineLogin?.classList.toggle('hidden', isAuthed);
+    mentorControlsAuthed?.classList.toggle('hidden', !isAuthed);
+    if (isAuthed && mentorAuthedBadge && mentor) {
+      mentorAuthedBadge.textContent = mentor.mentorName ? `✓ ${mentor.mentorName}` : `✓ ${mentor.role.toUpperCase()}`;
+    }
+  }
+  syncMentorAuthUI();
+  // Verify any existing mentor session against Supabase on load
+  if (getStoredMentor()?.token) {
+    ensureMentorAnswerKey().then(() => {
+      syncMentorAuthUI();
+      renderMentorReveals();
+    });
+  }
+
+  mentorInlineLogin?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!mentorInlinePassword) return;
+    const pwd = mentorInlinePassword.value.trim();
+    if (!pwd) return;
+    if (mentorInlineSubmit) {
+      mentorInlineSubmit.disabled = true;
+      mentorInlineSubmit.textContent = 'Checking…';
+    }
+    mentorInlineError?.classList.add('hidden');
+
+    try {
+      const session = await mentorLogin(pwd);
+      storeMentor(session);
+      const key = await ensureMentorAnswerKey();
+      if (!key) throw new Error('Unable to load mentor answer key. Please try again.');
+      mentorInlinePassword.value = '';
+      syncMentorAuthUI();
+      renderMentorReveals();
+    } catch (err: any) {
+      clearMentor();
+      serverAnswerKey = null;
+      if (mentorInlineError) {
+        mentorInlineError.textContent = friendlyError(err);
+        mentorInlineError.classList.remove('hidden');
+      }
+    } finally {
+      if (mentorInlineSubmit) {
+        mentorInlineSubmit.disabled = false;
+        mentorInlineSubmit.textContent = 'Unlock Mentor Controls';
+      }
+    }
   });
-  document.addEventListener('click', () => {
+
+  function closeMentorMenu() {
     mentorMenu?.classList.add('hidden');
+    mentorToggle?.setAttribute('aria-expanded', 'false');
+  }
+
+  document.getElementById('btn-mentor-logout')?.addEventListener('click', () => {
+    clearMentor();
+    serverAnswerKey = null;
+    state.mentorReveals = { ...defaultReveals };
+    saveState();
+    clearMentorKeyDOM();
+    syncMentorAuthUI();
+    renderMentorReveals();
+    closeMentorMenu();
+  });
+
+  mentorToggle?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (getStoredMentor()?.token && !serverAnswerKey) {
+      await ensureMentorAnswerKey();
+    }
+    syncMentorAuthUI();
+    const willOpen = mentorMenu?.classList.contains('hidden');
+    mentorMenu?.classList.toggle('hidden');
+    mentorToggle.setAttribute('aria-expanded', String(Boolean(willOpen)));
+    if (willOpen && !serverAnswerKey) {
+      setTimeout(() => mentorInlinePassword?.focus(), 50);
+    }
+  });
+  document.addEventListener('click', closeMentorMenu);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMentorMenu();
   });
   mentorMenu?.addEventListener('click', (e) => {
     e.stopPropagation();
   });
 
   document.getElementById('btn-reveal-next')?.addEventListener('click', () => {
+    if (!serverAnswerKey) return;
     unlockToStep(state.unlockedStep + 1);
     showPanel(state.unlockedStep);
-    mentorMenu?.classList.add('hidden');
+    closeMentorMenu();
   });
 
   document.getElementById('btn-reveal-all')?.addEventListener('click', () => {
+    if (!serverAnswerKey) return;
     state.unlockedStep = 5;
     saveState();
     renderLocks();
-    mentorMenu?.classList.add('hidden');
+    closeMentorMenu();
   });
 
   document.getElementById('btn-lock-all')?.addEventListener('click', () => {
+    if (!serverAnswerKey) return;
     state.unlockedStep = 0;
+    state.mentorReveals = { ...defaultReveals };
     saveState();
     showPanel(0);
     renderLocks();
-    mentorMenu?.classList.add('hidden');
+    renderMentorReveals();
+    closeMentorMenu();
+  });
+
+  // Per-step Mentor Answer Key Reveal Toggles
+  document.querySelectorAll<HTMLInputElement>('.mentor-reveal-toggle').forEach((cb) => {
+    cb.addEventListener('change', () => {
+      if (!serverAnswerKey) {
+        cb.checked = false;
+        return;
+      }
+      const stepNum = Number(cb.dataset.revealStep);
+      state.mentorReveals[stepNum] = cb.checked;
+      saveState();
+      renderMentorReveals();
+    });
+  });
+
+  document.getElementById('btn-reveal-current-answers')?.addEventListener('click', () => {
+    if (!serverAnswerKey) return;
+    state.mentorReveals[activePanel] = true;
+    saveState();
+    renderMentorReveals();
+    closeMentorMenu();
+    const firstRevealed = document.querySelector<HTMLElement>(`[data-mentor-reveal="${activePanel}"]`);
+    firstRevealed?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  document.getElementById('btn-reveal-all-answers')?.addEventListener('click', () => {
+    if (!serverAnswerKey) return;
+    for (let i = 0; i <= 5; i++) state.mentorReveals[i] = true;
+    saveState();
+    renderMentorReveals();
+    closeMentorMenu();
+  });
+
+  document.getElementById('btn-hide-all-answers')?.addEventListener('click', () => {
+    if (!serverAnswerKey) return;
+    state.mentorReveals = { ...defaultReveals };
+    saveState();
+    renderMentorReveals();
+    closeMentorMenu();
   });
 
   // ==================== STEP 0 ====================
@@ -1503,24 +2047,11 @@ const steps = [
       saveState('s0-saved');
     });
   }
-  document.querySelectorAll<HTMLButtonElement>('.hw-chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const text = chip.dataset.suggestion || '';
-      if (hwQ1 && !hwQ1.value.trim()) {
-        hwQ1.value = text;
-        state.hw_q1 = text;
-      } else if (hwQ2) {
-        hwQ2.value = text;
-        state.hw_q2 = text;
-      }
-      saveState('s0-saved');
-    });
-  });
 
   // ==================== STEP 1 ====================
-  // Check parts pages
-  function checkPages() {
-    sparkSession2.paperParts.forEach((part) => {
+  // Check parts pages (non-spoiling until Mentor Reveal)
+  function checkPages(shouldSave = true) {
+    sparkSession2.paperParts.forEach((part, idx) => {
       const input = document.querySelector<HTMLInputElement>(`.page-part-input[data-part="${part.id}"]`);
       const fb = document.querySelector<HTMLElement>(`.page-feedback[data-feedback="${part.id}"]`);
       if (!input || !fb) return;
@@ -1531,14 +2062,17 @@ const steps = [
       }
       if (part.validPages.includes(val)) {
         fb.textContent = '✓ Correct';
-        fb.className = 'page-feedback text-[12px] font-semibold text-emerald-700';
+        fb.className = 'page-feedback text-[12px] font-semibold text-emerald-700 whitespace-nowrap';
+      } else if (state.mentorReveals[1] && serverAnswerKey?.step1?.pageMap[idx]) {
+        fb.textContent = `Check ${serverAnswerKey.step1.pageMap[idx].expected}`;
+        fb.className = 'page-feedback text-[12px] text-body whitespace-nowrap';
       } else {
-        fb.textContent = `Hint: check around ${part.expectedPageDisplay}`;
-        fb.className = 'page-feedback text-[12px] text-body';
+        fb.textContent = 'Try skimming again';
+        fb.className = 'page-feedback text-[12px] text-muted whitespace-nowrap';
       }
       state.pages[part.id] = val;
     });
-    saveState('s1-saved');
+    if (shouldSave) saveState('s1-saved');
   }
 
   document.querySelectorAll<HTMLInputElement>('.page-part-input').forEach((input) => {
@@ -1546,9 +2080,9 @@ const steps = [
     if (part && state.pages[part]) {
       input.value = String(state.pages[part]);
     }
-    input.addEventListener('change', checkPages);
+    input.addEventListener('change', () => checkPages(true));
   });
-  document.getElementById('check-pages-btn')?.addEventListener('click', checkPages);
+  document.getElementById('check-pages-btn')?.addEventListener('click', () => checkPages(true));
 
   // 4-part trick inputs
   const trickInputs: Record<keyof typeof state.trick, HTMLInputElement | null> = {
@@ -1590,32 +2124,44 @@ const steps = [
     });
   });
 
-  // Word Jar
+  // Word Jar (starts empty so teams hunt for terms themselves)
   const jarContainer = document.getElementById('jar-words-list');
   function renderJar() {
     if (!jarContainer) return;
     jarContainer.innerHTML = '';
+    if (!state.jarWords.length) {
+      const empty = document.createElement('p');
+      empty.className = 'text-[12px] text-pink-800/70 italic';
+      empty.textContent = 'No pink words added yet — type any unfamiliar term from the paper above.';
+      jarContainer.appendChild(empty);
+      return;
+    }
+
     state.jarWords.forEach((word, idx) => {
       const pill = document.createElement('span');
       pill.className =
         'inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-pink-200 text-pink-900 rounded-full text-[12px] font-medium shadow-2xs';
-      pill.innerHTML = `<span>🩷 ${word}</span><button type="button" class="text-pink-400 hover:text-pink-700 ml-1 font-bold text-[14px] leading-none" data-idx="${idx}">×</button>`;
-      jarContainer.appendChild(pill);
-    });
-
-    jarContainer.querySelectorAll('button[data-idx]').forEach((b) => {
-      b.addEventListener('click', (e) => {
-        const i = Number((e.currentTarget as HTMLElement).dataset.idx);
-        state.jarWords.splice(i, 1);
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = `🩷 ${word}`;
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'text-pink-400 hover:text-pink-700 ml-1 font-bold text-[14px] leading-none';
+      removeBtn.dataset.idx = String(idx);
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', () => {
+        state.jarWords.splice(idx, 1);
         renderJar();
         saveState('s2-saved');
       });
+      pill.appendChild(labelSpan);
+      pill.appendChild(removeBtn);
+      jarContainer.appendChild(pill);
     });
   }
   renderJar();
 
   const pinkInput = document.getElementById('new-pink-word') as HTMLInputElement | null;
-  document.getElementById('add-pink-btn')?.addEventListener('click', () => {
+  function addPinkWord() {
     if (!pinkInput) return;
     const w = pinkInput.value.trim();
     if (w && !state.jarWords.includes(w)) {
@@ -1624,10 +2170,19 @@ const steps = [
       renderJar();
       saveState('s2-saved');
     }
+  }
+  document.getElementById('add-pink-btn')?.addEventListener('click', addPinkWord);
+  pinkInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addPinkWord();
+    }
   });
 
   // ==================== STEP 3: PREDICT & CHECK ====================
   const sortContainer = document.getElementById('conditions-sortable');
+  const lockPredBtn = document.getElementById('lock-prediction-btn') as HTMLButtonElement | null;
+
   function renderSortable() {
     if (!sortContainer) return;
     sortContainer.innerHTML = '';
@@ -1649,13 +2204,22 @@ const steps = [
             <p class="text-[12px] text-muted">${cond.shortDesc}</p>
           </div>
         </div>
-        <div class="flex flex-col gap-1 shrink-0">
-          <button type="button" class="rank-up text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Up">▲</button>
-          <button type="button" class="rank-down text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Down">▼</button>
+        <div class="flex flex-col gap-1 shrink-0 ${state.predictionLocked ? 'opacity-40 pointer-events-none' : ''}">
+          <button type="button" class="rank-up text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Up" ${state.predictionLocked ? 'disabled' : ''}>▲</button>
+          <button type="button" class="rank-down text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Down" ${state.predictionLocked ? 'disabled' : ''}>▼</button>
         </div>
       `;
       sortContainer.appendChild(el);
     });
+
+    if (state.predictionLocked) {
+      if (lockPredBtn) {
+        lockPredBtn.disabled = true;
+        lockPredBtn.textContent = '🔒 Prediction Locked';
+        lockPredBtn.classList.add('opacity-60', 'cursor-not-allowed');
+      }
+      return;
+    }
 
     sortContainer.querySelectorAll('.rank-up').forEach((b) => {
       b.addEventListener('click', (e) => {
@@ -1685,12 +2249,10 @@ const steps = [
   }
   renderSortable();
 
-  const phase1El = document.getElementById('predict-phase-1');
   const phase2El = document.getElementById('predict-phase-2');
-  const phase3El = document.getElementById('predict-phase-3');
-  const lockedList = document.getElementById('locked-prediction-list');
 
   function renderLockedList() {
+    const lockedList = document.getElementById('locked-prediction-list');
     if (!lockedList) return;
     lockedList.innerHTML = '';
     state.prediction.forEach((cid, idx) => {
@@ -1706,18 +2268,16 @@ const steps = [
   function updatePredictionUI() {
     if (state.predictionLocked) {
       phase2El?.classList.remove('hidden');
-      if (state.resultsRevealed) {
-        phase3El?.classList.remove('hidden');
-        renderLockedList();
-      }
+      renderLockedList();
     }
   }
   updatePredictionUI();
 
-  document.getElementById('lock-prediction-btn')?.addEventListener('click', () => {
+  lockPredBtn?.addEventListener('click', () => {
     state.predictionLocked = true;
     saveState('s3-saved');
-    phase2El?.classList.remove('hidden');
+    renderSortable();
+    updatePredictionUI();
     phase2El?.scrollIntoView({ behavior: 'smooth' });
   });
 
@@ -1730,12 +2290,24 @@ const steps = [
     });
   }
 
-  document.getElementById('reveal-comparison-btn')?.addEventListener('click', () => {
-    state.resultsRevealed = true;
+  const resultsBonusText = document.getElementById('results-bonus-text') as HTMLTextAreaElement | null;
+  if (resultsBonusText) {
+    resultsBonusText.value = state.resultsBonusText;
+    resultsBonusText.addEventListener('input', () => {
+      state.resultsBonusText = resultsBonusText.value;
+      saveState('s3-saved');
+    });
+  }
+
+  const s3FindingsStatus = document.getElementById('s3-findings-status');
+  document.getElementById('save-results-btn')?.addEventListener('click', () => {
     saveState('s3-saved');
-    phase3El?.classList.remove('hidden');
-    renderLockedList();
-    phase3El?.scrollIntoView({ behavior: 'smooth' });
+    if (s3FindingsStatus) {
+      s3FindingsStatus.textContent = '✓ Findings saved — ready for Mentor Reveal';
+      setTimeout(() => {
+        if (s3FindingsStatus) s3FindingsStatus.textContent = '';
+      }, 4000);
+    }
   });
 
   // ==================== STEP 4: READING CARD ====================
@@ -1747,26 +2319,51 @@ const steps = [
     }
     el.addEventListener('input', () => {
       state.readingCard[box.id] = el.value;
+      if (state.cardSubmitted) updateCardStatusUI();
       saveState('s4-saved');
     });
   });
 
-  const cardApprovedBox = document.getElementById('card-mentor-approved');
+  const cardWaitingBox = document.getElementById('card-mentor-waiting');
   const cardStatus = document.getElementById('s4-card-status');
-  if (state.cardApproved) {
-    cardApprovedBox?.classList.remove('hidden');
-    if (cardStatus) cardStatus.textContent = '✓ Approved by mentor';
+
+  function getEmptyCardBoxCount(): number {
+    return sparkSession2.readingCardBoxes.filter((b) => !(state.readingCard[b.id] || '').trim()).length;
+  }
+
+  function updateCardStatusUI() {
+    const revealed = Boolean(serverAnswerKey && state.mentorReveals[4]);
+    if (revealed) {
+      cardWaitingBox?.classList.add('hidden');
+      if (cardStatus) cardStatus.textContent = '✓ Approved by mentor';
+    } else if (state.cardSubmitted) {
+      cardWaitingBox?.classList.remove('hidden');
+      const emptyCount = getEmptyCardBoxCount();
+      if (cardStatus) {
+        cardStatus.textContent = emptyCount > 0
+          ? `⏳ Sent (${emptyCount} box${emptyCount === 1 ? '' : 'es'} still empty — feel free to finish filling them)`
+          : '⏳ Sent — waiting for mentor review';
+      }
+    } else {
+      cardWaitingBox?.classList.add('hidden');
+      if (cardStatus) cardStatus.textContent = 'Fill the 8 boxes, then send to your mentor';
+    }
   }
 
   document.getElementById('send-card-mentor-btn')?.addEventListener('click', () => {
-    state.cardApproved = true;
+    state.cardSubmitted = true;
     saveState('s4-saved');
-    cardApprovedBox?.classList.remove('hidden');
-    if (cardStatus) cardStatus.textContent = '✓ Approved by mentor';
-    cardApprovedBox?.scrollIntoView({ behavior: 'smooth' });
+    updateCardStatusUI();
+    cardWaitingBox?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
   // ==================== STEP 5: CASE FILE #2 ====================
+  const choiceLabels: Record<string, string> = {
+    yes: 'Yes',
+    partly: 'Partly',
+    no: 'No',
+  };
+
   // Homework check choice
   document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((b) => {
     const choice = b.dataset.choice || 'yes';
@@ -1775,6 +2372,7 @@ const steps = [
       document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((btn) => btn.classList.remove('chosen'));
       b.classList.add('chosen');
       state.cf2.choice = choice;
+      if (state.cf2Saved) updateSummaryCardUI();
       saveState('s5-saved');
     });
   });
@@ -1784,45 +2382,68 @@ const steps = [
     cf2Explanation.value = state.cf2.explanation;
     cf2Explanation.addEventListener('input', () => {
       state.cf2.explanation = cf2Explanation.value;
+      if (state.cf2Saved) updateSummaryCardUI();
       saveState('s5-saved');
     });
   }
 
   const sentenceYacine = document.getElementById('cf2-sentence-yacine') as HTMLTextAreaElement | null;
+  const reasonCareful = document.getElementById('cf2-reason-careful') as HTMLTextAreaElement | null;
+  const summaryCard = document.getElementById('cf2-summary-card');
+  const summaryHwCheck = document.getElementById('summary-hw-check');
   const summarySentence = document.getElementById('summary-sentence-yacine');
+  const summaryReason = document.getElementById('summary-reason-careful');
+
+  function updateSummaryCardUI() {
+    if (summaryHwCheck) {
+      const label = choiceLabels[state.cf2.choice] || 'Yes';
+      const exp = state.cf2.explanation.trim();
+      summaryHwCheck.textContent = exp ? `${label} — ${exp}` : label;
+    }
+    if (summarySentence) {
+      summarySentence.textContent = state.cf2.sentenceYacine.trim()
+        ? `“${state.cf2.sentenceYacine.trim()}”`
+        : '—';
+    }
+    if (summaryReason) {
+      summaryReason.textContent = state.cf2.reasonCareful.trim() || '—';
+    }
+    summaryCard?.classList.toggle('hidden', !state.cf2Saved);
+  }
+
   if (sentenceYacine) {
     sentenceYacine.value = state.cf2.sentenceYacine;
-    if (state.cf2.sentenceYacine && summarySentence) {
-      summarySentence.textContent = `“${state.cf2.sentenceYacine}”`;
-    }
     sentenceYacine.addEventListener('input', () => {
       state.cf2.sentenceYacine = sentenceYacine.value;
-      if (summarySentence) {
-        summarySentence.textContent = sentenceYacine.value ? `“${sentenceYacine.value}”` : '“If you need to read and understand what you study, turn off songs with lyrics—even your favourites—and study in silence or with instrumental music.”';
-      }
+      if (state.cf2Saved) updateSummaryCardUI();
       saveState('s5-saved');
     });
   }
 
-  const reasonCareful = document.getElementById('cf2-reason-careful') as HTMLTextAreaElement | null;
   if (reasonCareful) {
     reasonCareful.value = state.cf2.reasonCareful;
     reasonCareful.addEventListener('input', () => {
       state.cf2.reasonCareful = reasonCareful.value;
+      if (state.cf2Saved) updateSummaryCardUI();
       saveState('s5-saved');
     });
   }
 
   document.getElementById('save-cf2-btn')?.addEventListener('click', () => {
+    state.cf2Saved = true;
     saveState('s5-saved');
+    updateSummaryCardUI();
+    summaryCard?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
   document.getElementById('print-case-btn')?.addEventListener('click', () => {
     window.print();
   });
 
-  // Initial setup: render locks and show active step
+  // Initial setup: render locks, mentor reveals, summary state, and active step
+  updateSummaryCardUI();
   renderLocks();
+  renderMentorReveals();
   if (state.step && state.step > 0 && state.step <= state.unlockedStep) {
     showPanel(state.step);
   } else {
