@@ -687,6 +687,21 @@ const steps = [
           <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">The Fun Part!</span>
         </div>
 
+        <!-- Step 3 Paper Reference Bar (Easy Copy + Full Copy) -->
+        <div class="mt-5 p-4 bg-blue/5 border border-blue/20 rounded-lg flex flex-wrap items-center justify-between gap-3">
+          <div class="text-[13px] text-body">
+            <strong class="text-ink">Need the simplified paper for Step 3?</strong> Open the 4-page Easy Copy to check the Results &amp; Table 1:
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <a href={sparkSession2.paper.easyPdfPath} target="_blank" rel="noopener" class="btn btn-sm btn-primary">
+              📄 Open Easy Copy (PDF) ↗
+            </a>
+            <a href={sparkSession2.paper.pdfPath} target="_blank" rel="noopener" class="btn btn-sm btn-secondary btn-on-light">
+              Full Copy ↗
+            </a>
+          </div>
+        </div>
+
         <!-- Phase 1: Team Prediction -->
         <div id="predict-phase-1" class="mt-6 bg-white border border-navy/10 p-6 sm:p-8 rounded-lg shadow-sm">
           <div class="flex items-center justify-between flex-wrap gap-2">
@@ -770,9 +785,14 @@ const steps = [
           </div>
 
           <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <a href={sparkSession2.paper.pdfPath} target="_blank" rel="noopener" class="text-[13px] text-blue underline font-medium">
-              📄 Check Results on Page 3 / Page 8 ↗
-            </a>
+            <div class="flex flex-wrap items-center gap-3">
+              <a href={sparkSession2.paper.easyPdfPath} target="_blank" rel="noopener" class="btn btn-sm btn-secondary btn-on-light font-semibold">
+                📄 Open Easy Copy (Page 3) ↗
+              </a>
+              <a href={sparkSession2.paper.pdfPath} target="_blank" rel="noopener" class="text-[13px] text-blue underline font-medium">
+                Full Copy (Page 8) ↗
+              </a>
+            </div>
             <div class="flex items-center gap-3">
               <span id="s3-findings-status" class="text-[12px] font-medium text-emerald-700"></span>
               <button type="button" id="save-results-btn" class="btn btn-primary">

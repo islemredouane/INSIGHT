@@ -177,6 +177,7 @@ export const sparkSession2 = {
     citation: 'Perham, N., & Currie, H. (2014). Does listening to preferred music improve reading comprehension performance? Applied Cognitive Psychology, 28(2), 279–284.',
     doiLink: 'https://doi.org/10.1002/acp.2994',
     pdfPath: '/events/spark-2026/Perham_Currie_2014_SPARK_Student_Copy.pdf',
+    easyPdfPath: '/events/spark-2026/Perham_Currie_2014_Easy_Copy.pdf',
   },
   mentorCue: 'Today you open the paper and check if it answers your questions.',
   paperParts: [
