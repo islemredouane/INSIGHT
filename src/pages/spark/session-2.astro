@@ -1296,9 +1296,25 @@ const steps = [
       }
       markStatus(statusElId, 'saved');
     } catch (e) {
+      // Preserve unsaved fields so a transient Wi-Fi blip does not drop edits
+      pendingPatches[statusElId] = { ...patch, ...(pendingPatches[statusElId] || {}) };
       markStatus(statusElId, friendlyError(e));
     }
   }
+
+  function flushAllPendingSaves() {
+    for (const statusId of Object.keys(pendingPatches)) {
+      if (saveTimers[statusId]) {
+        clearTimeout(saveTimers[statusId]);
+        delete saveTimers[statusId];
+      }
+      flushSave(statusId);
+    }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushAllPendingSaves();
+  });
+  window.addEventListener('pagehide', flushAllPendingSaves);
 
   function queueSave(statusElId: string, patch: Record<string, unknown>, immediate = false) {
     pendingPatches[statusElId] = { ...(pendingPatches[statusElId] || {}), ...patch };
@@ -1713,13 +1729,14 @@ const steps = [
       lastRevealedJson = revJson;
       hydrateRevealedStepDOM(revealedKeys);
     } else if (revJson !== lastRevealedJson) {
-      lastRevealedJson = revJson;
       try {
         revealedKeys = await getSession2RevealedKeys();
+        lastRevealedJson = revJson;
+        hydrateRevealedStepDOM(revealedKeys);
       } catch {
-        revealedKeys = {};
+        // Leave lastRevealedJson unset so the next 4s poll automatically retries
+        lastRevealedJson = '';
       }
-      hydrateRevealedStepDOM(revealedKeys);
     }
 
     renderMentorReveals();
@@ -1984,6 +2001,7 @@ const steps = [
       const val = Number(input.value);
       if (!val) {
         fb.textContent = '';
+        delete answers.pages[part.id];
         return;
       }
       if (part.validPages.includes(val)) {
@@ -2422,6 +2440,7 @@ const steps = [
         teamCode = null;
         const guestPayload = await getSession2State(null);
         renderTeamBanner(null);
+        hydrateInputsFromAnswers();
         if (guestPayload) await applyRoomState(guestPayload.state, guestPayload.revealed_keys);
       } else if (payload) {
         renderTeamBanner(payload.team);
@@ -2456,9 +2475,10 @@ const steps = [
       applyRoomState(s);
     });
 
-    // Poll Reading Card approval live every 4s while team is waiting for Mentor approval
+    // Poll Reading Card approval live every 4s while team is pending or on Step 4
     setInterval(async () => {
-      if (!teamCode || answers.card_status !== 'pending') return;
+      if (!teamCode || answers.card_status === 'approved') return;
+      if (answers.card_status !== 'pending' && activePanel !== 4) return;
       try {
         const fresh = await getSession2State(teamCode);
         if (fresh?.answers && fresh.answers.card_status === 'approved') {

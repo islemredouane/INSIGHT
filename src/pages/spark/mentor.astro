@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { sparkSession2 } from '../../data/spark';
 
 const s2ReadingBoxes = sparkSession2.readingCardBoxes.map((b) => ({ id: b.id, title: b.title }));
+const s2PaperPartsCount = sparkSession2.paperParts.length;
 const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   sparkSession2.conditions.map((c) => [c.id, `${c.icon} ${c.title}`])
 );
@@ -363,9 +364,10 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   </div>
 </BaseLayout>
 
-<script define:vars={{ s2ReadingBoxes, s2ConditionLabels }}>
+<script define:vars={{ s2ReadingBoxes, s2ConditionLabels, s2PaperPartsCount }}>
   window.__S2_READING_BOXES = s2ReadingBoxes;
   window.__S2_CONDITION_LABELS = s2ConditionLabels;
+  window.__S2_PAPER_PARTS_COUNT = s2PaperPartsCount;
 </script>
 
 <script>
@@ -381,6 +383,13 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
 
   const READING_BOXES: { id: string; title: string }[] = (window as any).__S2_READING_BOXES || [];
   const CONDITION_LABELS: Record<string, string> = (window as any).__S2_CONDITION_LABELS || {};
+  const PAPER_PARTS_COUNT: number = Number((window as any).__S2_PAPER_PARTS_COUNT || 5);
+
+  function safeCsvCell(raw: unknown): string {
+    const str = typeof raw === 'object' && raw !== null ? JSON.stringify(raw) : String(raw ?? '');
+    const neutralized = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str;
+    return `"${neutralized.replace(/"/g, '""')}"`;
+  }
 
   const stepLabels = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
   const s2StepLabels = [
@@ -413,6 +422,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   let s2Data: MentorS2Overview | null = null;
   let s2CardFilter: 'all' | 'pending' | 'approved' = 'all';
   let s2InspectTeamId: string | null = null;
+  let s2InspectLastHash = '';
   let s2AnswerKeyCache: Session2AnswerKey | null = null;
 
   // Top Session Switcher
@@ -584,9 +594,30 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       }
 
       const syncEl = document.getElementById('live-sync-label');
-      if (syncEl) syncEl.textContent = `Synced ${new Date().toLocaleTimeString()}`;
+      if (syncEl) {
+        syncEl.textContent = `Synced ${new Date().toLocaleTimeString()}`;
+        syncEl.classList.remove('text-signal');
+      }
     } catch (e) {
+      const msg = friendlyError(e);
       console.error(e);
+      const syncEl = document.getElementById('live-sync-label');
+      if (syncEl) {
+        syncEl.textContent = `Sync warning: ${msg}`;
+        syncEl.classList.add('text-signal');
+      }
+      if (/expired|invalid|mentor session/i.test(msg)) {
+        clearMentor();
+        mentor = null;
+        panel.classList.add('hidden');
+        mentorBadge.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        const errEl = document.getElementById('login-error');
+        if (errEl) {
+          errEl.textContent = 'Mentor session expired — please sign in again.';
+          errEl.classList.remove('hidden');
+        }
+      }
     }
   }
 
@@ -705,7 +736,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
             </td>
             <td class="p-3.5 text-body text-[12px]">${escapeHtml((t.members || []).join(', '))}</td>
             <td class="p-3.5 font-mono text-[12px]">${hwCount}/2</td>
-            <td class="p-3.5 font-mono text-[12px]">${pagesCount}/6 · ${trickCount}/4</td>
+            <td class="p-3.5 font-mono text-[12px]">${pagesCount}/${PAPER_PARTS_COUNT} · ${trickCount}/4</td>
             <td class="p-3.5 font-mono text-[12px]">Y:${yCount} · B:${bCount}</td>
             <td class="p-3.5">${predCell}</td>
             <td class="p-3.5">${cardBadge}</td>
@@ -726,8 +757,12 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     });
   }
 
-  function renderS2Cards() {
+  function renderS2Cards(force = false) {
     const list = document.getElementById('s2-cards-list')!;
+    // Don't clobber the DOM while a mentor is actively typing in a comment input
+    if (!force && document.activeElement && list.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') {
+      return;
+    }
     const teams = s2Data?.teams || [];
     let filtered = teams;
     if (s2CardFilter === 'pending') filtered = teams.filter((t) => t.card_status === 'pending');
@@ -881,11 +916,16 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     const team = s2Data?.teams.find((t) => t.id === teamId);
     if (!team) return;
     s2InspectTeamId = teamId;
+    s2InspectLastHash = '';
     renderInspectModalBody(team);
     inspectModal.classList.remove('hidden');
   }
 
   function renderInspectModalBody(t: MentorS2TeamRow) {
+    const hash = JSON.stringify(t);
+    if (hash === s2InspectLastHash) return;
+    s2InspectLastHash = hash;
+
     document.getElementById('s2-inspect-title')!.textContent = `${t.name} (${t.code})`;
     document.getElementById('s2-inspect-subtitle')!.textContent = `Members: ${(t.members || []).join(', ') || '—'}`;
 
@@ -903,6 +943,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     ).join('');
 
     const body = document.getElementById('s2-inspect-body')!;
+    const prevScroll = body.scrollTop;
     body.innerHTML = `
       <div class="space-y-2 border-b border-navy/10 pb-4">
         <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 0 · Homework Questions</p>
@@ -951,6 +992,8 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
         <p><strong>Reason to be careful:</strong> ${t.cf2?.reasonCareful ? escapeHtml(t.cf2.reasonCareful) : '—'}</p>
       </div>
     `;
+
+    body.scrollTop = prevScroll;
 
     body.querySelector<HTMLButtonElement>('#modal-quick-approve')?.addEventListener('click', async (e) => {
       if (!mentor) return;
@@ -1026,7 +1069,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       target.classList.add('bg-navy/10', 'font-medium');
       target.classList.remove('text-muted');
       s2CardFilter = target.dataset.filter as any;
-      renderS2Cards();
+      renderS2Cards(true);
     });
   });
 
@@ -1039,15 +1082,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       const headers = Object.keys(rows[0]);
       const csv = [
         headers.join(','),
-        ...rows.map((r) =>
-          headers
-            .map((h) => {
-              const raw = (r as any)[h];
-              const str = typeof raw === 'object' && raw !== null ? JSON.stringify(raw) : String(raw ?? '');
-              return `"${str.replace(/"/g, '""')}"`;
-            })
-            .join(',')
-        ),
+        ...rows.map((r) => headers.map((h) => safeCsvCell((r as any)[h])).join(',')),
       ].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
@@ -1179,8 +1214,11 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     }
   }
 
-  function renderQuestions() {
+  function renderQuestions(force = false) {
     const list = document.getElementById('questions-list')!;
+    if (!force && document.activeElement && list.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') {
+      return;
+    }
     let filtered = currentQuestions;
     if (questionFilter === 'pending') filtered = currentQuestions.filter((q) => q.status === 'pending');
     else if (questionFilter === 'approved') filtered = currentQuestions.filter((q) => q.status === 'approved');
@@ -1290,7 +1328,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       target.classList.add('bg-navy/10', 'font-medium');
       target.classList.remove('text-muted');
       questionFilter = target.dataset.filter as any;
-      renderQuestions();
+      renderQuestions(true);
     });
   });
 
@@ -1330,7 +1368,7 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       const headers = Object.keys(rows[0]);
       const csv = [
         headers.join(','),
-        ...rows.map((r) => headers.map((h) => `"${String((r as any)[h] ?? '').replace(/"/g, '""')}"`).join(',')),
+        ...rows.map((r) => headers.map((h) => safeCsvCell((r as any)[h])).join(',')),
       ].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
