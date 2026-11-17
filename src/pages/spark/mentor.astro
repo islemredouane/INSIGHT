@@ -1,16 +1,24 @@
 ---
-// SPARK · The Music Case — mentor panel. Password-gated; the mentor password
-// unlocks steps and watches teams, the admin password also resets the session.
+// SPARK · The Music Case — mentor panel. Password-gated; supports Session 2 (Live) and Session 1 (Archive).
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sparkSession2 } from '../../data/spark';
+
+const s2ReadingBoxes = sparkSession2.readingCardBoxes.map((b) => ({ id: b.id, title: b.title }));
+const s2ConditionLabels: Record<string, string> = Object.fromEntries(
+  sparkSession2.conditions.map((c) => [c.id, `${c.icon} ${c.title}`])
+);
 ---
 <BaseLayout title="Mentor panel · SPARK" description="SPARK 2026 mentor panel." noindex>
   <section class="bg-ink text-white pt-24 xl:pt-32 pb-8 border-b border-white/10">
-    <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+    <div class="max-w-[1160px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
       <div>
         <p class="eyebrow text-peri">SPARK 2026 · The Music Case</p>
         <h1 class="mt-1 font-display text-2xl font-bold">Mentor Panel</h1>
       </div>
       <div id="mentor-badge" class="hidden text-[13px] text-silver/80 flex items-center gap-3">
+        <a href="/spark/session-2" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[12px] font-medium transition-colors">
+          Open Session 2 ↗
+        </a>
         <span id="mentor-role-label" class="bg-white/10 px-2.5 py-1 rounded font-mono uppercase text-[11px]">Mentor</span>
         <button type="button" id="logout-btn" class="hover:text-white underline">Log out</button>
       </div>
@@ -18,13 +26,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   </section>
 
   <section class="bg-paper text-ink py-10 min-h-[70vh]">
-    <div class="max-w-[1100px] mx-auto px-5">
+    <div class="max-w-[1160px] mx-auto px-5">
 
       <!-- Login Form -->
       <form id="login-form" class="max-w-sm mx-auto bg-white border border-navy/10 p-6 sm:p-8 mt-10 rounded shadow-sm">
         <h2 class="font-display text-lg font-bold text-ink">Sign in to Mentor Panel</h2>
         <p class="text-[13px] text-muted mt-1">Enter the mentor password given to organizers.</p>
-        
+
         <label for="mentor-name-input" class="field-label mt-4">Your name (optional)</label>
         <input id="mentor-name-input" class="field mt-1" placeholder="e.g. Amine" />
 
@@ -37,110 +45,361 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <!-- Main Panel -->
       <div id="panel" class="hidden space-y-6">
 
-        <!-- Global Session Control Bar -->
-        <div class="bg-white border border-navy/10 p-5 rounded flex flex-wrap items-center justify-between gap-4 shadow-sm">
-          <div class="flex items-center gap-3">
-            <span class="text-sm font-semibold">Room Progress:</span>
-            <span id="current-step" class="font-display font-bold text-blue text-base">Step 0 · Story</span>
-          </div>
-
+        <!-- Top Session Switcher: Session 2 (Live) vs Session 1 (Archive) -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white border border-navy/10 p-2 rounded-lg shadow-sm">
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" id="unlock-next" class="btn btn-sm btn-primary">Unlock next step</button>
-            <button type="button" id="reveal-mission" class="btn btn-sm btn-secondary btn-on-light">Reveal mission question</button>
+            <button
+              type="button"
+              id="switch-session-2"
+              class="px-4 py-2 rounded-md text-[14px] font-semibold bg-ink text-white flex items-center gap-2 transition-colors"
+            >
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Session 2 · Live</span>
+              <span id="s2-top-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button
+              type="button"
+              id="switch-session-1"
+              class="px-4 py-2 rounded-md text-[14px] font-medium text-muted hover:text-ink hover:bg-paper transition-colors flex items-center gap-2"
+            >
+              <span>Session 1 · Archive</span>
+              <span id="s1-top-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
           </div>
-
-          <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
-            <span class="text-[12px] text-muted font-mono uppercase mr-1">Jump:</span>
-            <div class="flex gap-1" id="jump-steps"></div>
+          <div class="flex items-center gap-2 px-2 text-[12px] text-muted font-mono">
+            <span id="live-sync-label">Live · syncing every 4s</span>
           </div>
         </div>
 
-        <!-- Navigation Tabs: Overview vs Questions -->
-        <div class="flex border-b border-navy/15 gap-4">
-          <button type="button" id="tab-overview" class="mentor-tab active py-2.5 px-4 font-semibold text-[14px] border-b-2 border-blue text-blue transition-colors">
-            Teams Overview
-          </button>
-          <button type="button" id="tab-questions" class="mentor-tab py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
-            <span>Questions</span>
-            <span id="questions-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
-          </button>
-        </div>
+        <!-- =========================================================================
+             SESSION 2 · LIVE PANEL (Default)
+             ========================================================================= -->
+        <div id="session-2-wrap" class="space-y-6">
 
-        <!-- TAB 1: OVERVIEW -->
-        <div id="view-overview" class="space-y-6">
-          <div class="overflow-x-auto bg-white border border-navy/10 rounded shadow-sm">
-            <table class="w-full text-[13px] text-left">
-              <thead class="bg-paper border-b border-navy/10 text-muted uppercase text-[11px] font-mono tracking-wider">
-                <tr>
-                  <th class="p-3.5">Team</th>
-                  <th class="p-3.5">Members</th>
-                  <th class="p-3.5">Assigned Mentor</th>
-                  <th class="p-3.5">Step 1 Question</th>
-                  <th class="p-3.5">Cards</th>
-                  <th class="p-3.5">Key Paper</th>
-                  <th class="p-3.5">Hints</th>
-                  <th class="p-3.5">Last Active</th>
-                  <th class="p-3.5 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody id="teams-body" class="divide-y divide-navy/10"></tbody>
-            </table>
-          </div>
+          <!-- Session 2 Control Bar: Room Step + Live Answer Key Reveals -->
+          <div class="bg-white border border-navy/10 p-5 rounded-lg shadow-sm space-y-4">
+            <!-- Row 1: Room Step Progress -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-muted uppercase font-mono text-[11px] tracking-wider">Session 2 Room Step:</span>
+                <span id="s2-current-step" class="font-display font-bold text-blue text-base">Step 0 · Back to Yacine</span>
+              </div>
 
-          <!-- Quick notes and exports -->
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div class="bg-white border border-navy/10 p-5 rounded shadow-sm">
-              <p class="font-semibold text-ink">Mentor Notes (Session Secrets)</p>
-              <p class="text-[12px] text-muted mb-3">Visible to mentors only — never sent to team pages.</p>
-              <ul id="notes-list" class="text-[13px] space-y-1.5 max-h-56 overflow-y-auto pr-1"></ul>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="s2-unlock-next" class="btn btn-sm btn-primary">Unlock next step →</button>
+              </div>
+
+              <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
+                <span class="text-[12px] text-muted font-mono uppercase mr-1">Jump:</span>
+                <div class="flex gap-1" id="s2-jump-steps"></div>
+              </div>
             </div>
-            
-            <div class="bg-white border border-navy/10 p-5 rounded shadow-sm space-y-3 flex flex-col justify-between">
+
+            <!-- Row 2: Live Room Answer Key Reveals -->
+            <div class="pt-4 border-t border-navy/10 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-[12px] font-mono uppercase tracking-wider font-bold text-ink">👑 Live Answer Key Reveals (All Student Screens)</span>
+                  <p class="text-[12px] text-muted">Click any step below to reveal or hide its official answer key live on every student laptop. Unrevealed keys never leave the server.</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" id="s2-reveal-all" class="px-2.5 py-1 rounded text-[12px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                    Reveal All
+                  </button>
+                  <button type="button" id="s2-hide-all" class="px-2.5 py-1 rounded text-[12px] font-semibold bg-paper text-muted border border-navy/15 hover:text-ink transition-colors">
+                    Hide All
+                  </button>
+                </div>
+              </div>
+              <div id="s2-reveal-controls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Session 2 Quick Stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Teams Active</p>
+              <p id="s2-stat-teams" class="font-display font-bold text-2xl text-ink mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Predictions 🔒</p>
+              <p id="s2-stat-preds" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-amber-200 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-amber-800">Cards Pending</p>
+              <p id="s2-stat-pending" class="font-display font-bold text-2xl text-amber-600 mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-emerald-200 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-emerald-800">Cards Approved</p>
+              <p id="s2-stat-approved" class="font-display font-bold text-2xl text-emerald-600 mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm col-span-2 sm:col-span-1">
+              <p class="font-mono text-[11px] uppercase text-muted">Case File #2</p>
+              <p id="s2-stat-cf2" class="font-display font-bold text-2xl text-ink mt-0.5">0</p>
+            </div>
+          </div>
+
+          <!-- Session 2 Sub-tabs -->
+          <div class="flex flex-wrap border-b border-navy/15 gap-4">
+            <button type="button" id="s2-tab-overview" class="py-2.5 px-4 font-semibold text-[14px] border-b-2 border-blue text-blue transition-colors">
+              Teams Overview
+            </button>
+            <button type="button" id="s2-tab-cards" class="py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
+              <span>Reading Cards Review</span>
+              <span id="s2-cards-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button type="button" id="s2-tab-jar" class="py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
+              <span>🏺 Word Jar &amp; Answer Key</span>
+              <span id="s2-jar-count-badge" class="text-[11px] bg-pink-100 text-pink-800 font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+          </div>
+
+          <!-- S2 SUB-TAB 1: TEAMS OVERVIEW -->
+          <div id="s2-view-overview" class="space-y-4">
+            <div class="overflow-x-auto bg-white border border-navy/10 rounded-lg shadow-sm">
+              <table class="w-full text-[13px] text-left">
+                <thead class="bg-paper border-b border-navy/10 text-muted uppercase text-[11px] font-mono tracking-wider">
+                  <tr>
+                    <th class="p-3.5">Team</th>
+                    <th class="p-3.5">Members</th>
+                    <th class="p-3.5">HW</th>
+                    <th class="p-3.5">Map / 4-Part</th>
+                    <th class="p-3.5">Facts</th>
+                    <th class="p-3.5">Prediction</th>
+                    <th class="p-3.5">Reading Card</th>
+                    <th class="p-3.5">Case File #2</th>
+                    <th class="p-3.5">Updated</th>
+                    <th class="p-3.5 text-right">Inspect</th>
+                  </tr>
+                </thead>
+                <tbody id="s2-teams-body" class="divide-y divide-navy/10">
+                  <tr><td colspan="10" class="p-6 text-center text-muted">Loading live teams…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- S2 SUB-TAB 2: READING CARDS REVIEW -->
+          <div id="s2-view-cards" class="hidden space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-lg border border-navy/10 shadow-sm">
               <div>
-                <p class="font-semibold text-ink">Session Management</p>
-                <p class="text-[12px] text-muted mt-1">Export full session responses or reset for a new workshop.</p>
+                <h2 class="font-display font-bold text-lg text-ink">Step 4 — Reading Cards Review</h2>
+                <p class="text-[13px] text-muted">Review each team's 8-box Reading Card in their own words. Approving pops up a live green ✓ on their laptop.</p>
               </div>
-              <div class="space-y-2">
-                <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export all answers (CSV)</button>
-                <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session (Admin only)</button>
+              <div class="flex gap-2 text-[13px]">
+                <button type="button" class="s2-card-filter-btn px-3 py-1 rounded bg-navy/10 font-medium" data-filter="all">All</button>
+                <button type="button" class="s2-card-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="pending">Pending review</button>
+                <button type="button" class="s2-card-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="approved">Approved</button>
+              </div>
+            </div>
+
+            <div id="s2-cards-list" class="space-y-4">
+              <p class="text-center py-12 text-muted">Loading Reading Cards…</p>
+            </div>
+          </div>
+
+          <!-- S2 SUB-TAB 3: WORD JAR, ANSWER KEY & EXPORT -->
+          <div id="s2-view-jar" class="hidden space-y-6">
+            <div class="grid lg:grid-cols-3 gap-5">
+              <!-- Live Room Word Jar -->
+              <div class="lg:col-span-2 bg-white border border-navy/10 p-6 rounded-lg shadow-sm space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h2 class="font-display font-bold text-lg text-ink">🏺 Live Room Word Jar</h2>
+                    <p class="text-[13px] text-muted">Ranked live across every team's Step 2 Pink Words. Pick the top 2 to explain aloud!</p>
+                  </div>
+                  <span id="s2-jar-total-label" class="font-mono text-[12px] bg-pink-50 text-pink-800 border border-pink-200 px-2.5 py-1 rounded">0 words</span>
+                </div>
+                <div id="s2-word-jar-list" class="flex flex-wrap gap-2">
+                  <p class="text-[13px] text-muted italic">No words added to the jar yet.</p>
+                </div>
+              </div>
+
+              <!-- Session 2 Export & Actions -->
+              <div class="bg-white border border-navy/10 p-6 rounded-lg shadow-sm flex flex-col justify-between space-y-4">
+                <div>
+                  <h3 class="font-display font-bold text-base text-ink">Session 2 Export</h3>
+                  <p class="text-[13px] text-muted mt-1">Download all teams' Session 2 responses (Homework, Page Map, 4-Part Trick, Facts, Word Jar, Predictions, Reading Cards &amp; Case File #2) as CSV.</p>
+                </div>
+                <button type="button" id="s2-export-csv" class="btn btn-sm btn-primary w-full">
+                  Export Session 2 CSV ↓
+                </button>
+              </div>
+            </div>
+
+            <!-- Private Mentor Answer Key Reference -->
+            <div class="bg-white border border-navy/10 p-6 rounded-lg shadow-sm space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-navy/10 pb-3">
+                <div>
+                  <h2 class="font-display font-bold text-lg text-ink">🔑 Private Mentor Answer Key (Session 2)</h2>
+                  <p class="text-[12px] text-muted">Fetched directly from server secrets for authenticated mentors only — never sent to students unless you click Reveal above.</p>
+                </div>
+                <button type="button" id="s2-toggle-key-ref" class="btn btn-sm btn-secondary btn-on-light">
+                  Show Answer Key
+                </button>
+              </div>
+              <div id="s2-mentor-key-body" class="hidden space-y-5 text-[13px]">
+                <p class="text-muted">Loading answer key…</p>
               </div>
             </div>
           </div>
+
         </div>
 
-        <!-- TAB 2: QUESTIONS LAB REVIEW -->
-        <div id="view-questions" class="hidden space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded border border-navy/10">
-            <div>
-              <h2 class="font-display font-bold text-lg text-ink">Step 1 — Research Questions Review</h2>
-              <p class="text-[13px] text-muted">Review teams' questions and 4-field breakdowns. Mentors have one action: Approve.</p>
+        <!-- =========================================================================
+             SESSION 1 · ARCHIVE PANEL (Original Panel Preserved Intact)
+             ========================================================================= -->
+        <div id="session-1-wrap" class="hidden space-y-6">
+
+          <!-- Global Session Control Bar -->
+          <div class="bg-white border border-navy/10 p-5 rounded flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-semibold">Room Progress (Session 1):</span>
+              <span id="current-step" class="font-display font-bold text-blue text-base">Step 0 · Story</span>
             </div>
-            <div class="flex gap-2 text-[13px]">
-              <button type="button" class="q-filter-btn px-3 py-1 rounded bg-navy/10 font-medium" data-filter="all">All</button>
-              <button type="button" class="q-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="pending">Pending review</button>
-              <button type="button" class="q-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="approved">Approved</button>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="unlock-next" class="btn btn-sm btn-primary">Unlock next step</button>
+              <button type="button" id="reveal-mission" class="btn btn-sm btn-secondary btn-on-light">Reveal mission question</button>
+            </div>
+
+            <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
+              <span class="text-[12px] text-muted font-mono uppercase mr-1">Jump:</span>
+              <div class="flex gap-1" id="jump-steps"></div>
             </div>
           </div>
 
-          <div id="questions-list" class="space-y-4">
-            <p class="text-center py-12 text-muted">Loading questions...</p>
+          <!-- Navigation Tabs: Overview vs Questions -->
+          <div class="flex border-b border-navy/15 gap-4">
+            <button type="button" id="tab-overview" class="mentor-tab active py-2.5 px-4 font-semibold text-[14px] border-b-2 border-blue text-blue transition-colors">
+              Teams Overview
+            </button>
+            <button type="button" id="tab-questions" class="mentor-tab py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
+              <span>Questions</span>
+              <span id="questions-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
           </div>
+
+          <!-- TAB 1: OVERVIEW -->
+          <div id="view-overview" class="space-y-6">
+            <div class="overflow-x-auto bg-white border border-navy/10 rounded shadow-sm">
+              <table class="w-full text-[13px] text-left">
+                <thead class="bg-paper border-b border-navy/10 text-muted uppercase text-[11px] font-mono tracking-wider">
+                  <tr>
+                    <th class="p-3.5">Team</th>
+                    <th class="p-3.5">Members</th>
+                    <th class="p-3.5">Assigned Mentor</th>
+                    <th class="p-3.5">Step 1 Question</th>
+                    <th class="p-3.5">Cards</th>
+                    <th class="p-3.5">Key Paper</th>
+                    <th class="p-3.5">Hints</th>
+                    <th class="p-3.5">Last Active</th>
+                    <th class="p-3.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="teams-body" class="divide-y divide-navy/10"></tbody>
+              </table>
+            </div>
+
+            <!-- Quick notes and exports -->
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="bg-white border border-navy/10 p-5 rounded shadow-sm">
+                <p class="font-semibold text-ink">Mentor Notes (Session 1 Secrets)</p>
+                <p class="text-[12px] text-muted mb-3">Visible to mentors only — never sent to team pages.</p>
+                <ul id="notes-list" class="text-[13px] space-y-1.5 max-h-56 overflow-y-auto pr-1"></ul>
+              </div>
+
+              <div class="bg-white border border-navy/10 p-5 rounded shadow-sm space-y-3 flex flex-col justify-between">
+                <div>
+                  <p class="font-semibold text-ink">Session 1 Management</p>
+                  <p class="text-[12px] text-muted mt-1">Export full Session 1 responses or reset for a new workshop.</p>
+                </div>
+                <div class="space-y-2">
+                  <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export Session 1 answers (CSV)</button>
+                  <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session (Admin only)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: QUESTIONS LAB REVIEW -->
+          <div id="view-questions" class="hidden space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded border border-navy/10">
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 1 — Research Questions Review</h2>
+                <p class="text-[13px] text-muted">Review teams' questions and 4-field breakdowns. Mentors have one action: Approve.</p>
+              </div>
+              <div class="flex gap-2 text-[13px]">
+                <button type="button" class="q-filter-btn px-3 py-1 rounded bg-navy/10 font-medium" data-filter="all">All</button>
+                <button type="button" class="q-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="pending">Pending review</button>
+                <button type="button" class="q-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="approved">Approved</button>
+              </div>
+            </div>
+
+            <div id="questions-list" class="space-y-4">
+              <p class="text-center py-12 text-muted">Loading questions...</p>
+            </div>
+          </div>
+
         </div>
-
       </div>
     </div>
   </section>
+
+  <!-- Session 2 Team Inspect Modal -->
+  <div id="s2-inspect-modal" class="hidden fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
+      <div class="px-6 py-4 bg-ink text-white flex items-center justify-between gap-4">
+        <div>
+          <h3 id="s2-inspect-title" class="font-display font-bold text-lg">Team Details</h3>
+          <p id="s2-inspect-subtitle" class="text-[12px] text-silver/80 font-mono mt-0.5"></p>
+        </div>
+        <button type="button" id="s2-inspect-close" class="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-sm font-semibold">
+          Close ✕
+        </button>
+      </div>
+      <div id="s2-inspect-body" class="p-6 overflow-y-auto space-y-5 text-[13px]"></div>
+    </div>
+  </div>
 </BaseLayout>
+
+<script define:vars={{ s2ReadingBoxes, s2ConditionLabels }}>
+  window.__S2_READING_BOXES = s2ReadingBoxes;
+  window.__S2_CONDITION_LABELS = s2ConditionLabels;
+</script>
 
 <script>
   import {
     mentorLogin, mentorOverview, mentorQuestions, mentorApproveStep1,
     mentorSetStep, mentorRevealMission, mentorNotes, mentorExport,
+    mentorS2Overview, mentorS2SetStep, mentorS2SetReveal, mentorS2ApproveCard,
+    mentorS2Export, mentorSession2Key,
     adminReset, getStoredMentor, storeMentor, clearMentor, friendlyError, escapeHtml,
     type MentorOverview, type MentorSession, type MentorQuestionItem,
+    type MentorS2Overview, type MentorS2TeamRow, type Session2AnswerKey,
   } from '../../lib/spark/api';
 
+  const READING_BOXES: { id: string; title: string }[] = (window as any).__S2_READING_BOXES || [];
+  const CONDITION_LABELS: Record<string, string> = (window as any).__S2_CONDITION_LABELS || {};
+
   const stepLabels = ['Story', 'Question', 'Keywords', 'Cards', 'Trail', 'Case file'];
+  const s2StepLabels = [
+    'Back to Yacine',
+    'Skim & Map',
+    'Read in 3 Colours',
+    'Predict & Check',
+    'The Reading Card',
+    'Case File #2',
+  ];
+  const s2RevealLabels = [
+    'Key 0 · HW',
+    'Key 1 · Map/4-Part',
+    'Key 2 · Facts/Jar',
+    'Key 3 · Results/T1',
+    'Key 4 · Reading Card',
+    'Key 5 · Case File #2',
+  ];
+
   const loginForm = document.getElementById('login-form') as HTMLFormElement;
   const panel = document.getElementById('panel')!;
   const mentorBadge = document.getElementById('mentor-badge')!;
@@ -150,7 +409,70 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   let currentQuestions: MentorQuestionItem[] = [];
   let questionFilter: 'all' | 'pending' | 'approved' = 'all';
 
-  // Tabs
+  // Session 2 state
+  let s2Data: MentorS2Overview | null = null;
+  let s2CardFilter: 'all' | 'pending' | 'approved' = 'all';
+  let s2InspectTeamId: string | null = null;
+  let s2AnswerKeyCache: Session2AnswerKey | null = null;
+
+  // Top Session Switcher
+  const switchS2 = document.getElementById('switch-session-2')!;
+  const switchS1 = document.getElementById('switch-session-1')!;
+  const wrapS2 = document.getElementById('session-2-wrap')!;
+  const wrapS1 = document.getElementById('session-1-wrap')!;
+
+  function selectSession(num: 1 | 2) {
+    if (num === 2) {
+      wrapS2.classList.remove('hidden');
+      wrapS1.classList.add('hidden');
+      switchS2.classList.add('bg-ink', 'text-white', 'font-semibold');
+      switchS2.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+      switchS1.classList.remove('bg-ink', 'text-white', 'font-semibold');
+      switchS1.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+    } else {
+      wrapS1.classList.remove('hidden');
+      wrapS2.classList.add('hidden');
+      switchS1.classList.add('bg-ink', 'text-white', 'font-semibold');
+      switchS1.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+      switchS2.classList.remove('bg-ink', 'text-white', 'font-semibold');
+      switchS2.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+    }
+  }
+  switchS2.addEventListener('click', () => selectSession(2));
+  switchS1.addEventListener('click', () => selectSession(1));
+
+  // Session 2 Sub-tabs
+  const s2TabOverview = document.getElementById('s2-tab-overview')!;
+  const s2TabCards = document.getElementById('s2-tab-cards')!;
+  const s2TabJar = document.getElementById('s2-tab-jar')!;
+  const s2ViewOverview = document.getElementById('s2-view-overview')!;
+  const s2ViewCards = document.getElementById('s2-view-cards')!;
+  const s2ViewJar = document.getElementById('s2-view-jar')!;
+
+  function switchS2Tab(tab: 'overview' | 'cards' | 'jar') {
+    const map = [
+      { key: 'overview', btn: s2TabOverview, view: s2ViewOverview },
+      { key: 'cards', btn: s2TabCards, view: s2ViewCards },
+      { key: 'jar', btn: s2TabJar, view: s2ViewJar },
+    ] as const;
+    map.forEach(({ key, btn, view }) => {
+      const active = key === tab;
+      btn.classList.toggle('border-blue', active);
+      btn.classList.toggle('text-blue', active);
+      btn.classList.toggle('font-semibold', active);
+      btn.classList.toggle('border-transparent', !active);
+      btn.classList.toggle('text-muted', !active);
+      btn.classList.toggle('font-medium', !active);
+      view.classList.toggle('hidden', !active);
+    });
+    if (tab === 'cards') renderS2Cards();
+    if (tab === 'jar') renderS2Jar();
+  }
+  s2TabOverview.addEventListener('click', () => switchS2Tab('overview'));
+  s2TabCards.addEventListener('click', () => switchS2Tab('cards'));
+  s2TabJar.addEventListener('click', () => switchS2Tab('jar'));
+
+  // Session 1 Tabs
   const tabOverview = document.getElementById('tab-overview')!;
   const tabQuestions = document.getElementById('tab-questions')!;
   const viewOverview = document.getElementById('view-overview')!;
@@ -178,7 +500,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     }
   }
 
-  // Jump buttons
+  // Session 1 Jump buttons
   const jumpWrap = document.getElementById('jump-steps')!;
   stepLabels.forEach((_, i) => {
     const b = document.createElement('button');
@@ -188,6 +510,31 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     b.title = `Step ${i}: ${stepLabels[i]}`;
     b.addEventListener('click', () => setStep(i));
     jumpWrap.appendChild(b);
+  });
+
+  // Session 2 Jump buttons
+  const s2JumpWrap = document.getElementById('s2-jump-steps')!;
+  s2StepLabels.forEach((label, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.s2Jump = String(i);
+    b.className = 'w-7 h-7 rounded border border-navy/20 text-[12px] font-semibold hover:border-blue hover:text-blue transition-colors';
+    b.textContent = String(i);
+    b.title = `Step ${i}: ${label}`;
+    b.addEventListener('click', () => setS2Step(i));
+    s2JumpWrap.appendChild(b);
+  });
+
+  // Session 2 Reveal toggle buttons
+  const s2RevealWrap = document.getElementById('s2-reveal-controls')!;
+  s2RevealLabels.forEach((label, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.s2Reveal = String(i);
+    b.className = 'px-2.5 py-2 rounded-md border text-[12px] font-semibold transition-all text-left flex items-center justify-between gap-1 bg-paper border-navy/15 text-muted hover:border-blue hover:text-ink';
+    b.innerHTML = `<span class="truncate">${escapeHtml(label)}</span><span class="s2-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy/10">OFF</span>`;
+    b.addEventListener('click', () => toggleS2Reveal(i));
+    s2RevealWrap.appendChild(b);
   });
 
   async function init() {
@@ -214,21 +561,566 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   async function refreshAll() {
     if (!mentor) return;
     try {
-      const [overviewData, questionsData] = await Promise.all([
+      const [s2OverviewData, overviewData, questionsData] = await Promise.all([
+        mentorS2Overview(mentor.token),
         mentorOverview(mentor.token),
         mentorQuestions(mentor.token),
       ]);
+
+      s2Data = s2OverviewData;
+      renderS2Overview(s2OverviewData);
+      if (!s2ViewCards.classList.contains('hidden')) renderS2Cards();
+      if (!s2ViewJar.classList.contains('hidden')) renderS2Jar();
+      if (s2InspectTeamId) {
+        const team = s2OverviewData.teams.find((t) => t.id === s2InspectTeamId);
+        if (team) renderInspectModalBody(team);
+      }
+
       renderOverview(overviewData);
       currentQuestions = questionsData;
       updatePendingBadge();
       if (!viewQuestions.classList.contains('hidden')) {
         renderQuestions();
       }
+
+      const syncEl = document.getElementById('live-sync-label');
+      if (syncEl) syncEl.textContent = `Synced ${new Date().toLocaleTimeString()}`;
     } catch (e) {
       console.error(e);
     }
   }
 
+  /* =========================================================================
+     SESSION 2 RENDERING & HANDLERS
+     ========================================================================= */
+  function countFilled(obj: Record<string, unknown> | undefined | null): number {
+    if (!obj || typeof obj !== 'object') return 0;
+    return Object.values(obj).filter((v) => String(v ?? '').trim().length > 0).length;
+  }
+
+  function countNonEmpty(arr: unknown[] | undefined | null): number {
+    if (!Array.isArray(arr)) return 0;
+    return arr.filter((v) => String(v ?? '').trim().length > 0).length;
+  }
+
+  function renderS2Overview(data: MentorS2Overview) {
+    const step = Number(data.state?.unlocked_step ?? 0);
+    document.getElementById('s2-current-step')!.textContent = `Step ${step} · ${s2StepLabels[step] ?? ''}`;
+
+    // Highlight active jump button
+    s2JumpWrap.querySelectorAll<HTMLButtonElement>('[data-s2-jump]').forEach((btn) => {
+      const idx = Number(btn.dataset.s2Jump);
+      btn.classList.toggle('bg-blue', idx === step);
+      btn.classList.toggle('text-white', idx === step);
+      btn.classList.toggle('border-blue', idx === step);
+    });
+
+    // Update reveal toggles
+    const rev = data.state?.revealed_steps || {};
+    s2RevealWrap.querySelectorAll<HTMLButtonElement>('[data-s2-reveal]').forEach((btn) => {
+      const k = btn.dataset.s2Reveal!;
+      const isOn = Boolean(rev[k]);
+      btn.classList.toggle('bg-emerald-50', isOn);
+      btn.classList.toggle('border-emerald-400', isOn);
+      btn.classList.toggle('text-emerald-900', isOn);
+      btn.classList.toggle('bg-paper', !isOn);
+      btn.classList.toggle('border-navy/15', !isOn);
+      btn.classList.toggle('text-muted', !isOn);
+      const pill = btn.querySelector('.s2-rev-pill');
+      if (pill) {
+        pill.textContent = isOn ? '👁 ON' : 'OFF';
+        pill.className = isOn
+          ? 's2-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-600 text-white'
+          : 's2-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy/10 text-muted';
+      }
+    });
+
+    // Stats & pending badges
+    const teams = data.teams || [];
+    const pendingCards = teams.filter((t) => t.card_status === 'pending').length;
+    const approvedCards = teams.filter((t) => t.card_status === 'approved').length;
+    const lockedPreds = teams.filter((t) => t.prediction_locked).length;
+    const cf2Saved = teams.filter((t) => t.cf2_saved).length;
+
+    document.getElementById('s2-stat-teams')!.textContent = String(teams.length);
+    document.getElementById('s2-stat-preds')!.textContent = String(lockedPreds);
+    document.getElementById('s2-stat-pending')!.textContent = String(pendingCards);
+    document.getElementById('s2-stat-approved')!.textContent = String(approvedCards);
+    document.getElementById('s2-stat-cf2')!.textContent = String(cf2Saved);
+
+    const jarBadge = document.getElementById('s2-jar-count-badge')!;
+    jarBadge.textContent = String((data.word_jar || []).length);
+
+    for (const id of ['s2-cards-pending-badge', 's2-top-pending-badge']) {
+      const el = document.getElementById(id)!;
+      if (pendingCards > 0) {
+        el.textContent = String(pendingCards);
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    // Teams table
+    const body = document.getElementById('s2-teams-body')!;
+    if (!teams.length) {
+      body.innerHTML = '<tr><td colspan="10" class="p-6 text-center text-muted">No teams have joined yet. Share /spark/join with students.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = teams
+      .map((t) => {
+        const hwCount = (t.hw_q1?.trim() ? 1 : 0) + (t.hw_q2?.trim() ? 1 : 0);
+        const pagesCount = Object.values(t.pages || {}).filter((v) => Number(v) > 0).length;
+        const trickCount = countFilled(t.trick as unknown as Record<string, unknown>);
+        const yCount = countNonEmpty(t.yellow);
+        const bCount = countNonEmpty(t.blue);
+        const topPick = t.prediction?.[0] ? CONDITION_LABELS[t.prediction[0]] || t.prediction[0] : '';
+
+        let cardBadge = '<span class="text-muted text-[12px]">Draft</span>';
+        if (t.card_status === 'approved') {
+          cardBadge = '<span class="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-semibold text-[11px]">✓ Approved</span>';
+        } else if (t.card_status === 'pending') {
+          cardBadge = '<span class="text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded font-semibold text-[11px] animate-pulse">⏳ Pending</span>';
+        }
+
+        const predCell = t.prediction_locked
+          ? `<span class="text-emerald-700 font-semibold text-[12px]" title="${escapeHtml(topPick)}">🔒 ${escapeHtml(topPick.slice(0, 18))}</span>`
+          : '<span class="text-muted">—</span>';
+
+        const cf2Cell = t.cf2_saved
+          ? `<span class="text-emerald-700 font-semibold text-[12px]">✓ ${escapeHtml(t.cf2?.choice || 'Saved')}</span>`
+          : '<span class="text-muted">—</span>';
+
+        const updatedTime = t.s2_updated_at || t.last_activity;
+        const timeStr = updatedTime ? new Date(updatedTime).toLocaleTimeString() : '—';
+
+        return `
+          <tr class="hover:bg-paper/70 transition-colors ${t.card_status === 'pending' ? 'bg-amber-50/30' : ''}">
+            <td class="p-3.5 font-semibold text-ink">
+              <button type="button" class="s2-inspect-trigger text-left hover:text-blue hover:underline" data-team-id="${escapeHtml(t.id)}">
+                ${escapeHtml(t.name)}
+                <span class="text-muted font-mono text-[11px] block font-normal">${escapeHtml(t.code)}</span>
+              </button>
+            </td>
+            <td class="p-3.5 text-body text-[12px]">${escapeHtml((t.members || []).join(', '))}</td>
+            <td class="p-3.5 font-mono text-[12px]">${hwCount}/2</td>
+            <td class="p-3.5 font-mono text-[12px]">${pagesCount}/6 · ${trickCount}/4</td>
+            <td class="p-3.5 font-mono text-[12px]">Y:${yCount} · B:${bCount}</td>
+            <td class="p-3.5">${predCell}</td>
+            <td class="p-3.5">${cardBadge}</td>
+            <td class="p-3.5">${cf2Cell}</td>
+            <td class="p-3.5 text-muted text-[12px]">${escapeHtml(timeStr)}</td>
+            <td class="p-3.5 text-right">
+              <button type="button" class="s2-inspect-trigger btn btn-sm btn-secondary btn-on-light !py-1 !px-2.5 !text-[12px]" data-team-id="${escapeHtml(t.id)}">
+                Inspect
+              </button>
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    body.querySelectorAll<HTMLButtonElement>('.s2-inspect-trigger').forEach((btn) => {
+      btn.addEventListener('click', () => openInspectModal(btn.dataset.teamId!));
+    });
+  }
+
+  function renderS2Cards() {
+    const list = document.getElementById('s2-cards-list')!;
+    const teams = s2Data?.teams || [];
+    let filtered = teams;
+    if (s2CardFilter === 'pending') filtered = teams.filter((t) => t.card_status === 'pending');
+    else if (s2CardFilter === 'approved') filtered = teams.filter((t) => t.card_status === 'approved');
+
+    // Sort pending first, then approved, then draft
+    const order: Record<string, number> = { pending: 0, approved: 1, draft: 2 };
+    filtered = [...filtered].sort((a, b) => (order[a.card_status] ?? 2) - (order[b.card_status] ?? 2));
+
+    if (!filtered.length) {
+      list.innerHTML = '<div class="bg-white p-8 text-center text-muted rounded-lg border border-navy/10">No Reading Cards in this filter yet.</div>';
+      return;
+    }
+
+    // Preserve any comment text the mentor is currently typing before re-rendering
+    const draftComments: Record<string, string> = {};
+    list.querySelectorAll<HTMLElement>('[data-s2-card-team]').forEach((el) => {
+      const inp = el.querySelector<HTMLInputElement>('.s2-card-comment-input');
+      if (inp && inp.value) draftComments[el.dataset.s2CardTeam!] = inp.value;
+    });
+
+    list.innerHTML = filtered
+      .map((t) => {
+        const isPending = t.card_status === 'pending';
+        const isApproved = t.card_status === 'approved';
+        const rc = t.reading_card || {};
+        const filledBoxes = READING_BOXES.filter((b) => String(rc[b.id] || '').trim().length > 0).length;
+
+        let badge = `<span class="text-muted bg-navy/5 px-2.5 py-1 rounded text-[12px]">Draft (${filledBoxes}/8 boxes)</span>`;
+        if (isApproved) {
+          badge = `<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded text-[12px]">✓ Approved ${t.card_approved_by ? `by ${escapeHtml(t.card_approved_by)}` : ''}</span>`;
+        } else if (isPending) {
+          badge = `<span class="bg-amber-100 text-amber-900 font-semibold px-2.5 py-1 rounded text-[12px] animate-pulse">⏳ Pending Review (${filledBoxes}/8)</span>`;
+        }
+
+        const boxesHtml = READING_BOXES.map((b) => {
+          const val = String(rc[b.id] || '').trim();
+          return `
+            <div class="bg-paper/70 p-2.5 rounded border border-navy/10">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-muted font-bold">${escapeHtml(b.title)}</p>
+              <p class="text-[13px] text-ink mt-1 whitespace-pre-wrap">${val ? escapeHtml(val) : '<span class="text-muted italic">—</span>'}</p>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="bg-white border ${isPending ? 'border-amber-300 ring-1 ring-amber-200' : 'border-navy/10'} rounded-lg p-5 shadow-sm space-y-4" data-s2-card-team="${escapeHtml(t.id)}">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-navy/10 pb-3">
+              <div>
+                <span class="font-display font-bold text-lg text-ink">${escapeHtml(t.name)}</span>
+                <span class="text-muted font-mono text-[12px] ml-2">${escapeHtml(t.code)}</span>
+                <span class="text-muted text-[13px] block sm:inline sm:ml-3">(${escapeHtml((t.members || []).join(', '))})</span>
+              </div>
+              <div class="flex items-center gap-2">
+                ${badge}
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-2.5">
+              ${boxesHtml}
+            </div>
+
+            ${
+              !isApproved
+                ? `
+              <div class="pt-3 border-t border-navy/10 flex flex-wrap items-center gap-3">
+                <input
+                  class="field !mt-0 text-[13px] !py-1.5 flex-1 min-w-[220px] s2-card-comment-input"
+                  placeholder="Optional mentor note (e.g. 'Great synthesis in your own words!')"
+                  value="${escapeHtml(draftComments[t.id] || '')}"
+                />
+                <button type="button" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white font-semibold s2-approve-card-btn">
+                  ✓ Approve Reading Card
+                </button>
+              </div>
+            `
+                : t.card_mentor_comment
+                  ? `<p class="text-[12px] text-emerald-800 bg-emerald-50 px-3 py-2 rounded border border-emerald-200"><strong>Mentor note:</strong> "${escapeHtml(t.card_mentor_comment)}"</p>`
+                  : ''
+            }
+          </div>
+        `;
+      })
+      .join('');
+
+    list.querySelectorAll<HTMLButtonElement>('.s2-approve-card-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!mentor) return;
+        const cardEl = btn.closest<HTMLElement>('[data-s2-card-team]')!;
+        const teamId = cardEl.dataset.s2CardTeam!;
+        const comment = cardEl.querySelector<HTMLInputElement>('.s2-card-comment-input')?.value.trim() || undefined;
+        btn.disabled = true;
+        btn.textContent = 'Approving…';
+        try {
+          await mentorS2ApproveCard(mentor.token, teamId, mentor.mentorName, comment);
+          await refreshAll();
+        } catch (err) {
+          alert(friendlyError(err));
+          btn.disabled = false;
+          btn.textContent = '✓ Approve Reading Card';
+        }
+      });
+    });
+  }
+
+  function renderS2Jar() {
+    const jarWrap = document.getElementById('s2-word-jar-list')!;
+    const totalLabel = document.getElementById('s2-jar-total-label')!;
+    const words = s2Data?.word_jar || [];
+    const totalCount = words.reduce((acc, w) => acc + Number(w.count || 0), 0);
+    totalLabel.textContent = `${words.length} unique · ${totalCount} total`;
+
+    if (!words.length) {
+      jarWrap.innerHTML = '<p class="text-[13px] text-muted italic">No teams have added Pink Words to the Word Jar yet.</p>';
+      return;
+    }
+
+    jarWrap.innerHTML = words
+      .map((item, idx) => {
+        const isTop = idx < 2;
+        return `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium ${
+            isTop
+              ? 'bg-pink-600 text-white shadow-sm'
+              : 'bg-pink-50 text-pink-900 border border-pink-200'
+          }">
+            ${isTop ? '<span>🔥</span>' : ''}
+            <span>${escapeHtml(item.word)}</span>
+            <span class="font-mono text-[11px] px-1.5 py-0.5 rounded-full ${isTop ? 'bg-white/20 text-white' : 'bg-pink-200/70 text-pink-900'}">${Number(item.count)}×</span>
+          </span>
+        `;
+      })
+      .join('');
+  }
+
+  // Inspect Team Modal
+  const inspectModal = document.getElementById('s2-inspect-modal')!;
+  const inspectClose = document.getElementById('s2-inspect-close')!;
+  inspectClose.addEventListener('click', () => {
+    s2InspectTeamId = null;
+    inspectModal.classList.add('hidden');
+  });
+  inspectModal.addEventListener('click', (e) => {
+    if (e.target === inspectModal) {
+      s2InspectTeamId = null;
+      inspectModal.classList.add('hidden');
+    }
+  });
+
+  function openInspectModal(teamId: string) {
+    const team = s2Data?.teams.find((t) => t.id === teamId);
+    if (!team) return;
+    s2InspectTeamId = teamId;
+    renderInspectModalBody(team);
+    inspectModal.classList.remove('hidden');
+  }
+
+  function renderInspectModalBody(t: MentorS2TeamRow) {
+    document.getElementById('s2-inspect-title')!.textContent = `${t.name} (${t.code})`;
+    document.getElementById('s2-inspect-subtitle')!.textContent = `Members: ${(t.members || []).join(', ') || '—'}`;
+
+    const pagesEntries = Object.entries(t.pages || {})
+      .map(([k, v]) => `<span class="px-2 py-0.5 bg-paper border border-navy/10 rounded font-mono text-[11px]">${escapeHtml(k)}: p.${Number(v)}</span>`)
+      .join(' ');
+
+    const predList = (t.prediction || [])
+      .map((id, idx) => `<li><strong>#${idx + 1}</strong> ${escapeHtml(CONDITION_LABELS[id] || id)}</li>`)
+      .join('');
+
+    const rc = t.reading_card || {};
+    const rcHtml = READING_BOXES.map(
+      (b) => `<div><strong class="text-ink">${escapeHtml(b.title)}:</strong> <span class="text-body">${rc[b.id]?.trim() ? escapeHtml(rc[b.id]) : '—'}</span></div>`
+    ).join('');
+
+    const body = document.getElementById('s2-inspect-body')!;
+    body.innerHTML = `
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 0 · Homework Questions</p>
+        <p><strong>Q1:</strong> ${t.hw_q1?.trim() ? escapeHtml(t.hw_q1) : '<span class="text-muted">—</span>'}</p>
+        <p><strong>Q2:</strong> ${t.hw_q2?.trim() ? escapeHtml(t.hw_q2) : '<span class="text-muted">—</span>'}</p>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 1 · Page Map &amp; 4-Part Trick</p>
+        <div class="flex flex-wrap gap-1.5">${pagesEntries || '<span class="text-muted">No pages mapped yet</span>'}</div>
+        <div class="grid sm:grid-cols-2 gap-2 mt-2 bg-paper p-3 rounded border border-navy/10">
+          <div><strong>Who:</strong> ${t.trick?.who ? escapeHtml(t.trick.who) : '—'}</div>
+          <div><strong>What tested:</strong> ${t.trick?.what ? escapeHtml(t.trick.what) : '—'}</div>
+          <div><strong>Compared to:</strong> ${t.trick?.compared ? escapeHtml(t.trick.compared) : '—'}</div>
+          <div><strong>Measured how:</strong> ${t.trick?.measured ? escapeHtml(t.trick.measured) : '—'}</div>
+        </div>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 2 · 3 Colours &amp; Word Jar</p>
+        <div><strong>Yellow (Method):</strong> ${(t.yellow || []).filter(Boolean).length ? `<ul class="list-disc pl-5">${t.yellow.filter(Boolean).map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>` : '<span class="text-muted">—</span>'}</div>
+        <div><strong>Blue (Results):</strong> ${(t.blue || []).filter(Boolean).length ? `<ul class="list-disc pl-5">${t.blue.filter(Boolean).map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>` : '<span class="text-muted">—</span>'}</div>
+        <div><strong>Pink Word Jar:</strong> ${(t.jar_words || []).length ? t.jar_words.map((w) => `<span class="inline-block px-2 py-0.5 bg-pink-50 text-pink-900 border border-pink-200 rounded-full text-[12px] mr-1">${escapeHtml(w)}</span>`).join('') : '<span class="text-muted">—</span>'}</div>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 3 · Prediction &amp; Findings</p>
+        <p><strong>Status:</strong> ${t.prediction_locked ? '<span class="text-emerald-700 font-semibold">🔒 Locked</span>' : '<span class="text-muted">Not locked yet</span>'}</p>
+        ${predList ? `<ol class="space-y-0.5 pl-1">${predList}</ol>` : ''}
+        <p><strong>What paper really found:</strong> ${t.results_real_text?.trim() ? escapeHtml(t.results_real_text) : '<span class="text-muted">—</span>'}</p>
+        <p><strong>Table 1 Bonus:</strong> ${t.results_bonus_text?.trim() ? escapeHtml(t.results_bonus_text) : '<span class="text-muted">—</span>'}</p>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <div class="flex items-center justify-between gap-2">
+          <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 4 · Reading Card (${escapeHtml(t.card_status)})</p>
+          ${t.card_status !== 'approved' ? `<button type="button" id="modal-quick-approve" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white !py-1 !px-3 !text-[12px]">✓ Approve Card Now</button>` : '<span class="text-emerald-700 font-semibold text-[12px]">✓ Approved</span>'}
+        </div>
+        <div class="space-y-1.5 bg-paper p-3 rounded border border-navy/10">${rcHtml}</div>
+      </div>
+
+      <div class="space-y-2">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 5 · Case File #2 ${t.cf2_saved ? '(✓ Saved)' : '(Draft)'}</p>
+        <p><strong>Homework answered?</strong> ${t.cf2?.choice ? escapeHtml(t.cf2.choice) : '—'} ${t.cf2?.explanation ? `— ${escapeHtml(t.cf2.explanation)}` : ''}</p>
+        <p><strong>Sentence for Yacine:</strong> ${t.cf2?.sentenceYacine ? escapeHtml(t.cf2.sentenceYacine) : '—'}</p>
+        <p><strong>Reason to be careful:</strong> ${t.cf2?.reasonCareful ? escapeHtml(t.cf2.reasonCareful) : '—'}</p>
+      </div>
+    `;
+
+    body.querySelector<HTMLButtonElement>('#modal-quick-approve')?.addEventListener('click', async (e) => {
+      if (!mentor) return;
+      const btn = e.currentTarget as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = 'Approving…';
+      try {
+        await mentorS2ApproveCard(mentor.token, t.id, mentor.mentorName);
+        await refreshAll();
+      } catch (err) {
+        alert(friendlyError(err));
+        btn.disabled = false;
+        btn.textContent = '✓ Approve Card Now';
+      }
+    });
+  }
+
+  // Session 2 Controls
+  async function setS2Step(n: number) {
+    if (!mentor) return;
+    try {
+      await mentorS2SetStep(mentor.token, n);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  }
+
+  async function toggleS2Reveal(step: number) {
+    if (!mentor) return;
+    const current = Boolean(s2Data?.state?.revealed_steps?.[String(step)]);
+    try {
+      await mentorS2SetReveal(mentor.token, step, !current);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  }
+
+  document.getElementById('s2-unlock-next')?.addEventListener('click', async () => {
+    const cur = Number(s2Data?.state?.unlocked_step ?? 0);
+    await setS2Step(Math.min(5, cur + 1));
+  });
+
+  document.getElementById('s2-reveal-all')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      await mentorS2SetReveal(mentor.token, -1, true);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s2-hide-all')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      await mentorS2SetReveal(mentor.token, -1, false);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  // Reading Card Filter Buttons
+  document.querySelectorAll('.s2-card-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.s2-card-filter-btn').forEach((b) => {
+        b.classList.remove('bg-navy/10', 'font-medium');
+        b.classList.add('text-muted');
+      });
+      const target = e.currentTarget as HTMLButtonElement;
+      target.classList.add('bg-navy/10', 'font-medium');
+      target.classList.remove('text-muted');
+      s2CardFilter = target.dataset.filter as any;
+      renderS2Cards();
+    });
+  });
+
+  // Session 2 CSV Export
+  document.getElementById('s2-export-csv')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      const rows = await mentorS2Export(mentor.token);
+      if (!rows.length) return alert('No teams yet.');
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(','),
+        ...rows.map((r) =>
+          headers
+            .map((h) => {
+              const raw = (r as any)[h];
+              const str = typeof raw === 'object' && raw !== null ? JSON.stringify(raw) : String(raw ?? '');
+              return `"${str.replace(/"/g, '""')}"`;
+            })
+            .join(',')
+        ),
+      ].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `spark-session-2-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  // Private Mentor Answer Key Toggle
+  document.getElementById('s2-toggle-key-ref')?.addEventListener('click', async (e) => {
+    if (!mentor) return;
+    const btn = e.currentTarget as HTMLButtonElement;
+    const body = document.getElementById('s2-mentor-key-body')!;
+    const isHidden = body.classList.contains('hidden');
+    if (!isHidden) {
+      body.classList.add('hidden');
+      btn.textContent = 'Show Answer Key';
+      return;
+    }
+    body.classList.remove('hidden');
+    btn.textContent = 'Hide Answer Key';
+
+    if (!s2AnswerKeyCache) {
+      try {
+        s2AnswerKeyCache = await mentorSession2Key(mentor.token);
+      } catch (err) {
+        body.innerHTML = `<p class="text-signal">${escapeHtml(friendlyError(err))}</p>`;
+        return;
+      }
+    }
+
+    const k = s2AnswerKeyCache;
+    body.innerHTML = `
+      <div class="p-4 bg-paper rounded border border-navy/10 space-y-1.5">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 1 · Page Map &amp; 4-Part Trick</p>
+        <div class="flex flex-wrap gap-2">${k.step1.pageMap.map((p) => `<span class="px-2 py-0.5 bg-white rounded border border-navy/10"><strong>${escapeHtml(p.name)}:</strong> ${escapeHtml(p.expected)}</span>`).join('')}</div>
+        <div class="grid sm:grid-cols-2 gap-2 pt-2">${k.step1.fourPartTrick.map((f) => `<div class="bg-white p-2 rounded border border-navy/10"><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(f.expected)} <span class="text-muted text-[11px]">(${escapeHtml(f.where)})</span></div>`).join('')}</div>
+      </div>
+
+      <div class="p-4 bg-paper rounded border border-navy/10 space-y-2">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 2 · 3 Colours &amp; Essential Terms</p>
+        <p><strong>Yellow (Method):</strong> ${k.step2.yellowFacts.map((x) => escapeHtml(x)).join(' • ')}</p>
+        <p><strong>Blue (Results):</strong> ${k.step2.blueFacts.map((x) => escapeHtml(x)).join(' • ')}</p>
+        <p class="text-amber-900"><strong>Common mistake:</strong> ${escapeHtml(k.step2.commonMistake)}</p>
+        <div class="grid sm:grid-cols-2 gap-2 pt-1">${k.step2.essentialTerms.map((t) => `<div class="bg-white p-2 rounded border border-navy/10"><strong>${escapeHtml(t.term)}:</strong> ${escapeHtml(t.definition)}</div>`).join('')}</div>
+      </div>
+
+      <div class="p-4 bg-paper rounded border border-navy/10 space-y-2">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 3 · Real Ranking &amp; Table 1</p>
+        <ol class="space-y-1">${k.step3.ranking.map((r) => `<li><strong>${escapeHtml(r.rank)} ${escapeHtml(r.icon)} ${escapeHtml(r.title)}</strong> — ${escapeHtml(r.note)}</li>`).join('')}</ol>
+        <p class="pt-1"><strong>Table 1 Bonus:</strong> ${escapeHtml(k.step3.table1.bonusAnswer)}</p>
+      </div>
+
+      <div class="p-4 bg-paper rounded border border-navy/10 space-y-1.5">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 4 · Model Reading Card</p>
+        <p class="text-emerald-800 font-medium">${escapeHtml(k.step4.approvalRule)}</p>
+        <div class="grid sm:grid-cols-2 gap-2 pt-1">${k.step4.boxes.map((b) => `<div class="bg-white p-2 rounded border border-navy/10"><strong>${escapeHtml(b.title)}:</strong> ${escapeHtml(b.answer)}</div>`).join('')}</div>
+      </div>
+
+      <div class="p-4 bg-paper rounded border border-navy/10 space-y-1.5">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 5 · Case File #2 Model Verdict</p>
+        <p><strong>Model sentence for Yacine:</strong> "${escapeHtml(k.step5.modelVerdict)}"</p>
+        <p><strong>Accepted limits:</strong> ${k.step5.acceptedLimits.map((x) => escapeHtml(x)).join(' • ')}</p>
+      </div>
+    `;
+  });
+
+  /* =========================================================================
+     SESSION 1 RENDERING & HANDLERS (Preserved)
+     ========================================================================= */
   function renderOverview(data: MentorOverview) {
     document.getElementById('current-step')!.textContent = `Step ${data.state.unlocked_step} · ${stepLabels[data.state.unlocked_step]}`;
     (document.getElementById('reveal-mission') as HTMLButtonElement).classList.toggle('btn-primary', data.state.mission_revealed);
@@ -276,12 +1168,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   function updatePendingBadge() {
     const pendingCount = currentQuestions.filter((q) => q.status === 'pending').length;
-    const badge = document.getElementById('questions-pending-badge')!;
-    if (pendingCount > 0) {
-      badge.textContent = String(pendingCount);
-      badge.classList.remove('hidden');
-    } else {
-      badge.classList.add('hidden');
+    for (const id of ['questions-pending-badge', 's1-top-pending-badge']) {
+      const badge = document.getElementById(id)!;
+      if (pendingCount > 0) {
+        badge.textContent = String(pendingCount);
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
     }
   }
 
@@ -325,13 +1219,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               </div>
             </div>
 
-            <!-- Question text -->
             <div>
               <p class="font-mono text-[11px] uppercase tracking-wider text-muted">Research question</p>
               <p class="text-[16px] font-medium text-ink mt-1 font-serif">${q.question_text ? escapeHtml(q.question_text) : '<span class="text-muted italic">Not written yet</span>'}</p>
             </div>
 
-            <!-- 4 breakdown fields -->
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[13px] bg-paper p-3 rounded border border-navy/10">
               <div><span class="font-semibold text-ink">Who:</span> <span class="text-body">${q.who ? escapeHtml(q.who) : '—'}</span></div>
               <div><span class="font-semibold text-ink">What tested:</span> <span class="text-body">${q.what ? escapeHtml(q.what) : '—'}</span></div>
@@ -339,7 +1231,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               <div><span class="font-semibold text-ink">Measured how:</span> <span class="text-body">${q.measured_how ? escapeHtml(q.measured_how) : '—'}</span></div>
             </div>
 
-            <!-- Action bar -->
             ${
               isPending
                 ? `
@@ -367,7 +1258,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       })
       .join('');
 
-    // Attach approve handlers
     list.querySelectorAll('.approve-btn').forEach((btn) => {
       btn.addEventListener('click', async (e) => {
         const target = e.currentTarget as HTMLButtonElement;
@@ -390,7 +1280,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     });
   }
 
-  // Filter buttons in Questions tab
   document.querySelectorAll('.q-filter-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       document.querySelectorAll('.q-filter-btn').forEach((b) => {

@@ -392,6 +392,140 @@ export const mentorNotes = (token: string) =>
 export const mentorSession2Key = (token: string) =>
   rpc<Session2AnswerKey>('spark_session2_answer_key', { p_token: token });
 
+/* ---- Session 2 Live Types & RPCs ---- */
+export interface Session2RoomState {
+  unlocked_step: number;
+  revealed_steps: Record<string, boolean>;
+  updated_at?: string;
+}
+
+export interface Session2TeamAnswers {
+  team_id?: string;
+  hw_q1: string;
+  hw_q2: string;
+  pages: Record<string, number>;
+  trick: { who: string; what: string; compared: string; measured: string };
+  yellow: string[];
+  blue: string[];
+  jar_words: string[];
+  prediction: string[];
+  prediction_locked: boolean;
+  results_real_text: string;
+  results_bonus_text: string;
+  reading_card: Record<string, string>;
+  card_status: 'draft' | 'pending' | 'approved';
+  card_submitted_at?: string | null;
+  card_approved_at?: string | null;
+  card_approved_by?: string | null;
+  card_mentor_comment?: string | null;
+  cf2: {
+    choice: string;
+    explanation: string;
+    sentenceYacine: string;
+    reasonCareful: string;
+  };
+  cf2_saved: boolean;
+  updated_at?: string;
+}
+
+export interface Session2TeamPayload {
+  team: { id: string; code: string; name: string; members: string[] } | null;
+  state: Session2RoomState;
+  answers: Session2TeamAnswers | null;
+  revealed_keys: Partial<Session2AnswerKey>;
+}
+
+export interface MentorS2TeamRow extends Session2TeamAnswers {
+  id: string;
+  code: string;
+  name: string;
+  members: string[];
+  last_activity: string;
+  s2_updated_at?: string | null;
+}
+
+export interface MentorS2Overview {
+  state: Session2RoomState;
+  teams: MentorS2TeamRow[];
+  word_jar: { word: string; count: number }[];
+}
+
+export const getSession2State = (code?: string | null) =>
+  rpc<Session2TeamPayload | null>('spark_s2_get_state', { p_code: code || null });
+
+export const getSession2RevealedKeys = () =>
+  rpc<Partial<Session2AnswerKey>>('spark_s2_revealed_keys');
+
+export const saveSession2Progress = (code: string, patch: Record<string, unknown>) =>
+  rpc<Session2TeamAnswers>('spark_s2_save', { p_code: code, p_patch: patch });
+
+export const submitSession2Card = (code: string, readingCard: Record<string, string>) =>
+  rpc<Session2TeamAnswers>('spark_s2_submit_card', { p_code: code, p_reading_card: readingCard });
+
+export const mentorS2Overview = (token: string) =>
+  rpc<MentorS2Overview>('spark_mentor_s2_overview', { p_token: token });
+
+export const mentorS2SetStep = (token: string, step: number) =>
+  rpc<void>('spark_mentor_s2_set_step', { p_token: token, p_step: step });
+
+export const mentorS2SetReveal = (token: string, step: number, revealed: boolean) =>
+  rpc<Record<string, boolean>>('spark_mentor_s2_set_reveal', {
+    p_token: token,
+    p_step: step,
+    p_revealed: revealed,
+  });
+
+export const mentorS2ApproveCard = (
+  token: string,
+  teamId: string,
+  mentorName?: string,
+  comment?: string
+) =>
+  rpc<void>('spark_mentor_s2_approve_card', {
+    p_token: token,
+    p_team_id: teamId,
+    p_mentor_name: mentorName || null,
+    p_comment: comment || null,
+  });
+
+export const mentorS2Export = (token: string) =>
+  rpc<Record<string, unknown>[]>('spark_mentor_s2_export', { p_token: token });
+
+export function watchSession2State(onChange: (s: Session2RoomState) => void): () => void {
+  let stopped = false;
+  const poll = async () => {
+    if (stopped) return;
+    try {
+      const { data } = await sb()
+        .from('spark_session2_state')
+        .select('unlocked_step, revealed_steps, updated_at')
+        .eq('id', true)
+        .single();
+      if (data) onChange(data as Session2RoomState);
+    } catch {
+      /* network hiccup */
+    }
+  };
+  poll();
+  const interval = setInterval(poll, 4000);
+  const channel = sb()
+    .channel('spark-session2-state')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'spark_session2_state' },
+      (payload) => {
+        onChange(payload.new as Session2RoomState);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    stopped = true;
+    clearInterval(interval);
+    sb().removeChannel(channel);
+  };
+}
+
 export const mentorExport = (token: string) =>
   rpc<Record<string, unknown>[]>('spark_mentor_export', { p_token: token });
 

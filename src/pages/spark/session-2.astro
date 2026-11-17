@@ -854,24 +854,33 @@ const steps = [
             <span id="s4-card-status" class="text-[13px] text-muted">Fill the 8 boxes, then send to your mentor</span>
           </div>
 
-          <!-- Waiting Banner (Shown after student submits, before mentor reveals/approves Step 4) -->
+          <!-- Waiting Banner (Shown after student submits, before mentor approves) -->
           <div id="card-mentor-waiting" class="hidden mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 flex items-start gap-3">
             <span class="text-xl leading-none">⏳</span>
             <div>
               <p class="font-bold text-amber-900 text-[14px]">Sent to Mentor — Waiting for Review</p>
               <p class="text-[13px] text-amber-800 mt-0.5 leading-relaxed">
-                Call your mentor over (or wait for room debrief). Your mentor will approve your card with a green ✓ and reveal the official example Reading Card.
+                Your Reading Card is live on the Mentor Panel! As soon as your mentor approves it, a green ✓ will appear here automatically.
               </p>
+            </div>
+          </div>
+
+          <!-- Live Individual Team Mentor Approval Banner (from /spark/mentor) -->
+          <div id="card-mentor-approved-personal" class="hidden mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 flex items-start gap-3">
+            <span class="text-2xl leading-none text-emerald-600 font-bold">✓</span>
+            <div>
+              <p id="card-approved-title" class="font-bold text-emerald-900 text-[14px]">Reading Card Approved by Mentor!</p>
+              <p id="card-approved-comment" class="hidden text-[13px] text-emerald-800 mt-1 leading-relaxed"></p>
             </div>
           </div>
 
           <!-- Locked Banner before Mentor Reveal -->
           <div data-mentor-locked="4" class="mt-4 flex items-center gap-2 text-[12px] text-muted bg-paper/70 border border-dashed border-navy/15 rounded-md px-3.5 py-2.5">
             <span>🔒</span>
-            <span>Example Reading Card &amp; Mentor approval unlock after your team submits and your mentor reveals Step 4.</span>
+            <span>Official Example Reading Card unlocks when your mentor reveals Step 4 for the room.</span>
           </div>
 
-          <!-- Mentor Reveal: Approved Banner + Official Example Reading Card (Server-hydrated) -->
+          <!-- Mentor Reveal: Official Example Reading Card (Server-hydrated) -->
           <div id="mentor-reveal-4" data-mentor-reveal="4" class="hidden mt-4 space-y-4"></div>
         </div>
 
@@ -1156,15 +1165,62 @@ const steps = [
 <script>
   import { sparkSession2 } from '../../data/spark';
   import {
-    getTeam, getStoredTeamCode, storeTeamCode, clearTeamCode,
-    mentorLogin, mentorSession2Key, getStoredMentor, storeMentor, clearMentor,
-    friendlyError, escapeHtml, type Session2AnswerKey,
+    getStoredTeamCode, storeTeamCode, clearTeamCode,
+    mentorLogin, getStoredMentor, storeMentor, clearMentor,
+    getSession2State, getSession2RevealedKeys, saveSession2Progress, submitSession2Card,
+    mentorS2SetStep, mentorS2SetReveal, watchSession2State,
+    friendlyError, escapeHtml,
+    type Session2AnswerKey, type Session2RoomState, type Session2TeamAnswers,
   } from '../../lib/spark/api';
 
-  // Team handling
-  let teamCode = getStoredTeamCode() || 'DEMO';
-  let STORAGE_KEY = `spark-s2-${teamCode}`;
+  // ---- Team & Live State (100% Supabase Postgres — zero localStorage game state) ----
+  let teamCode: string | null = getStoredTeamCode();
+  let activePanel = 0;
 
+  let roomState: Session2RoomState = {
+    unlocked_step: 0,
+    revealed_steps: { '0': false, '1': false, '2': false, '3': false, '4': false, '5': false },
+  };
+  let revealedKeys: Partial<Session2AnswerKey> = {};
+  let lastRevealedJson = '';
+
+  const defaultAnswers: Session2TeamAnswers = {
+    hw_q1: '',
+    hw_q2: '',
+    pages: {},
+    trick: { who: '', what: '', compared: '', measured: '' },
+    yellow: ['', '', ''],
+    blue: ['', ''],
+    jar_words: [],
+    prediction: ['quiet', 'liked', 'no_lyrics', 'disliked'],
+    prediction_locked: false,
+    results_real_text: '',
+    results_bonus_text: '',
+    reading_card: {
+      reference: sparkSession2.paper.citation,
+      question: '',
+      who: '',
+      what_done: '',
+      main_result: '',
+      explanation: '',
+      limits: '',
+      our_questions: '',
+    },
+    card_status: 'draft',
+    card_approved_by: null,
+    card_mentor_comment: null,
+    cf2: {
+      choice: 'yes',
+      explanation: '',
+      sentenceYacine: '',
+      reasonCareful: '',
+    },
+    cf2_saved: false,
+  };
+
+  let answers: Session2TeamAnswers = structuredClone(defaultAnswers);
+
+  // ---- DOM refs ----
   const teamBanner = document.getElementById('team-banner');
   const bannerIconBox = document.getElementById('banner-icon-box');
   const bannerName = document.getElementById('banner-team-name');
@@ -1177,7 +1233,7 @@ const steps = [
   const inlineInput = document.getElementById('inline-team-code') as HTMLInputElement | null;
   const inlineBtn = document.getElementById('inline-connect-btn') as HTMLButtonElement | null;
 
-  let feedbackTimer: any = null;
+  let feedbackTimer: ReturnType<typeof setTimeout> | null = null;
   function showBannerFeedback(message: string, type: 'error' | 'success') {
     if (!bannerFeedback) return;
     if (feedbackTimer) clearTimeout(feedbackTimer);
@@ -1200,57 +1256,89 @@ const steps = [
     bannerFeedback.textContent = '';
   }
 
-  async function syncTeamInfo() {
-    teamCode = getStoredTeamCode() || 'DEMO';
-    STORAGE_KEY = `spark-s2-${teamCode}`;
+  function markStatus(id: string, st: 'saving' | 'saved' | string) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('status-saving', 'status-saved', 'status-error');
+    if (st === 'saving') {
+      el.textContent = 'Saving to server…';
+      el.classList.add('status-saving');
+    } else if (st === 'saved') {
+      el.textContent = '✓ Saved live';
+      el.classList.add('status-saved');
+    } else {
+      el.textContent = st;
+      el.classList.add('status-error');
+    }
+  }
 
-    if (teamCode && teamCode !== 'DEMO') {
-      try {
-        const data = await getTeam(teamCode);
-        if (data && data.team) {
-          if (teamLabel) teamLabel.textContent = `Team ${data.team.name}`;
-          if (teamBadge) teamBadge.textContent = `${data.team.code} · ${data.team.members.length} Members`;
-          if (bannerName) bannerName.textContent = `Team ${data.team.name}`;
-          if (bannerMembers) bannerMembers.textContent = `Members: ${data.team.members.join(', ')}`;
-          if (bannerBadge) {
-            bannerBadge.textContent = `✓ Code: ${data.team.code}`;
-            bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold';
-          }
-          if (bannerIconBox) bannerIconBox.textContent = '✨';
-          teamBanner?.classList.add('is-connected');
-          return;
-        }
-      } catch (err) {
-        console.warn('Backend sync warning:', err);
+  // ---- Debounced Live Supabase Auto-Save ----
+  const saveTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+  const pendingPatches: Record<string, Record<string, unknown>> = {};
+
+  async function flushSave(statusElId: string, immediatePatch?: Record<string, unknown>) {
+    const patch = { ...(pendingPatches[statusElId] || {}), ...(immediatePatch || {}) };
+    delete pendingPatches[statusElId];
+    if (!Object.keys(patch).length) return;
+
+    if (!teamCode) {
+      markStatus(statusElId, 'Enter your Team Code above to save live');
+      return;
+    }
+
+    markStatus(statusElId, 'saving');
+    try {
+      const updated = await saveSession2Progress(teamCode, patch);
+      if (updated) {
+        answers.card_status = updated.card_status || answers.card_status;
+        answers.card_approved_by = updated.card_approved_by ?? answers.card_approved_by;
+        answers.card_mentor_comment = updated.card_mentor_comment ?? answers.card_mentor_comment;
       }
+      markStatus(statusElId, 'saved');
+    } catch (e) {
+      markStatus(statusElId, friendlyError(e));
+    }
+  }
 
-      // Offline fallback with code
-      if (teamLabel) teamLabel.textContent = `Team ${teamCode}`;
-      if (teamBadge) teamBadge.textContent = `Code: ${teamCode}`;
-      if (bannerName) bannerName.textContent = `Team ${teamCode}`;
-      if (bannerMembers) bannerMembers.textContent = `Connected with code ${teamCode}`;
+  function queueSave(statusElId: string, patch: Record<string, unknown>, immediate = false) {
+    pendingPatches[statusElId] = { ...(pendingPatches[statusElId] || {}), ...patch };
+    if (saveTimers[statusElId]) clearTimeout(saveTimers[statusElId]);
+    if (immediate) {
+      flushSave(statusElId);
+    } else {
+      if (teamCode) markStatus(statusElId, 'saving');
+      saveTimers[statusElId] = setTimeout(() => flushSave(statusElId), 550);
+    }
+  }
+
+  // ---- Render Team Identity Banner ----
+  function renderTeamBanner(team: { id: string; code: string; name: string; members: string[] } | null) {
+    if (team) {
+      if (teamLabel) teamLabel.textContent = `Team ${team.name}`;
+      if (teamBadge) teamBadge.textContent = `${team.code} · ${team.members.length} Members`;
+      if (bannerName) bannerName.textContent = `Team ${team.name}`;
+      if (bannerMembers) bannerMembers.textContent = `Members: ${team.members.join(', ')} · Live sync active`;
       if (bannerBadge) {
-        bannerBadge.textContent = `Code: ${teamCode}`;
-        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-blue/10 text-blue font-semibold';
+        bannerBadge.textContent = `✓ Code: ${team.code}`;
+        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold';
       }
-      if (bannerIconBox) bannerIconBox.textContent = '👥';
+      if (bannerIconBox) bannerIconBox.textContent = '✨';
       teamBanner?.classList.add('is-connected');
     } else {
-      // Explorer / Guest mode
       if (teamLabel) teamLabel.textContent = 'The Music Case · Part 2';
-      if (teamBadge) teamBadge.textContent = 'Explorer Mode';
-      if (bannerName) bannerName.textContent = 'Working with a team?';
-      if (bannerMembers) bannerMembers.textContent = 'Have a team code from Session 1? Enter it below. New to SPARK? Register a team in 1 minute!';
+      if (teamBadge) teamBadge.textContent = 'Not Connected';
+      if (bannerName) bannerName.textContent = 'Connect your team to save live!';
+      if (bannerMembers) bannerMembers.textContent = 'Enter your 6-character team code from Session 1 below, or register a new team in 1 minute so your answers go live to your mentor.';
       if (bannerBadge) {
-        bannerBadge.textContent = 'Explorer Mode';
-        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-paper text-muted border border-navy/10 font-medium';
+        bannerBadge.textContent = 'Connect Required';
+        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-amber-100 text-amber-900 border border-amber-300 font-semibold';
       }
       if (bannerIconBox) bannerIconBox.textContent = '👥';
       teamBanner?.classList.remove('is-connected');
     }
   }
 
-  // Connect button click
+  // ---- Connect / Switch Team ----
   async function handleConnectCode() {
     if (!inlineInput) return;
     const raw = inlineInput.value.trim().toUpperCase();
@@ -1262,17 +1350,14 @@ const steps = [
     clearBannerFeedback();
 
     try {
-      const data = await getTeam(raw);
-      if (!data || !data.team) {
+      const payload = await getSession2State(raw);
+      if (!payload || !payload.team) {
         throw new Error("That code wasn't found. Check the letters or register a new team.");
       }
       storeTeamCode(raw);
       teamCode = raw;
-      STORAGE_KEY = `spark-s2-${teamCode}`;
-      showBannerFeedback(`✓ Connected as Team ${data.team.name}! Loading team workspace…`, 'success');
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      showBannerFeedback(`✓ Connected as Team ${payload.team.name}! Loading live workspace…`, 'success');
+      setTimeout(() => window.location.reload(), 400);
     } catch (err: any) {
       showBannerFeedback(friendlyError(err), 'error');
       if (inlineBtn) inlineBtn.disabled = false;
@@ -1289,157 +1374,366 @@ const steps = [
 
   switchTeamBtn?.addEventListener('click', () => {
     clearTeamCode();
-    showBannerFeedback('Switched to Explorer Mode. Reloading workspace…', 'success');
-    setTimeout(() => {
-      window.location.reload();
-    }, 400);
+    showBannerFeedback('Disconnected team. Reloading…', 'success');
+    setTimeout(() => window.location.reload(), 300);
   });
 
-  // Run on load
-  syncTeamInfo();
-
-  // Load existing state from localStorage
-  interface Session2State {
-    step: number;
-    unlockedStep: number;
-    mentorReveals: Record<number, boolean>;
-    hw_q1: string;
-    hw_q2: string;
-    pages: Record<string, number>;
-    trick: { who: string; what: string; compared: string; measured: string };
-    yellow: string[];
-    blue: string[];
-    jarWords: string[];
-    prediction: string[]; // condition ids in ranked order
-    predictionLocked: boolean;
-    resultsRealText: string;
-    resultsBonusText: string;
-    readingCard: Record<string, string>;
-    cardSubmitted: boolean;
-    cf2Saved: boolean;
-    cf2: {
-      choice: string;
-      explanation: string;
-      sentenceYacine: string;
-      reasonCareful: string;
-    };
-  }
-
-  const defaultReveals: Record<number, boolean> = {
-    0: false,
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-  };
-
-  const defaultState: Session2State = {
-    step: 0,
-    unlockedStep: 0,
-    mentorReveals: { ...defaultReveals },
-    hw_q1: '',
-    hw_q2: '',
-    pages: {},
-    trick: { who: '', what: '', compared: '', measured: '' },
-    yellow: ['', '', ''],
-    blue: ['', ''],
-    jarWords: [],
-    prediction: ['quiet', 'liked', 'no_lyrics', 'disliked'],
-    predictionLocked: false,
-    resultsRealText: '',
-    resultsBonusText: '',
-    readingCard: {
-      reference: sparkSession2.paper.citation,
-      question: '',
-      who: '',
-      what_done: '',
-      main_result: '',
-      explanation: '',
-      limits: '',
-      our_questions: '',
-    },
-    cardSubmitted: false,
-    cf2Saved: false,
-    cf2: {
-      choice: 'yes',
-      explanation: '',
-      sentenceYacine: '',
-      reasonCareful: '',
-    },
-  };
-
-  const LEGACY_JAR_JSON = JSON.stringify([
-    'Within design',
-    'Significant (p < .05)',
-    'Counterbalanced',
-    'Pilot study',
-    'Likert scale',
-  ]);
-
-  let state: Session2State = {
-    ...defaultState,
-    mentorReveals: { ...defaultReveals },
-  };
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const parsedJar = Array.isArray(parsed.jarWords)
-        ? (JSON.stringify(parsed.jarWords) === LEGACY_JAR_JSON ? [] : parsed.jarWords)
-        : [];
-      state = {
-        ...defaultState,
-        ...parsed,
-        jarWords: parsedJar,
-        mentorReveals: { ...defaultReveals, ...(parsed.mentorReveals || {}) },
-        trick: { ...defaultState.trick, ...(parsed.trick || {}) },
-        readingCard: { ...defaultState.readingCard, ...(parsed.readingCard || {}) },
-        cf2: { ...defaultState.cf2, ...(parsed.cf2 || {}) },
-      };
+  // ---- Server-Hydrated Mentor Reveal DOM Renderer (ONLY renders steps revealed in Supabase!) ----
+  function hydrateRevealedStepDOM(keys: Partial<Session2AnswerKey>) {
+    // Step 0
+    const r0 = document.getElementById('mentor-reveal-0');
+    if (r0) {
+      if (keys.step0) {
+        r0.innerHTML = `
+          <p class="text-[11px] font-mono uppercase text-blue font-bold tracking-wider">👑 Mentor Reveal · Sample Homework Questions</p>
+          <p class="text-[12px] text-muted mt-0.5">Click any example below to add it to your team’s questions:</p>
+          <div class="mt-2.5 flex flex-wrap gap-2">
+            ${keys.step0.sampleHomeworkQuestions
+              .map(
+                (q) =>
+                  `<button type="button" class="hw-chip text-[12px] bg-white hover:bg-blue/10 text-body hover:text-blue border border-navy/10 px-3 py-1.5 rounded transition text-left" data-suggestion="${escapeHtml(q)}">+ ${escapeHtml(q)}</button>`
+              )
+              .join('')}
+          </div>
+        `;
+        r0.querySelectorAll<HTMLButtonElement>('.hw-chip').forEach((chip) => {
+          chip.addEventListener('click', () => {
+            const text = chip.dataset.suggestion || '';
+            if (!text) return;
+            if (hwQ1?.value.trim() === text || hwQ2?.value.trim() === text) return;
+            if (hwQ1 && !hwQ1.value.trim()) {
+              hwQ1.value = text;
+              answers.hw_q1 = text;
+              queueSave('s0-saved', { hw_q1: text }, true);
+            } else if (hwQ2) {
+              hwQ2.value = text;
+              answers.hw_q2 = text;
+              queueSave('s0-saved', { hw_q2: text }, true);
+            }
+          });
+        });
+      } else {
+        r0.innerHTML = '';
+      }
     }
-  } catch (e) {
-    console.error('Failed to load session 2 state', e);
-  }
 
-  function saveState(statusElId?: string) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      if (statusElId) markStatus(statusElId, 'saved');
-    } catch (e) {
-      console.error('Save failed', e);
-      if (statusElId) markStatus(statusElId, 'Save error');
+    // Step 1
+    const r1 = document.getElementById('mentor-reveal-1');
+    if (r1) {
+      if (keys.step1) {
+        r1.innerHTML = `
+          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 1 Answer Key</p>
+          <div>
+            <p class="font-semibold text-ink mb-1.5">Task A · Official Page Map</p>
+            <ul class="space-y-1 text-body text-[12px]">
+              ${keys.step1.pageMap.map((p) => `<li><strong>${escapeHtml(p.name)}:</strong> ${escapeHtml(p.expected)}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="pt-3 border-t border-blue/15 space-y-1.5 text-body">
+            <p class="font-semibold text-ink">Task B · Expected Four-Part Trick Answers</p>
+            ${keys.step1.fourPartTrick
+              .map(
+                (f) =>
+                  `<p><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(f.expected)} <span class="text-muted text-[11px]">(${escapeHtml(f.where)})</span></p>`
+              )
+              .join('')}
+            <p class="text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5 mt-2">
+              <strong>Mentor tip:</strong> ${escapeHtml(keys.step1.mentorTip)}
+            </p>
+          </div>
+        `;
+      } else {
+        r1.innerHTML = '';
+      }
     }
-  }
 
-  function markStatus(id: string, st: 'saving' | 'saved' | string) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.remove('status-saving', 'status-saved', 'status-error');
-    if (st === 'saving') {
-      el.textContent = 'Saving…';
-      el.classList.add('status-saving');
-    } else if (st === 'saved') {
-      el.textContent = '✓ Saved';
-      el.classList.add('status-saved');
+    // Step 2
+    const r2y = document.getElementById('mentor-reveal-2-yellow');
+    const r2b = document.getElementById('mentor-reveal-2-blue');
+    const r2j = document.getElementById('mentor-reveal-2-jar');
+    if (keys.step2) {
+      if (r2y) {
+        r2y.innerHTML = `
+          <p class="font-mono text-[11px] uppercase tracking-wider text-amber-900 font-bold">👑 Mentor Reveal · Accepted Yellow Facts (Any 3 are correct)</p>
+          <ul class="mt-2 pl-4 list-disc space-y-1 text-amber-950/90">
+            ${keys.step2.yellowFacts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}
+          </ul>
+        `;
+      }
+      if (r2b) {
+        r2b.innerHTML = `
+          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Accepted Blue Facts (Any 2 are correct)</p>
+          <ul class="mt-2 pl-4 list-disc space-y-1 text-body">
+            ${keys.step2.blueFacts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}
+          </ul>
+          <p class="mt-2.5 text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2">
+            <strong>Most common mistake:</strong> ${escapeHtml(keys.step2.commonMistake)}
+          </p>
+        `;
+      }
+      if (r2j) {
+        r2j.innerHTML = `
+          <div class="p-4 bg-ink text-white rounded-lg">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-peri">👑 Mentor Reveal · The 2 Essential Terms</p>
+            <div class="mt-3 grid sm:grid-cols-2 gap-3 text-[13px]">
+              ${keys.step2.essentialTerms
+                .map(
+                  (t) => `
+                <div class="p-3 bg-white/5 border border-white/10 rounded">
+                  <span class="font-bold text-peri font-mono">${escapeHtml(t.term)}</span>
+                  <p class="mt-1 text-silver leading-relaxed">${escapeHtml(t.definition)}</p>
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+          </div>
+          <div class="p-4 bg-paper border border-navy/10 rounded-lg">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold mb-3">👑 Mentor Reveal · All 12 Curated Paper Terms</p>
+            <div class="grid sm:grid-cols-2 gap-2">
+              ${keys.step2.wordJar
+                .map(
+                  (w) => `
+                <div class="p-3 bg-white border border-navy/10 rounded text-[13px]">
+                  <div class="flex items-center justify-between gap-2">
+                    <strong class="text-ink">${escapeHtml(w.term)}</strong>
+                    <span class="font-mono text-[10px] text-muted shrink-0">${escapeHtml(w.pageHint)}</span>
+                  </div>
+                  <p class="mt-1 text-body text-[12px] leading-relaxed">${escapeHtml(w.definition)}</p>
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+      }
     } else {
-      el.textContent = st;
-      el.classList.add('status-error');
+      if (r2y) r2y.innerHTML = '';
+      if (r2b) r2b.innerHTML = '';
+      if (r2j) r2j.innerHTML = '';
+    }
+
+    // Step 3
+    const r3 = document.getElementById('predict-phase-3');
+    if (r3) {
+      if (keys.step3) {
+        const t1 = keys.step3.table1;
+        r3.innerHTML = `
+          <div class="bg-white border border-blue/30 p-6 sm:p-8 rounded-lg shadow-sm">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 3 Answer Key</p>
+            <h3 class="font-display text-xl font-bold text-ink mt-1">Prediction vs. Empirical Reality</h3>
+            <p class="text-[14px] text-body mt-1">Here is how your locked prediction matches what Perham &amp; Currie (2014) found:</p>
+
+            <div class="mt-6 grid sm:grid-cols-2 gap-4">
+              <div class="p-4 bg-paper/60 border border-navy/10 rounded-lg">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-semibold">Your Locked Prediction</span>
+                <ol id="locked-prediction-list" class="mt-3 space-y-2 text-[14px]"></ol>
+              </div>
+              <div class="p-4 bg-blue/10 border border-blue/30 rounded-lg">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-blue font-semibold">Real Result (Page 3 / Page 8)</span>
+                <div class="mt-3 space-y-2 text-[14px]">
+                  ${keys.step3.ranking
+                    .map(
+                      (row) => `
+                    <div class="p-2.5 bg-white rounded border border-blue/20">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="font-bold text-ink">${escapeHtml(row.rank)} · ${escapeHtml(row.icon)} ${escapeHtml(row.title)}</span>
+                        <span class="font-mono text-[11px] font-semibold ${row.tone === 'good' ? 'text-emerald-700' : 'text-signal'}">${escapeHtml(row.note)}</span>
+                      </div>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 space-y-3">
+              ${keys.step3.surprises
+                .map(
+                  (s) => `
+                <div class="p-4 rounded-lg border ${s.tone === 'amber' ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'}">
+                  <span class="font-bold text-[14px] ${s.tone === 'amber' ? 'text-amber-900' : 'text-emerald-900'}">${escapeHtml(s.title)}</span>
+                  <p class="text-[13px] mt-1 leading-relaxed ${s.tone === 'amber' ? 'text-amber-800' : 'text-emerald-800'}">${escapeHtml(s.body)}</p>
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-navy/10">
+              <h4 class="font-display font-bold text-ink text-[15px]">Bonus Answer · Table 1: Did Students Know Which Condition Hurt Them?</h4>
+              <p class="text-[13px] text-muted mt-0.5">Students rated each condition out of 100 after the test:</p>
+              <div class="mt-3 overflow-x-auto">
+                <table class="w-full text-left text-[13px] border border-navy/10 rounded overflow-hidden">
+                  <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
+                    <tr>
+                      <th class="p-2.5">Table 1 (out of 100)</th>
+                      <th class="p-2.5">Disliked songs</th>
+                      <th class="p-2.5">Liked songs</th>
+                      <th class="p-2.5">No lyrics</th>
+                      <th class="p-2.5">Quiet</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-navy/10 bg-white">
+                    <tr>
+                      <td class="p-2.5 font-medium">How distracting it was</td>
+                      <td class="p-2.5 font-mono text-signal font-semibold">${escapeHtml(t1.distracting.disliked)}</td>
+                      <td class="p-2.5 font-mono text-signal font-semibold">${escapeHtml(t1.distracting.liked)}</td>
+                      <td class="p-2.5 font-mono text-body">${escapeHtml(t1.distracting.noLyrics)}</td>
+                      <td class="p-2.5 font-mono text-emerald-700">${escapeHtml(t1.distracting.quiet)}</td>
+                    </tr>
+                    <tr>
+                      <td class="p-2.5 font-medium">How well I think I did</td>
+                      <td class="p-2.5 font-mono text-signal">${escapeHtml(t1.perceived.disliked)}</td>
+                      <td class="p-2.5 font-mono text-signal">${escapeHtml(t1.perceived.liked)}</td>
+                      <td class="p-2.5 font-mono text-body">${escapeHtml(t1.perceived.noLyrics)}</td>
+                      <td class="p-2.5 font-mono text-emerald-700">${escapeHtml(t1.perceived.quiet)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-[12px] text-body mt-2.5 leading-relaxed">
+                <strong>Answer:</strong> ${escapeHtml(t1.bonusAnswer)}
+              </p>
+            </div>
+          </div>
+        `;
+        renderLockedList();
+      } else {
+        r3.innerHTML = '';
+      }
+    }
+
+    // Step 4
+    const r4 = document.getElementById('mentor-reveal-4');
+    if (r4) {
+      if (keys.step4) {
+        r4.innerHTML = `
+          <div class="p-5 bg-blue/5 border border-blue/25 rounded-lg space-y-3 text-[13px]">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Example Reading Card (Official Key)</p>
+            <div class="divide-y divide-navy/10 border border-navy/10 rounded bg-white overflow-hidden">
+              ${keys.step4.boxes
+                .map(
+                  (b) => `
+                <div class="p-3 grid sm:grid-cols-[160px_1fr] gap-2">
+                  <span class="font-semibold text-ink">${escapeHtml(b.title)}</span>
+                  <span class="text-body leading-relaxed">${escapeHtml(b.answer)}</span>
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+            <p class="text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5">
+              <strong>Mentor check:</strong> ${escapeHtml(keys.step4.approvalRule)}
+            </p>
+          </div>
+        `;
+      } else {
+        r4.innerHTML = '';
+      }
+    }
+
+    // Step 5
+    const r5 = document.getElementById('mentor-reveal-5');
+    if (r5) {
+      if (keys.step5) {
+        const bc = keys.step5.bonusChallenge;
+        r5.innerHTML = `
+          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 5 Official Answer Key</p>
+          <div>
+            <h4 class="font-display font-bold text-ink text-[15px]">1. Typical Homework Questions &amp; Answers</h4>
+            <div class="mt-2.5 overflow-x-auto">
+              <table class="w-full text-left border border-navy/10 rounded overflow-hidden">
+                <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
+                  <tr>
+                    <th class="p-2.5">Homework Question</th>
+                    <th class="p-2.5">Answer from the Paper</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-navy/10 bg-white">
+                  ${keys.step5.typicalHomeworkAnswers
+                    .map(
+                      (row) => `
+                    <tr>
+                      <td class="p-2.5 font-semibold text-ink">${escapeHtml(row.q)}</td>
+                      <td class="p-2.5 text-body">${escapeHtml(row.a)}</td>
+                    </tr>
+                  `
+                    )
+                    .join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+            <h4 class="font-display font-bold text-emerald-900 text-[14px]">2. Model Sentence for Yacine</h4>
+            <p class="mt-1 font-serif italic text-[15px] text-emerald-950">${escapeHtml(keys.step5.modelVerdict)}</p>
+          </div>
+          <div>
+            <h4 class="font-display font-bold text-ink text-[15px]">3. Accepted Reasons to Be Careful</h4>
+            <ul class="mt-2 pl-4 list-disc space-y-1 text-body">
+              ${keys.step5.acceptedLimits.map((ex) => `<li>${escapeHtml(ex)}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="p-4 bg-ink text-white rounded-lg space-y-2">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-peri">✨ ${escapeHtml(bc.title)}</p>
+            <p class="text-silver">${escapeHtml(bc.prompt)}</p>
+            <p class="text-white font-medium pt-1"><strong>Answer:</strong> ${escapeHtml(bc.answer)}</p>
+            <p class="text-silver/90 text-[12px] pt-1 border-t border-white/10">
+              <strong>Detective extra:</strong> ${escapeHtml(bc.detectiveExtra)}
+            </p>
+          </div>
+        `;
+      } else {
+        r5.innerHTML = '';
+      }
     }
   }
 
-  // Navigation & Progressive Locks
-  let activePanel = 0;
+  // ---- Apply Live Room State (Step Locks + Answer Key Reveals from Supabase) ----
+  async function applyRoomState(nextState: Session2RoomState, preloadedKeys?: Partial<Session2AnswerKey>) {
+    roomState = {
+      unlocked_step: Number(nextState.unlocked_step ?? 0),
+      revealed_steps: nextState.revealed_steps || {},
+      updated_at: nextState.updated_at,
+    };
+
+    // If current panel got locked by mentor reset, return to unlocked_step
+    if (activePanel > roomState.unlocked_step) {
+      activePanel = roomState.unlocked_step;
+    }
+
+    renderLocks();
+
+    const revJson = JSON.stringify(roomState.revealed_steps);
+    if (preloadedKeys) {
+      revealedKeys = preloadedKeys;
+      lastRevealedJson = revJson;
+      hydrateRevealedStepDOM(revealedKeys);
+    } else if (revJson !== lastRevealedJson) {
+      lastRevealedJson = revJson;
+      try {
+        revealedKeys = await getSession2RevealedKeys();
+      } catch {
+        revealedKeys = {};
+      }
+      hydrateRevealedStepDOM(revealedKeys);
+    }
+
+    renderMentorReveals();
+  }
 
   function renderLocks() {
     const indicator = document.getElementById('unlocked-step-indicator');
     if (indicator) {
-      indicator.textContent = `Step ${state.unlockedStep}/5`;
+      indicator.textContent = `Step ${roomState.unlocked_step}/5`;
     }
 
     document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
       const n = Number(btn.dataset.step);
-      const isLocked = n > state.unlockedStep;
+      const isLocked = n > roomState.unlocked_step;
       btn.classList.toggle('locked', isLocked);
       btn.classList.toggle('active', n === activePanel);
       btn.disabled = isLocked;
@@ -1455,347 +1749,10 @@ const steps = [
     });
   }
 
-  // Server-verified Session 2 Answer Key (kept strictly in JS memory, never in HTML/localStorage)
-  let serverAnswerKey: Session2AnswerKey | null = null;
-  let keyLoadPromise: Promise<Session2AnswerKey | null> | null = null;
-
-  function clearMentorKeyDOM() {
-    document.querySelectorAll<HTMLElement>('[data-mentor-reveal]').forEach((el) => {
-      el.innerHTML = '';
-      el.classList.add('hidden');
-    });
-    document.querySelectorAll<HTMLElement>('[data-mentor-locked]').forEach((el) => {
-      el.classList.remove('hidden');
-    });
-    document.querySelectorAll<HTMLInputElement>('.mentor-reveal-toggle').forEach((cb) => {
-      cb.checked = false;
-    });
-  }
-
-  function hydrateMentorKeyDOM(key: Session2AnswerKey) {
-    // Step 0 · Sample HW Ideas
-    const r0 = document.getElementById('mentor-reveal-0');
-    if (r0) {
-      r0.innerHTML = `
-        <p class="text-[11px] font-mono uppercase text-blue font-bold tracking-wider">👑 Mentor Reveal · Sample Homework Questions</p>
-        <p class="text-[12px] text-muted mt-0.5">Click any example below to add it to your team’s questions:</p>
-        <div class="mt-2.5 flex flex-wrap gap-2">
-          ${key.step0.sampleHomeworkQuestions
-            .map(
-              (q) =>
-                `<button type="button" class="hw-chip text-[12px] bg-white hover:bg-blue/10 text-body hover:text-blue border border-navy/10 px-3 py-1.5 rounded transition text-left" data-suggestion="${escapeHtml(q)}">+ ${escapeHtml(q)}</button>`
-            )
-            .join('')}
-        </div>
-      `;
-      r0.querySelectorAll<HTMLButtonElement>('.hw-chip').forEach((chip) => {
-        chip.addEventListener('click', () => {
-          const text = chip.dataset.suggestion || '';
-          if (!text) return;
-          if (hwQ1?.value.trim() === text || hwQ2?.value.trim() === text) return;
-          if (hwQ1 && !hwQ1.value.trim()) {
-            hwQ1.value = text;
-            state.hw_q1 = text;
-          } else if (hwQ2) {
-            hwQ2.value = text;
-            state.hw_q2 = text;
-          }
-          saveState('s0-saved');
-        });
-      });
-    }
-
-    // Step 1 · Map & Four-Part Trick
-    const r1 = document.getElementById('mentor-reveal-1');
-    if (r1) {
-      r1.innerHTML = `
-        <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 1 Answer Key</p>
-        <div>
-          <p class="font-semibold text-ink mb-1.5">Task A · Official Page Map</p>
-          <ul class="space-y-1 text-body text-[12px]">
-            ${key.step1.pageMap.map((p) => `<li><strong>${escapeHtml(p.name)}:</strong> ${escapeHtml(p.expected)}</li>`).join('')}
-          </ul>
-        </div>
-        <div class="pt-3 border-t border-blue/15 space-y-1.5 text-body">
-          <p class="font-semibold text-ink">Task B · Expected Four-Part Trick Answers</p>
-          ${key.step1.fourPartTrick
-            .map(
-              (f) =>
-                `<p><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(f.expected)} <span class="text-muted text-[11px]">(${escapeHtml(f.where)})</span></p>`
-            )
-            .join('')}
-          <p class="text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5 mt-2">
-            <strong>Mentor tip:</strong> ${escapeHtml(key.step1.mentorTip)}
-          </p>
-        </div>
-      `;
-    }
-
-    // Step 2 · Yellow Facts, Blue Facts & Word Jar Glossary
-    const r2y = document.getElementById('mentor-reveal-2-yellow');
-    if (r2y) {
-      r2y.innerHTML = `
-        <p class="font-mono text-[11px] uppercase tracking-wider text-amber-900 font-bold">👑 Mentor Reveal · Accepted Yellow Facts (Any 3 are correct)</p>
-        <ul class="mt-2 pl-4 list-disc space-y-1 text-amber-950/90">
-          ${key.step2.yellowFacts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}
-        </ul>
-      `;
-    }
-    const r2b = document.getElementById('mentor-reveal-2-blue');
-    if (r2b) {
-      r2b.innerHTML = `
-        <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Accepted Blue Facts (Any 2 are correct)</p>
-        <ul class="mt-2 pl-4 list-disc space-y-1 text-body">
-          ${key.step2.blueFacts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}
-        </ul>
-        <p class="mt-2.5 text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2">
-          <strong>Most common mistake:</strong> ${escapeHtml(key.step2.commonMistake)}
-        </p>
-      `;
-    }
-    const r2j = document.getElementById('mentor-reveal-2-jar');
-    if (r2j) {
-      r2j.innerHTML = `
-        <div class="p-4 bg-ink text-white rounded-lg">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-peri">👑 Mentor Reveal · The 2 Essential Terms</p>
-          <div class="mt-3 grid sm:grid-cols-2 gap-3 text-[13px]">
-            ${key.step2.essentialTerms
-              .map(
-                (t) => `
-              <div class="p-3 bg-white/5 border border-white/10 rounded">
-                <span class="font-bold text-peri font-mono">${escapeHtml(t.term)}</span>
-                <p class="mt-1 text-silver leading-relaxed">${escapeHtml(t.definition)}</p>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-        </div>
-        <div class="p-4 bg-paper border border-navy/10 rounded-lg">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold mb-3">👑 Mentor Reveal · All 12 Curated Paper Terms</p>
-          <div class="grid sm:grid-cols-2 gap-2">
-            ${key.step2.wordJar
-              .map(
-                (w) => `
-              <div class="p-3 bg-white border border-navy/10 rounded text-[13px]">
-                <div class="flex items-center justify-between gap-2">
-                  <strong class="text-ink">${escapeHtml(w.term)}</strong>
-                  <span class="font-mono text-[10px] text-muted shrink-0">${escapeHtml(w.pageHint)}</span>
-                </div>
-                <p class="mt-1 text-body text-[12px] leading-relaxed">${escapeHtml(w.definition)}</p>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    // Step 3 · Real Results & Table 1
-    const r3 = document.getElementById('predict-phase-3');
-    if (r3) {
-      const t1 = key.step3.table1;
-      r3.innerHTML = `
-        <div class="bg-white border border-blue/30 p-6 sm:p-8 rounded-lg shadow-sm">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 3 Answer Key</p>
-          <h3 class="font-display text-xl font-bold text-ink mt-1">Prediction vs. Empirical Reality</h3>
-          <p class="text-[14px] text-body mt-1">Here is how your locked prediction matches what Perham &amp; Currie (2014) found:</p>
-
-          <div class="mt-6 grid sm:grid-cols-2 gap-4">
-            <div class="p-4 bg-paper/60 border border-navy/10 rounded-lg">
-              <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-semibold">Your Locked Prediction</span>
-              <ol id="locked-prediction-list" class="mt-3 space-y-2 text-[14px]"></ol>
-            </div>
-            <div class="p-4 bg-blue/10 border border-blue/30 rounded-lg">
-              <span class="font-mono text-[11px] uppercase tracking-wider text-blue font-semibold">Real Result (Page 3 / Page 8)</span>
-              <div class="mt-3 space-y-2 text-[14px]">
-                ${key.step3.ranking
-                  .map(
-                    (row) => `
-                  <div class="p-2.5 bg-white rounded border border-blue/20">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="font-bold text-ink">${escapeHtml(row.rank)} · ${escapeHtml(row.icon)} ${escapeHtml(row.title)}</span>
-                      <span class="font-mono text-[11px] font-semibold ${row.tone === 'good' ? 'text-emerald-700' : 'text-signal'}">${escapeHtml(row.note)}</span>
-                    </div>
-                  </div>
-                `
-                  )
-                  .join('')}
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-6 space-y-3">
-            ${key.step3.surprises
-              .map(
-                (s) => `
-              <div class="p-4 rounded-lg border ${s.tone === 'amber' ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'}">
-                <span class="font-bold text-[14px] ${s.tone === 'amber' ? 'text-amber-900' : 'text-emerald-900'}">${escapeHtml(s.title)}</span>
-                <p class="text-[13px] mt-1 leading-relaxed ${s.tone === 'amber' ? 'text-amber-800' : 'text-emerald-800'}">${escapeHtml(s.body)}</p>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-
-          <div class="mt-6 pt-6 border-t border-navy/10">
-            <h4 class="font-display font-bold text-ink text-[15px]">Bonus Answer · Table 1: Did Students Know Which Condition Hurt Them?</h4>
-            <p class="text-[13px] text-muted mt-0.5">Students rated each condition out of 100 after the test:</p>
-            <div class="mt-3 overflow-x-auto">
-              <table class="w-full text-left text-[13px] border border-navy/10 rounded overflow-hidden">
-                <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
-                  <tr>
-                    <th class="p-2.5">Table 1 (out of 100)</th>
-                    <th class="p-2.5">Disliked songs</th>
-                    <th class="p-2.5">Liked songs</th>
-                    <th class="p-2.5">No lyrics</th>
-                    <th class="p-2.5">Quiet</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-navy/10 bg-white">
-                  <tr>
-                    <td class="p-2.5 font-medium">How distracting it was</td>
-                    <td class="p-2.5 font-mono text-signal font-semibold">${escapeHtml(t1.distracting.disliked)}</td>
-                    <td class="p-2.5 font-mono text-signal font-semibold">${escapeHtml(t1.distracting.liked)}</td>
-                    <td class="p-2.5 font-mono text-body">${escapeHtml(t1.distracting.noLyrics)}</td>
-                    <td class="p-2.5 font-mono text-emerald-700">${escapeHtml(t1.distracting.quiet)}</td>
-                  </tr>
-                  <tr>
-                    <td class="p-2.5 font-medium">How well I think I did</td>
-                    <td class="p-2.5 font-mono text-signal">${escapeHtml(t1.perceived.disliked)}</td>
-                    <td class="p-2.5 font-mono text-signal">${escapeHtml(t1.perceived.liked)}</td>
-                    <td class="p-2.5 font-mono text-body">${escapeHtml(t1.perceived.noLyrics)}</td>
-                    <td class="p-2.5 font-mono text-emerald-700">${escapeHtml(t1.perceived.quiet)}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="text-[12px] text-body mt-2.5 leading-relaxed">
-              <strong>Answer:</strong> ${escapeHtml(t1.bonusAnswer)}
-            </p>
-          </div>
-        </div>
-      `;
-    }
-
-    // Step 4 · Reading Card Approval + Official Key
-    const r4 = document.getElementById('mentor-reveal-4');
-    if (r4) {
-      r4.innerHTML = `
-        <div id="card-mentor-approved" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 flex items-start gap-3">
-          <span class="text-2xl leading-none text-emerald-600 font-bold">✓</span>
-          <div>
-            <p class="font-bold text-emerald-900 text-[14px]">Reading Card Approved by Mentor!</p>
-            <p class="text-[13px] text-emerald-800 mt-1 leading-relaxed">Compare your team’s 8 boxes with the official model Reading Card below.</p>
-          </div>
-        </div>
-        <div class="p-5 bg-blue/5 border border-blue/25 rounded-lg space-y-3 text-[13px]">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Example Reading Card (Official Key)</p>
-          <div class="divide-y divide-navy/10 border border-navy/10 rounded bg-white overflow-hidden">
-            ${key.step4.boxes
-              .map(
-                (b) => `
-              <div class="p-3 grid sm:grid-cols-[160px_1fr] gap-2">
-                <span class="font-semibold text-ink">${escapeHtml(b.title)}</span>
-                <span class="text-body leading-relaxed">${escapeHtml(b.answer)}</span>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-          <p class="text-[12px] text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5">
-            <strong>Mentor check:</strong> ${escapeHtml(key.step4.approvalRule)}
-          </p>
-        </div>
-      `;
-    }
-
-    // Step 5 · Case File #2 Official Key & Bonus
-    const r5 = document.getElementById('mentor-reveal-5');
-    if (r5) {
-      const bc = key.step5.bonusChallenge;
-      r5.innerHTML = `
-        <p class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">👑 Mentor Reveal · Step 5 Official Answer Key</p>
-        <div>
-          <h4 class="font-display font-bold text-ink text-[15px]">1. Typical Homework Questions &amp; Answers</h4>
-          <div class="mt-2.5 overflow-x-auto">
-            <table class="w-full text-left border border-navy/10 rounded overflow-hidden">
-              <thead class="bg-paper font-mono text-[11px] uppercase text-muted">
-                <tr>
-                  <th class="p-2.5">Homework Question</th>
-                  <th class="p-2.5">Answer from the Paper</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-navy/10 bg-white">
-                ${key.step5.typicalHomeworkAnswers
-                  .map(
-                    (row) => `
-                  <tr>
-                    <td class="p-2.5 font-semibold text-ink">${escapeHtml(row.q)}</td>
-                    <td class="p-2.5 text-body">${escapeHtml(row.a)}</td>
-                  </tr>
-                `
-                  )
-                  .join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-          <h4 class="font-display font-bold text-emerald-900 text-[14px]">2. Model Sentence for Yacine</h4>
-          <p class="mt-1 font-serif italic text-[15px] text-emerald-950">${escapeHtml(key.step5.modelVerdict)}</p>
-        </div>
-        <div>
-          <h4 class="font-display font-bold text-ink text-[15px]">3. Accepted Reasons to Be Careful</h4>
-          <ul class="mt-2 pl-4 list-disc space-y-1 text-body">
-            ${key.step5.acceptedLimits.map((ex) => `<li>${escapeHtml(ex)}</li>`).join('')}
-          </ul>
-        </div>
-        <div class="p-4 bg-ink text-white rounded-lg space-y-2">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-peri">✨ ${escapeHtml(bc.title)}</p>
-          <p class="text-silver">${escapeHtml(bc.prompt)}</p>
-          <p class="text-white font-medium pt-1"><strong>Answer:</strong> ${escapeHtml(bc.answer)}</p>
-          <p class="text-silver/90 text-[12px] pt-1 border-t border-white/10">
-            <strong>Detective extra:</strong> ${escapeHtml(bc.detectiveExtra)}
-          </p>
-        </div>
-      `;
-    }
-  }
-
-  async function ensureMentorAnswerKey(): Promise<Session2AnswerKey | null> {
-    if (serverAnswerKey) return serverAnswerKey;
-    const mentor = getStoredMentor();
-    if (!mentor?.token) return null;
-    if (!keyLoadPromise) {
-      keyLoadPromise = mentorSession2Key(mentor.token)
-        .then((key) => {
-          serverAnswerKey = key;
-          hydrateMentorKeyDOM(key);
-          return key;
-        })
-        .catch(() => {
-          // Forged or expired mentor token: reject and clear immediately
-          clearMentor();
-          serverAnswerKey = null;
-          state.mentorReveals = { ...defaultReveals };
-          saveState();
-          clearMentorKeyDOM();
-          syncMentorAuthUI();
-          return null;
-        })
-        .finally(() => {
-          keyLoadPromise = null;
-        });
-    }
-    return keyLoadPromise;
-  }
-
   function renderMentorReveals() {
-    const canReveal = Boolean(serverAnswerKey && getStoredMentor()?.token);
     for (let stepNum = 0; stepNum <= 5; stepNum++) {
-      const revealed = canReveal && Boolean(state.mentorReveals[stepNum]);
+      const stepKey = `step${stepNum}` as keyof Session2AnswerKey;
+      const revealed = Boolean(roomState.revealed_steps[String(stepNum)] && revealedKeys[stepKey]);
       document.querySelectorAll<HTMLElement>(`[data-mentor-reveal="${stepNum}"]`).forEach((el) => {
         el.classList.toggle('hidden', !revealed);
       });
@@ -1804,39 +1761,25 @@ const steps = [
       });
       const checkbox = document.querySelector<HTMLInputElement>(`.mentor-reveal-toggle[data-reveal-step="${stepNum}"]`);
       if (checkbox) {
-        checkbox.checked = revealed;
+        checkbox.checked = Boolean(roomState.revealed_steps[String(stepNum)]);
       }
     }
 
-    // Step 1: refresh page feedback live without flashing "Saved"
-    if (Object.keys(state.pages).length > 0) {
+    if (Object.keys(answers.pages).length > 0) {
       checkPages(false);
     }
-
-    // Step 3: populate locked prediction list whenever Step 3 reveal opens
-    if (canReveal && state.mentorReveals[3]) {
+    if (revealedKeys.step3) {
       renderLockedList();
     }
-
-    // Step 4: sync waiting vs approved status
     updateCardStatusUI();
   }
 
-  function unlockToStep(n: number) {
-    if (n > state.unlockedStep) {
-      state.unlockedStep = Math.min(5, n);
-      saveState();
-      renderLocks();
-    }
-  }
-
   function showPanel(n: number) {
-    if (n > state.unlockedStep) {
+    if (n > roomState.unlocked_step) {
+      showBannerFeedback(`Step ${n} opens as soon as your mentor unlocks it in the Mentor Panel.`, 'error');
       return;
     }
     activePanel = n;
-    state.step = n;
-    saveState();
     renderLocks();
     window.scrollTo({ top: 180, behavior: 'smooth' });
   }
@@ -1844,16 +1787,18 @@ const steps = [
   document.querySelectorAll<HTMLButtonElement>('.step-tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       const n = Number(btn.dataset.step);
-      if (n <= state.unlockedStep) {
-        showPanel(n);
-      }
+      if (n <= roomState.unlocked_step) showPanel(n);
     });
   });
 
   document.querySelectorAll<HTMLButtonElement>('.next-panel-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const next = Number(btn.dataset.next);
-      unlockToStep(next);
+      if (next > roomState.unlocked_step) {
+        const statusId = `s${activePanel}-saved`;
+        markStatus(statusId, `🔒 Waiting for mentor to unlock Step ${next}`);
+        return;
+      }
       showPanel(next);
     });
   });
@@ -1865,7 +1810,7 @@ const steps = [
     });
   });
 
-  // Mentor Reveal Controls Dropdown & Server-Verified Auth Gate
+  // ---- Top-Bar Mentor Reveal Controls (Wired Live to Supabase Room State!) ----
   const mentorMenu = document.getElementById('mentor-controls-menu');
   const mentorToggle = document.getElementById('mentor-controls-toggle');
   const mentorInlineLogin = document.getElementById('mentor-inline-login') as HTMLFormElement | null;
@@ -1877,7 +1822,7 @@ const steps = [
 
   function syncMentorAuthUI() {
     const mentor = getStoredMentor();
-    const isAuthed = Boolean(mentor && mentor.token && serverAnswerKey);
+    const isAuthed = Boolean(mentor && mentor.token);
     mentorInlineLogin?.classList.toggle('hidden', isAuthed);
     mentorControlsAuthed?.classList.toggle('hidden', !isAuthed);
     if (isAuthed && mentorAuthedBadge && mentor) {
@@ -1885,12 +1830,10 @@ const steps = [
     }
   }
   syncMentorAuthUI();
-  // Verify any existing mentor session against Supabase on load
-  if (getStoredMentor()?.token) {
-    ensureMentorAnswerKey().then(() => {
-      syncMentorAuthUI();
-      renderMentorReveals();
-    });
+
+  function closeMentorMenu() {
+    mentorMenu?.classList.add('hidden');
+    mentorToggle?.setAttribute('aria-expanded', 'false');
   }
 
   mentorInlineLogin?.addEventListener('submit', async (e) => {
@@ -1907,14 +1850,10 @@ const steps = [
     try {
       const session = await mentorLogin(pwd);
       storeMentor(session);
-      const key = await ensureMentorAnswerKey();
-      if (!key) throw new Error('Unable to load mentor answer key. Please try again.');
       mentorInlinePassword.value = '';
       syncMentorAuthUI();
-      renderMentorReveals();
     } catch (err: any) {
       clearMentor();
-      serverAnswerKey = null;
       if (mentorInlineError) {
         mentorInlineError.textContent = friendlyError(err);
         mentorInlineError.classList.remove('hidden');
@@ -1927,32 +1866,19 @@ const steps = [
     }
   });
 
-  function closeMentorMenu() {
-    mentorMenu?.classList.add('hidden');
-    mentorToggle?.setAttribute('aria-expanded', 'false');
-  }
-
   document.getElementById('btn-mentor-logout')?.addEventListener('click', () => {
     clearMentor();
-    serverAnswerKey = null;
-    state.mentorReveals = { ...defaultReveals };
-    saveState();
-    clearMentorKeyDOM();
     syncMentorAuthUI();
-    renderMentorReveals();
     closeMentorMenu();
   });
 
-  mentorToggle?.addEventListener('click', async (e) => {
+  mentorToggle?.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (getStoredMentor()?.token && !serverAnswerKey) {
-      await ensureMentorAnswerKey();
-    }
     syncMentorAuthUI();
     const willOpen = mentorMenu?.classList.contains('hidden');
     mentorMenu?.classList.toggle('hidden');
     mentorToggle.setAttribute('aria-expanded', String(Boolean(willOpen)));
-    if (willOpen && !serverAnswerKey) {
+    if (willOpen && !getStoredMentor()) {
       setTimeout(() => mentorInlinePassword?.focus(), 50);
     }
   });
@@ -1960,96 +1886,96 @@ const steps = [
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeMentorMenu();
   });
-  mentorMenu?.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
+  mentorMenu?.addEventListener('click', (e) => e.stopPropagation());
+
+  async function runMentorAction(fn: (token: string) => Promise<void>) {
+    const mentor = getStoredMentor();
+    if (!mentor?.token) {
+      syncMentorAuthUI();
+      return;
+    }
+    try {
+      await fn(mentor.token);
+      const fresh = await getSession2State(teamCode);
+      if (fresh) await applyRoomState(fresh.state, fresh.revealed_keys);
+    } catch (err: any) {
+      const msg = friendlyError(err);
+      if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('session')) {
+        clearMentor();
+        syncMentorAuthUI();
+      }
+      showBannerFeedback(msg, 'error');
+    }
+  }
 
   document.getElementById('btn-reveal-next')?.addEventListener('click', () => {
-    if (!serverAnswerKey) return;
-    unlockToStep(state.unlockedStep + 1);
-    showPanel(state.unlockedStep);
+    const next = Math.min(5, roomState.unlocked_step + 1);
+    runMentorAction(async (token) => {
+      await mentorS2SetStep(token, next);
+      activePanel = next;
+    });
     closeMentorMenu();
   });
 
   document.getElementById('btn-reveal-all')?.addEventListener('click', () => {
-    if (!serverAnswerKey) return;
-    state.unlockedStep = 5;
-    saveState();
-    renderLocks();
+    runMentorAction((token) => mentorS2SetStep(token, 5));
     closeMentorMenu();
   });
 
   document.getElementById('btn-lock-all')?.addEventListener('click', () => {
-    if (!serverAnswerKey) return;
-    state.unlockedStep = 0;
-    state.mentorReveals = { ...defaultReveals };
-    saveState();
-    showPanel(0);
-    renderLocks();
-    renderMentorReveals();
+    runMentorAction(async (token) => {
+      await mentorS2SetStep(token, 0);
+      await mentorS2SetReveal(token, -1, false);
+      activePanel = 0;
+    });
     closeMentorMenu();
   });
 
-  // Per-step Mentor Answer Key Reveal Toggles
   document.querySelectorAll<HTMLInputElement>('.mentor-reveal-toggle').forEach((cb) => {
     cb.addEventListener('change', () => {
-      if (!serverAnswerKey) {
-        cb.checked = false;
-        return;
-      }
       const stepNum = Number(cb.dataset.revealStep);
-      state.mentorReveals[stepNum] = cb.checked;
-      saveState();
-      renderMentorReveals();
+      const val = cb.checked;
+      runMentorAction(async (token) => {
+        await mentorS2SetReveal(token, stepNum, val);
+      });
     });
   });
 
   document.getElementById('btn-reveal-current-answers')?.addEventListener('click', () => {
-    if (!serverAnswerKey) return;
-    state.mentorReveals[activePanel] = true;
-    saveState();
-    renderMentorReveals();
+    const current = activePanel;
+    runMentorAction(async (token) => {
+      await mentorS2SetReveal(token, current, true);
+    });
     closeMentorMenu();
-    const firstRevealed = document.querySelector<HTMLElement>(`[data-mentor-reveal="${activePanel}"]`);
-    firstRevealed?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
   document.getElementById('btn-reveal-all-answers')?.addEventListener('click', () => {
-    if (!serverAnswerKey) return;
-    for (let i = 0; i <= 5; i++) state.mentorReveals[i] = true;
-    saveState();
-    renderMentorReveals();
+    runMentorAction(async (token) => {
+      await mentorS2SetReveal(token, -1, true);
+    });
     closeMentorMenu();
   });
 
   document.getElementById('btn-hide-all-answers')?.addEventListener('click', () => {
-    if (!serverAnswerKey) return;
-    state.mentorReveals = { ...defaultReveals };
-    saveState();
-    renderMentorReveals();
+    runMentorAction(async (token) => {
+      await mentorS2SetReveal(token, -1, false);
+    });
     closeMentorMenu();
   });
 
   // ==================== STEP 0 ====================
   const hwQ1 = document.getElementById('hw-q1') as HTMLInputElement | null;
   const hwQ2 = document.getElementById('hw-q2') as HTMLInputElement | null;
-  if (hwQ1) {
-    hwQ1.value = state.hw_q1;
-    hwQ1.addEventListener('input', () => {
-      state.hw_q1 = hwQ1.value;
-      saveState('s0-saved');
-    });
-  }
-  if (hwQ2) {
-    hwQ2.value = state.hw_q2;
-    hwQ2.addEventListener('input', () => {
-      state.hw_q2 = hwQ2.value;
-      saveState('s0-saved');
-    });
-  }
+  hwQ1?.addEventListener('input', () => {
+    answers.hw_q1 = hwQ1.value;
+    queueSave('s0-saved', { hw_q1: answers.hw_q1 });
+  });
+  hwQ2?.addEventListener('input', () => {
+    answers.hw_q2 = hwQ2.value;
+    queueSave('s0-saved', { hw_q2: answers.hw_q2 });
+  });
 
   // ==================== STEP 1 ====================
-  // Check parts pages (non-spoiling until Mentor Reveal)
   function checkPages(shouldSave = true) {
     sparkSession2.paperParts.forEach((part, idx) => {
       const input = document.querySelector<HTMLInputElement>(`.page-part-input[data-part="${part.id}"]`);
@@ -2063,29 +1989,24 @@ const steps = [
       if (part.validPages.includes(val)) {
         fb.textContent = '✓ Correct';
         fb.className = 'page-feedback text-[12px] font-semibold text-emerald-700 whitespace-nowrap';
-      } else if (state.mentorReveals[1] && serverAnswerKey?.step1?.pageMap[idx]) {
-        fb.textContent = `Check ${serverAnswerKey.step1.pageMap[idx].expected}`;
+      } else if (revealedKeys.step1?.pageMap[idx]) {
+        fb.textContent = `Check ${revealedKeys.step1.pageMap[idx].expected}`;
         fb.className = 'page-feedback text-[12px] text-body whitespace-nowrap';
       } else {
         fb.textContent = 'Try skimming again';
         fb.className = 'page-feedback text-[12px] text-muted whitespace-nowrap';
       }
-      state.pages[part.id] = val;
+      answers.pages[part.id] = val;
     });
-    if (shouldSave) saveState('s1-saved');
+    if (shouldSave) queueSave('s1-saved', { pages: answers.pages }, true);
   }
 
   document.querySelectorAll<HTMLInputElement>('.page-part-input').forEach((input) => {
-    const part = input.dataset.part;
-    if (part && state.pages[part]) {
-      input.value = String(state.pages[part]);
-    }
     input.addEventListener('change', () => checkPages(true));
   });
   document.getElementById('check-pages-btn')?.addEventListener('click', () => checkPages(true));
 
-  // 4-part trick inputs
-  const trickInputs: Record<keyof typeof state.trick, HTMLInputElement | null> = {
+  const trickInputs: Record<keyof typeof answers.trick, HTMLInputElement | null> = {
     who: document.getElementById('trick-who') as HTMLInputElement | null,
     what: document.getElementById('trick-what') as HTMLInputElement | null,
     compared: document.getElementById('trick-compared') as HTMLInputElement | null,
@@ -2093,43 +2014,37 @@ const steps = [
   };
   Object.entries(trickInputs).forEach(([key, input]) => {
     if (!input) return;
-    const k = key as keyof typeof state.trick;
-    input.value = state.trick[k] || '';
+    const k = key as keyof typeof answers.trick;
     input.addEventListener('input', () => {
-      state.trick[k] = input.value;
-      saveState('s1-saved');
+      answers.trick[k] = input.value;
+      queueSave('s1-saved', { trick: answers.trick });
     });
   });
 
   // ==================== STEP 2 ====================
-  // Yellow facts
   ['yellow-1', 'yellow-2', 'yellow-3'].forEach((id, idx) => {
     const el = document.getElementById(id) as HTMLInputElement | null;
     if (!el) return;
-    el.value = state.yellow[idx] || '';
     el.addEventListener('input', () => {
-      state.yellow[idx] = el.value;
-      saveState('s2-saved');
+      answers.yellow[idx] = el.value;
+      queueSave('s2-saved', { yellow: answers.yellow });
     });
   });
 
-  // Blue facts
   ['blue-1', 'blue-2'].forEach((id, idx) => {
     const el = document.getElementById(id) as HTMLInputElement | null;
     if (!el) return;
-    el.value = state.blue[idx] || '';
     el.addEventListener('input', () => {
-      state.blue[idx] = el.value;
-      saveState('s2-saved');
+      answers.blue[idx] = el.value;
+      queueSave('s2-saved', { blue: answers.blue });
     });
   });
 
-  // Word Jar (starts empty so teams hunt for terms themselves)
   const jarContainer = document.getElementById('jar-words-list');
   function renderJar() {
     if (!jarContainer) return;
     jarContainer.innerHTML = '';
-    if (!state.jarWords.length) {
+    if (!answers.jar_words.length) {
       const empty = document.createElement('p');
       empty.className = 'text-[12px] text-pink-800/70 italic';
       empty.textContent = 'No pink words added yet — type any unfamiliar term from the paper above.';
@@ -2137,7 +2052,7 @@ const steps = [
       return;
     }
 
-    state.jarWords.forEach((word, idx) => {
+    answers.jar_words.forEach((word, idx) => {
       const pill = document.createElement('span');
       pill.className =
         'inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-pink-200 text-pink-900 rounded-full text-[12px] font-medium shadow-2xs';
@@ -2146,29 +2061,27 @@ const steps = [
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'text-pink-400 hover:text-pink-700 ml-1 font-bold text-[14px] leading-none';
-      removeBtn.dataset.idx = String(idx);
       removeBtn.textContent = '×';
       removeBtn.addEventListener('click', () => {
-        state.jarWords.splice(idx, 1);
+        answers.jar_words.splice(idx, 1);
         renderJar();
-        saveState('s2-saved');
+        queueSave('s2-saved', { jar_words: answers.jar_words }, true);
       });
       pill.appendChild(labelSpan);
       pill.appendChild(removeBtn);
       jarContainer.appendChild(pill);
     });
   }
-  renderJar();
 
   const pinkInput = document.getElementById('new-pink-word') as HTMLInputElement | null;
   function addPinkWord() {
     if (!pinkInput) return;
     const w = pinkInput.value.trim();
-    if (w && !state.jarWords.includes(w)) {
-      state.jarWords.push(w);
+    if (w && !answers.jar_words.some((existing) => existing.toLowerCase() === w.toLowerCase())) {
+      answers.jar_words.push(w);
       pinkInput.value = '';
       renderJar();
-      saveState('s2-saved');
+      queueSave('s2-saved', { jar_words: answers.jar_words }, true);
     }
   }
   document.getElementById('add-pink-btn')?.addEventListener('click', addPinkWord);
@@ -2182,11 +2095,12 @@ const steps = [
   // ==================== STEP 3: PREDICT & CHECK ====================
   const sortContainer = document.getElementById('conditions-sortable');
   const lockPredBtn = document.getElementById('lock-prediction-btn') as HTMLButtonElement | null;
+  const phase2El = document.getElementById('predict-phase-2');
 
   function renderSortable() {
     if (!sortContainer) return;
     sortContainer.innerHTML = '';
-    state.prediction.forEach((cid, idx) => {
+    answers.prediction.forEach((cid, idx) => {
       const cond = sparkSession2.conditions.find((c) => c.id === cid);
       if (!cond) return;
       const el = document.createElement('div');
@@ -2204,15 +2118,15 @@ const steps = [
             <p class="text-[12px] text-muted">${cond.shortDesc}</p>
           </div>
         </div>
-        <div class="flex flex-col gap-1 shrink-0 ${state.predictionLocked ? 'opacity-40 pointer-events-none' : ''}">
-          <button type="button" class="rank-up text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Up" ${state.predictionLocked ? 'disabled' : ''}>▲</button>
-          <button type="button" class="rank-down text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Down" ${state.predictionLocked ? 'disabled' : ''}>▼</button>
+        <div class="flex flex-col gap-1 shrink-0 ${answers.prediction_locked ? 'opacity-40 pointer-events-none' : ''}">
+          <button type="button" class="rank-up text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Up" ${answers.prediction_locked ? 'disabled' : ''}>▲</button>
+          <button type="button" class="rank-down text-xs font-mono px-2 py-1 bg-white border border-navy/10 rounded hover:bg-paper" data-idx="${idx}" title="Move Down" ${answers.prediction_locked ? 'disabled' : ''}>▼</button>
         </div>
       `;
       sortContainer.appendChild(el);
     });
 
-    if (state.predictionLocked) {
+    if (answers.prediction_locked) {
       if (lockPredBtn) {
         lockPredBtn.disabled = true;
         lockPredBtn.textContent = '🔒 Prediction Locked';
@@ -2225,11 +2139,11 @@ const steps = [
       b.addEventListener('click', (e) => {
         const i = Number((e.currentTarget as HTMLElement).dataset.idx);
         if (i > 0) {
-          const temp = state.prediction[i];
-          state.prediction[i] = state.prediction[i - 1];
-          state.prediction[i - 1] = temp;
+          const temp = answers.prediction[i];
+          answers.prediction[i] = answers.prediction[i - 1];
+          answers.prediction[i - 1] = temp;
           renderSortable();
-          saveState('s3-saved');
+          queueSave('s3-saved', { prediction: answers.prediction });
         }
       });
     });
@@ -2237,25 +2151,22 @@ const steps = [
     sortContainer.querySelectorAll('.rank-down').forEach((b) => {
       b.addEventListener('click', (e) => {
         const i = Number((e.currentTarget as HTMLElement).dataset.idx);
-        if (i < state.prediction.length - 1) {
-          const temp = state.prediction[i];
-          state.prediction[i] = state.prediction[i + 1];
-          state.prediction[i + 1] = temp;
+        if (i < answers.prediction.length - 1) {
+          const temp = answers.prediction[i];
+          answers.prediction[i] = answers.prediction[i + 1];
+          answers.prediction[i + 1] = temp;
           renderSortable();
-          saveState('s3-saved');
+          queueSave('s3-saved', { prediction: answers.prediction });
         }
       });
     });
   }
-  renderSortable();
-
-  const phase2El = document.getElementById('predict-phase-2');
 
   function renderLockedList() {
     const lockedList = document.getElementById('locked-prediction-list');
     if (!lockedList) return;
     lockedList.innerHTML = '';
-    state.prediction.forEach((cid, idx) => {
+    answers.prediction.forEach((cid, idx) => {
       const cond = sparkSession2.conditions.find((c) => c.id === cid);
       if (!cond) return;
       const li = document.createElement('li');
@@ -2266,44 +2177,40 @@ const steps = [
   }
 
   function updatePredictionUI() {
-    if (state.predictionLocked) {
+    if (answers.prediction_locked) {
       phase2El?.classList.remove('hidden');
       renderLockedList();
     }
   }
-  updatePredictionUI();
 
   lockPredBtn?.addEventListener('click', () => {
-    state.predictionLocked = true;
-    saveState('s3-saved');
+    answers.prediction_locked = true;
     renderSortable();
     updatePredictionUI();
+    queueSave('s3-saved', { prediction: answers.prediction, prediction_locked: true }, true);
     phase2El?.scrollIntoView({ behavior: 'smooth' });
   });
 
   const resultsRealText = document.getElementById('results-real-text') as HTMLTextAreaElement | null;
-  if (resultsRealText) {
-    resultsRealText.value = state.resultsRealText;
-    resultsRealText.addEventListener('input', () => {
-      state.resultsRealText = resultsRealText.value;
-      saveState('s3-saved');
-    });
-  }
+  resultsRealText?.addEventListener('input', () => {
+    answers.results_real_text = resultsRealText.value;
+    queueSave('s3-saved', { results_real_text: answers.results_real_text });
+  });
 
   const resultsBonusText = document.getElementById('results-bonus-text') as HTMLTextAreaElement | null;
-  if (resultsBonusText) {
-    resultsBonusText.value = state.resultsBonusText;
-    resultsBonusText.addEventListener('input', () => {
-      state.resultsBonusText = resultsBonusText.value;
-      saveState('s3-saved');
-    });
-  }
+  resultsBonusText?.addEventListener('input', () => {
+    answers.results_bonus_text = resultsBonusText.value;
+    queueSave('s3-saved', { results_bonus_text: answers.results_bonus_text });
+  });
 
   const s3FindingsStatus = document.getElementById('s3-findings-status');
-  document.getElementById('save-results-btn')?.addEventListener('click', () => {
-    saveState('s3-saved');
+  document.getElementById('save-results-btn')?.addEventListener('click', async () => {
+    await flushSave('s3-saved', {
+      results_real_text: answers.results_real_text,
+      results_bonus_text: answers.results_bonus_text,
+    });
     if (s3FindingsStatus) {
-      s3FindingsStatus.textContent = '✓ Findings saved — ready for Mentor Reveal';
+      s3FindingsStatus.textContent = teamCode ? '✓ Sent live — ready for Mentor Reveal' : 'Connect your team code above to save live';
       setTimeout(() => {
         if (s3FindingsStatus) s3FindingsStatus.textContent = '';
       }, 4000);
@@ -2314,78 +2221,101 @@ const steps = [
   sparkSession2.readingCardBoxes.forEach((box) => {
     const el = document.getElementById(`card-${box.id}`) as HTMLTextAreaElement | null;
     if (!el) return;
-    if (state.readingCard[box.id]) {
-      el.value = state.readingCard[box.id];
-    }
     el.addEventListener('input', () => {
-      state.readingCard[box.id] = el.value;
-      if (state.cardSubmitted) updateCardStatusUI();
-      saveState('s4-saved');
+      answers.reading_card[box.id] = el.value;
+      if (answers.card_status === 'pending') updateCardStatusUI();
+      queueSave('s4-saved', { reading_card: answers.reading_card });
     });
   });
 
   const cardWaitingBox = document.getElementById('card-mentor-waiting');
+  const cardApprovedPersonal = document.getElementById('card-mentor-approved-personal');
+  const cardApprovedTitle = document.getElementById('card-approved-title');
+  const cardApprovedComment = document.getElementById('card-approved-comment');
   const cardStatus = document.getElementById('s4-card-status');
+  const sendCardBtn = document.getElementById('send-card-mentor-btn') as HTMLButtonElement | null;
 
   function getEmptyCardBoxCount(): number {
-    return sparkSession2.readingCardBoxes.filter((b) => !(state.readingCard[b.id] || '').trim()).length;
+    return sparkSession2.readingCardBoxes.filter((b) => !(answers.reading_card[b.id] || '').trim()).length;
   }
 
   function updateCardStatusUI() {
-    const revealed = Boolean(serverAnswerKey && state.mentorReveals[4]);
-    if (revealed) {
+    if (answers.card_status === 'approved') {
       cardWaitingBox?.classList.add('hidden');
+      cardApprovedPersonal?.classList.remove('hidden');
+      if (cardApprovedTitle) {
+        cardApprovedTitle.textContent = answers.card_approved_by
+          ? `Reading Card Approved by ${answers.card_approved_by}!`
+          : 'Reading Card Approved by Mentor!';
+      }
+      if (cardApprovedComment) {
+        if (answers.card_mentor_comment) {
+          cardApprovedComment.textContent = `Mentor note: “${answers.card_mentor_comment}”`;
+          cardApprovedComment.classList.remove('hidden');
+        } else {
+          cardApprovedComment.classList.add('hidden');
+        }
+      }
       if (cardStatus) cardStatus.textContent = '✓ Approved by mentor';
-    } else if (state.cardSubmitted) {
+    } else if (answers.card_status === 'pending') {
+      cardApprovedPersonal?.classList.add('hidden');
       cardWaitingBox?.classList.remove('hidden');
       const emptyCount = getEmptyCardBoxCount();
       if (cardStatus) {
         cardStatus.textContent = emptyCount > 0
-          ? `⏳ Sent (${emptyCount} box${emptyCount === 1 ? '' : 'es'} still empty — feel free to finish filling them)`
-          : '⏳ Sent — waiting for mentor review';
+          ? `⏳ Sent to Mentor (${emptyCount} box${emptyCount === 1 ? '' : 'es'} still empty — you can still edit)`
+          : '⏳ Sent live — waiting for mentor review';
       }
     } else {
+      cardApprovedPersonal?.classList.add('hidden');
       cardWaitingBox?.classList.add('hidden');
       if (cardStatus) cardStatus.textContent = 'Fill the 8 boxes, then send to your mentor';
     }
   }
 
-  document.getElementById('send-card-mentor-btn')?.addEventListener('click', () => {
-    state.cardSubmitted = true;
-    saveState('s4-saved');
-    updateCardStatusUI();
-    cardWaitingBox?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  sendCardBtn?.addEventListener('click', async () => {
+    if (!teamCode) {
+      showBannerFeedback('Please connect your Team Code at the top first so your mentor receives your Reading Card!', 'error');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    sendCardBtn.disabled = true;
+    markStatus('s4-saved', 'saving');
+    try {
+      const updated = await submitSession2Card(teamCode, answers.reading_card);
+      answers.card_status = updated.card_status || 'pending';
+      answers.card_approved_by = updated.card_approved_by ?? null;
+      answers.card_mentor_comment = updated.card_mentor_comment ?? null;
+      markStatus('s4-saved', 'saved');
+      updateCardStatusUI();
+      cardWaitingBox?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+      markStatus('s4-saved', friendlyError(err));
+    } finally {
+      sendCardBtn.disabled = false;
+    }
   });
 
   // ==================== STEP 5: CASE FILE #2 ====================
-  const choiceLabels: Record<string, string> = {
-    yes: 'Yes',
-    partly: 'Partly',
-    no: 'No',
-  };
+  const choiceLabels: Record<string, string> = { yes: 'Yes', partly: 'Partly', no: 'No' };
 
-  // Homework check choice
   document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((b) => {
     const choice = b.dataset.choice || 'yes';
-    b.classList.toggle('chosen', choice === state.cf2.choice);
     b.addEventListener('click', () => {
       document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((btn) => btn.classList.remove('chosen'));
       b.classList.add('chosen');
-      state.cf2.choice = choice;
-      if (state.cf2Saved) updateSummaryCardUI();
-      saveState('s5-saved');
+      answers.cf2.choice = choice;
+      if (answers.cf2_saved) updateSummaryCardUI();
+      queueSave('s5-saved', { cf2: answers.cf2 });
     });
   });
 
   const cf2Explanation = document.getElementById('cf2-hw-explanation') as HTMLTextAreaElement | null;
-  if (cf2Explanation) {
-    cf2Explanation.value = state.cf2.explanation;
-    cf2Explanation.addEventListener('input', () => {
-      state.cf2.explanation = cf2Explanation.value;
-      if (state.cf2Saved) updateSummaryCardUI();
-      saveState('s5-saved');
-    });
-  }
+  cf2Explanation?.addEventListener('input', () => {
+    answers.cf2.explanation = cf2Explanation.value;
+    if (answers.cf2_saved) updateSummaryCardUI();
+    queueSave('s5-saved', { cf2: answers.cf2 });
+  });
 
   const sentenceYacine = document.getElementById('cf2-sentence-yacine') as HTMLTextAreaElement | null;
   const reasonCareful = document.getElementById('cf2-reason-careful') as HTMLTextAreaElement | null;
@@ -2396,43 +2326,37 @@ const steps = [
 
   function updateSummaryCardUI() {
     if (summaryHwCheck) {
-      const label = choiceLabels[state.cf2.choice] || 'Yes';
-      const exp = state.cf2.explanation.trim();
+      const label = choiceLabels[answers.cf2.choice] || 'Yes';
+      const exp = answers.cf2.explanation.trim();
       summaryHwCheck.textContent = exp ? `${label} — ${exp}` : label;
     }
     if (summarySentence) {
-      summarySentence.textContent = state.cf2.sentenceYacine.trim()
-        ? `“${state.cf2.sentenceYacine.trim()}”`
+      summarySentence.textContent = answers.cf2.sentenceYacine.trim()
+        ? `“${answers.cf2.sentenceYacine.trim()}”`
         : '—';
     }
     if (summaryReason) {
-      summaryReason.textContent = state.cf2.reasonCareful.trim() || '—';
+      summaryReason.textContent = answers.cf2.reasonCareful.trim() || '—';
     }
-    summaryCard?.classList.toggle('hidden', !state.cf2Saved);
+    summaryCard?.classList.toggle('hidden', !answers.cf2_saved);
   }
 
-  if (sentenceYacine) {
-    sentenceYacine.value = state.cf2.sentenceYacine;
-    sentenceYacine.addEventListener('input', () => {
-      state.cf2.sentenceYacine = sentenceYacine.value;
-      if (state.cf2Saved) updateSummaryCardUI();
-      saveState('s5-saved');
-    });
-  }
+  sentenceYacine?.addEventListener('input', () => {
+    answers.cf2.sentenceYacine = sentenceYacine.value;
+    if (answers.cf2_saved) updateSummaryCardUI();
+    queueSave('s5-saved', { cf2: answers.cf2 });
+  });
 
-  if (reasonCareful) {
-    reasonCareful.value = state.cf2.reasonCareful;
-    reasonCareful.addEventListener('input', () => {
-      state.cf2.reasonCareful = reasonCareful.value;
-      if (state.cf2Saved) updateSummaryCardUI();
-      saveState('s5-saved');
-    });
-  }
+  reasonCareful?.addEventListener('input', () => {
+    answers.cf2.reasonCareful = reasonCareful.value;
+    if (answers.cf2_saved) updateSummaryCardUI();
+    queueSave('s5-saved', { cf2: answers.cf2 });
+  });
 
-  document.getElementById('save-cf2-btn')?.addEventListener('click', () => {
-    state.cf2Saved = true;
-    saveState('s5-saved');
+  document.getElementById('save-cf2-btn')?.addEventListener('click', async () => {
+    answers.cf2_saved = true;
     updateSummaryCardUI();
+    await flushSave('s5-saved', { cf2: answers.cf2, cf2_saved: true });
     summaryCard?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
@@ -2440,13 +2364,114 @@ const steps = [
     window.print();
   });
 
-  // Initial setup: render locks, mentor reveals, summary state, and active step
-  updateSummaryCardUI();
-  renderLocks();
-  renderMentorReveals();
-  if (state.step && state.step > 0 && state.step <= state.unlockedStep) {
-    showPanel(state.step);
-  } else {
-    showPanel(0);
+  // ---- Populate All Inputs From Supabase Answers ----
+  function hydrateInputsFromAnswers() {
+    if (hwQ1) hwQ1.value = answers.hw_q1 || '';
+    if (hwQ2) hwQ2.value = answers.hw_q2 || '';
+
+    document.querySelectorAll<HTMLInputElement>('.page-part-input').forEach((input) => {
+      const part = input.dataset.part;
+      if (part && answers.pages[part]) input.value = String(answers.pages[part]);
+    });
+    if (Object.keys(answers.pages).length > 0) checkPages(false);
+
+    Object.entries(trickInputs).forEach(([key, input]) => {
+      if (input) input.value = answers.trick[key as keyof typeof answers.trick] || '';
+    });
+
+    ['yellow-1', 'yellow-2', 'yellow-3'].forEach((id, idx) => {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (el) el.value = answers.yellow[idx] || '';
+    });
+    ['blue-1', 'blue-2'].forEach((id, idx) => {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (el) el.value = answers.blue[idx] || '';
+    });
+
+    renderJar();
+    renderSortable();
+    updatePredictionUI();
+
+    if (resultsRealText) resultsRealText.value = answers.results_real_text || '';
+    if (resultsBonusText) resultsBonusText.value = answers.results_bonus_text || '';
+
+    sparkSession2.readingCardBoxes.forEach((box) => {
+      const el = document.getElementById(`card-${box.id}`) as HTMLTextAreaElement | null;
+      if (el && answers.reading_card[box.id] !== undefined) {
+        el.value = answers.reading_card[box.id];
+      }
+    });
+    updateCardStatusUI();
+
+    document.querySelectorAll<HTMLButtonElement>('.hw-ans-choice').forEach((b) => {
+      b.classList.toggle('chosen', (b.dataset.choice || 'yes') === answers.cf2.choice);
+    });
+    if (cf2Explanation) cf2Explanation.value = answers.cf2.explanation || '';
+    if (sentenceYacine) sentenceYacine.value = answers.cf2.sentenceYacine || '';
+    if (reasonCareful) reasonCareful.value = answers.cf2.reasonCareful || '';
+    updateSummaryCardUI();
   }
+
+  // ---- Boot Session 2 Live ----
+  async function boot() {
+    try {
+      const payload = await getSession2State(teamCode);
+      if (teamCode && (!payload || !payload.team)) {
+        // Stored team code was wiped/reset
+        clearTeamCode();
+        teamCode = null;
+        const guestPayload = await getSession2State(null);
+        renderTeamBanner(null);
+        if (guestPayload) await applyRoomState(guestPayload.state, guestPayload.revealed_keys);
+      } else if (payload) {
+        renderTeamBanner(payload.team);
+        if (payload.answers) {
+          answers = {
+            ...structuredClone(defaultAnswers),
+            ...payload.answers,
+            pages: { ...(payload.answers.pages || {}) },
+            trick: { ...defaultAnswers.trick, ...(payload.answers.trick || {}) },
+            yellow: Array.isArray(payload.answers.yellow) ? [...payload.answers.yellow, '', '', ''].slice(0, 3) : ['', '', ''],
+            blue: Array.isArray(payload.answers.blue) ? [...payload.answers.blue, '', ''].slice(0, 2) : ['', ''],
+            jar_words: Array.isArray(payload.answers.jar_words) ? [...payload.answers.jar_words] : [],
+            prediction: Array.isArray(payload.answers.prediction) && payload.answers.prediction.length === 4
+              ? [...payload.answers.prediction]
+              : [...defaultAnswers.prediction],
+            reading_card: { ...defaultAnswers.reading_card, ...(payload.answers.reading_card || {}) },
+            cf2: { ...defaultAnswers.cf2, ...(payload.answers.cf2 || {}) },
+          };
+        }
+        hydrateInputsFromAnswers();
+        await applyRoomState(payload.state, payload.revealed_keys);
+      }
+    } catch (err) {
+      console.error('Session 2 live boot warning:', err);
+      renderTeamBanner(null);
+      hydrateInputsFromAnswers();
+      renderLocks();
+    }
+
+    // Watch live room step unlocks & per-step Mentor Reveals via Supabase Realtime
+    watchSession2State((s) => {
+      applyRoomState(s);
+    });
+
+    // Poll Reading Card approval live every 4s while team is waiting for Mentor approval
+    setInterval(async () => {
+      if (!teamCode || answers.card_status !== 'pending') return;
+      try {
+        const fresh = await getSession2State(teamCode);
+        if (fresh?.answers && fresh.answers.card_status === 'approved') {
+          answers.card_status = 'approved';
+          answers.card_approved_by = fresh.answers.card_approved_by ?? null;
+          answers.card_mentor_comment = fresh.answers.card_mentor_comment ?? null;
+          updateCardStatusUI();
+        }
+      } catch {
+        /* ignore transient hiccup */
+      }
+    }, 4000);
+  }
+
+  boot();
 </script>
