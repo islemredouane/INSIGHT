@@ -10,6 +10,7 @@ import MobileMenu from '../components/layout/MobileMenu.astro';
 import Footer from '../components/layout/Footer.astro';
 import { site, reviewMode } from '../data/site';
 import { assetUrl } from '../lib/assets';
+import Analytics from '@vercel/analytics/astro';
 
 interface BreadcrumbItem {
   name: string;
@@ -402,5 +403,6 @@ const schemaGraph: Record<string, any> = {
       import '../scripts/motion.ts';
       import '../scripts/scrollbar.ts';
     </script>
+    <Analytics />
   </body>
 </html>
