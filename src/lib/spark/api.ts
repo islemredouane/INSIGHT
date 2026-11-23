@@ -529,6 +529,212 @@ export function watchSession2State(onChange: (s: Session2RoomState) => void): ()
   };
 }
 
+/* ---- Session 3 Live Types & RPCs ---- */
+export interface Session3RoomState {
+  unlocked_step: number;
+  revealed_steps: Record<string, boolean>;
+  updated_at?: string;
+}
+
+export interface PeelDraft {
+  p: string;
+  e: string;
+  explain: string;
+  l: string;
+  ref: string;
+}
+
+export interface PeerReviewSubmission {
+  target_team_id?: string | null;
+  target_team_code?: string | null;
+  checks: string[];
+  star: string;
+  wish: string;
+  submitted_at?: string | null;
+}
+
+export interface PeerFeedbackReceived {
+  reviewer_code: string;
+  checks: string[];
+  star: string;
+  wish: string;
+  submitted_at: string;
+}
+
+export interface Session3TeamAnswers {
+  team_id?: string;
+  step1_spots: Record<string, string>;
+  step2_p1: string;
+  step2_p2: string;
+  step2_peek1: number;
+  step2_peek2: number;
+  peel: PeelDraft;
+  peel_saved: boolean;
+  peer_review: PeerReviewSubmission;
+  improved_peel: PeelDraft;
+  cf3_status: 'draft' | 'pending' | 'approved';
+  cf3_submitted_at?: string | null;
+  cf3_approved_at?: string | null;
+  cf3_approved_by?: string | null;
+  cf3_mentor_comment?: string | null;
+  updated_at?: string;
+}
+
+export interface Session3AnswerKey {
+  step0: {
+    message: string;
+    fourPillars: { title: string; desc: string }[];
+  };
+  step1: {
+    badAnswer: string;
+    mistakes: { id: string; text: string; label: string; category: string; why: string }[];
+  };
+  step2: {
+    sentences: { original: string; keyCheck: string; modelAnswer: string }[];
+  };
+  step3: {
+    peelModel: PeelDraft;
+    mentorNotes: string;
+  };
+  step4: {
+    sixChecks: { id: string; title: string; desc: string }[];
+    peerAdvice: string;
+  };
+  step5: {
+    modelVerdict: string;
+    approvalCriteria: string[];
+  };
+}
+
+export interface Session3TeamPayload {
+  team: { id: string; code: string; name: string; members: string[] } | null;
+  state: Session3RoomState;
+  answers: Session3TeamAnswers | null;
+  s2_reading_card: Record<string, string> | null;
+  peer_feedback_received: PeerFeedbackReceived | null;
+  revealed_keys: Partial<Session3AnswerKey>;
+}
+
+export interface PeerTargetPayload {
+  is_fallback?: boolean;
+  target_team_id: string;
+  target_team_code: string;
+  peel: PeelDraft;
+}
+
+export interface MentorS3TeamRow {
+  id: string;
+  code: string;
+  name: string;
+  members: string[];
+  last_activity: string;
+  step1_spots: Record<string, string>;
+  step2_p1: string;
+  step2_p2: string;
+  step2_peek1: number;
+  step2_peek2: number;
+  peel: PeelDraft;
+  peel_saved: boolean;
+  peer_review: PeerReviewSubmission;
+  improved_peel: PeelDraft;
+  cf3_status: 'draft' | 'pending' | 'approved';
+  cf3_submitted_at?: string | null;
+  cf3_approved_at?: string | null;
+  cf3_approved_by?: string | null;
+  cf3_mentor_comment?: string | null;
+  s3_updated_at?: string | null;
+}
+
+export interface MentorS3Overview {
+  state: Session3RoomState;
+  teams: MentorS3TeamRow[];
+}
+
+export const getSession3State = (code?: string | null) =>
+  rpc<Session3TeamPayload | null>('spark_s3_get_state', { p_code: code || null });
+
+export const getSession3RevealedKeys = () =>
+  rpc<Partial<Session3AnswerKey>>('spark_s3_revealed_keys');
+
+export const saveSession3Progress = (code: string, patch: Record<string, unknown>) =>
+  rpc<Session3TeamAnswers>('spark_s3_save', { p_code: code, p_patch: patch });
+
+export const getPeerTargetSession3 = (code: string) =>
+  rpc<PeerTargetPayload>('spark_s3_get_peer_target', { p_code: code });
+
+export const submitPeerReviewSession3 = (code: string, review: Record<string, unknown>) =>
+  rpc<Session3TeamAnswers>('spark_s3_submit_peer_review', { p_code: code, p_review: review });
+
+export const submitCaseFile3 = (code: string, improvedPeel: PeelDraft) =>
+  rpc<Session3TeamAnswers>('spark_s3_submit_cf3', { p_code: code, p_improved_peel: improvedPeel });
+
+export const mentorS3Overview = (token: string) =>
+  rpc<MentorS3Overview>('spark_mentor_s3_overview', { p_token: token });
+
+export const mentorS3SetStep = (token: string, step: number) =>
+  rpc<void>('spark_mentor_s3_set_step', { p_token: token, p_step: step });
+
+export const mentorS3SetReveal = (token: string, step: number, revealed: boolean) =>
+  rpc<Record<string, boolean>>('spark_mentor_s3_set_reveal', {
+    p_token: token,
+    p_step: step,
+    p_revealed: revealed,
+  });
+
+export const mentorS3ApproveCaseFile = (
+  token: string,
+  teamId: string,
+  mentorName?: string,
+  comment?: string
+) =>
+  rpc<void>('spark_mentor_s3_approve_cf3', {
+    p_token: token,
+    p_team_id: teamId,
+    p_mentor_name: mentorName || null,
+    p_comment: comment || null,
+  });
+
+export const mentorS3Export = (token: string) =>
+  rpc<Record<string, unknown>[]>('spark_mentor_s3_export', { p_token: token });
+
+export const adminS3Reset = (token: string) =>
+  rpc<void>('spark_admin_s3_reset', { p_token: token });
+
+export function watchSession3State(onChange: (s: Session3RoomState) => void): () => void {
+  let stopped = false;
+  const poll = async () => {
+    if (stopped) return;
+    try {
+      const { data } = await sb()
+        .from('spark_session3_state')
+        .select('unlocked_step, revealed_steps, updated_at')
+        .eq('id', true)
+        .single();
+      if (data) onChange(data as Session3RoomState);
+    } catch {
+      /* network hiccup */
+    }
+  };
+  poll();
+  const interval = setInterval(poll, 4000);
+  const channel = sb()
+    .channel('spark-session3-state')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'spark_session3_state' },
+      (payload) => {
+        onChange(payload.new as Session3RoomState);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    stopped = true;
+    clearInterval(interval);
+    sb().removeChannel(channel);
+  };
+}
+
 export const mentorExport = (token: string) =>
   rpc<Record<string, unknown>[]>('spark_mentor_export', { p_token: token });
 

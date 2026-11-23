@@ -324,3 +324,158 @@ export const sparkSession2 = {
     },
   },
 };
+
+export const sparkSession3 = {
+  number: 3,
+  title: 'The Music Case — Part 3: "Write for Yacine"',
+  subtitle: 'From reading to writing · 60 minutes · PEEL Paragraph & Peer Review',
+  mentorCue:
+    'Today you’re the researchers who answer him. "Something he can trust" means: clear, your own words, a source, and careful words.',
+  yacineMessage:
+    'My sister found that paper about music. I don\'t have time to read research. Just tell me in one paragraph: should I stop listening to music when I study? And please, make it something I can trust.',
+  fourPillars: [
+    {
+      title: '1. Clear & Neutral Style',
+      desc: 'Short sentences, one idea at a time, no emotional drama or exclamation marks.',
+    },
+    {
+      title: '2. Real Paraphrase',
+      desc: 'Written in your team’s own words, never copied sentence structure from the paper.',
+    },
+    {
+      title: '3. Precise & Sourced',
+      desc: 'Includes empirical details (30 students, 4 sound conditions) and APA citation (Perham & Currie, 2014).',
+    },
+    {
+      title: '4. Careful Words',
+      desc: 'Uses cautious verbs ("suggests", "found", "may"). Never claims a single study "proves".',
+    },
+  ],
+  badAnswer:
+    'Music is really bad for studying!! Perham and Currie proved that listening to music is always distracting. In their study, songs with lyrics made reading worse, and the songs students liked were just as bad as the songs they disliked. So Yacine should never listen to any music. Lots of students did the test.',
+  mistakeLabels: [
+    'Not neutral',
+    'Too strong',
+    'Wrong',
+    'Copied',
+    'Vague',
+    'Missing citation',
+  ] as const,
+  badAnswerMistakes: [
+    {
+      id: 'm1',
+      text: 'Music is really bad for studying!!',
+      expectedLabel: 'Not neutral',
+      hint: 'Notice the emotional feeling and the dramatic "!!".',
+    },
+    {
+      id: 'm2',
+      text: 'Perham and Currie',
+      expectedLabel: 'Missing citation',
+      hint: 'No publication year (2014) and no formal APA in-text format.',
+    },
+    {
+      id: 'm3',
+      text: 'proved',
+      expectedLabel: 'Too strong',
+      hint: 'Can one single laboratory study ever "prove" human cognition universally?',
+    },
+    {
+      id: 'm4',
+      text: 'listening to music is always distracting',
+      expectedLabel: 'Wrong',
+      hint: 'Was music without lyrics distracting, or did they score just as well as quiet silence?',
+    },
+    {
+      id: 'm5',
+      text: 'songs with lyrics made reading worse, and the songs students liked were just as bad as the songs they disliked.',
+      expectedLabel: 'Copied',
+      hint: 'This sentence is lifted almost verbatim from the abstract with zero paraphrasing.',
+    },
+    {
+      id: 'm6',
+      text: 'So Yacine should never listen to any music.',
+      expectedLabel: 'Wrong / too strong',
+      hint: 'Does the study forbid all music or only background songs with lyrical speech?',
+    },
+    {
+      id: 'm7',
+      text: 'Lots of students',
+      expectedLabel: 'Vague',
+      hint: 'How many people actually took part? Be mathematically precise.',
+    },
+  ],
+  paraphraseSentences: [
+    {
+      id: 'p1',
+      title: 'Sentence 1 · The Findings',
+      original:
+        'Students understood the texts best in quiet and with music without lyrics, and worst with the two kinds of songs with lyrics.',
+      hint: 'Focus on contrast: silence & instrumental vs. lyric songs (liked or disliked).',
+      example:
+        'Reading was easiest in silence or with instrumental music, and hardest with any songs that had lyrics (Perham & Currie, 2014).',
+    },
+    {
+      id: 'p2',
+      title: 'Sentence 2 · The Mechanism (Why?)',
+      original:
+        'The brain has to block the lyrics so that they do not mix with the text, and this effort makes understanding the text less efficient.',
+      hint: 'Focus on cognitive interference: ignoring vocal words drains mental resources needed for reading.',
+      example:
+        'Because the mind must work to ignore the words of a song, less effort is left for understanding the text (Perham & Currie, 2014).',
+    },
+  ],
+  peelGuide: [
+    {
+      id: 'p',
+      letter: 'P',
+      name: 'Point',
+      role: 'Direct answer to Yacine’s question in one clear topic sentence.',
+      prompt: 'State your main answer directly: does listening to music with lyrics hurt reading comprehension?',
+      placeholder: 'e.g. Listening to songs with lyrics while reading may make it harder to understand the text, even when the songs are your favourites…',
+    },
+    {
+      id: 'e',
+      letter: 'E',
+      name: 'Evidence',
+      role: ' empirical data from Perham & Currie (2014) with sample size and conditions.',
+      prompt: 'Insert your paraphrased finding from Step 2 with the in-text citation (Perham & Currie, 2014).',
+      placeholder: 'e.g. In one study, 30 university students understood texts best in quiet and with instrumental music, but scored significantly lower with vocal music (Perham & Currie, 2014)…',
+    },
+    {
+      id: 'explain',
+      letter: 'E',
+      name: 'Explain',
+      role: 'Why this happens cognitively (interference of lyrics with text processing).',
+      prompt: 'Insert your paraphrased mechanism from Step 2: why do vocal lyrics interfere with reading?',
+      placeholder: 'e.g. The researchers suggest that processing words from song lyrics competes for the brain’s language resources, leaving less mental capacity for reading comprehension…',
+    },
+    {
+      id: 'l',
+      letter: 'L',
+      name: 'Link',
+      role: 'Connect back to Yacine’s specific study habits with careful limits.',
+      prompt: 'Apply the insight to Yacine’s daily studying: what should he actually do when reading?',
+      placeholder: 'e.g. Although this was a small laboratory experiment, it suggests Yacine should study in silence or listen only to instrumental music when reading challenging material…',
+    },
+  ],
+  apaReference:
+    'Perham, N., & Currie, H. (2014). Does listening to preferred music improve reading comprehension performance? Applied Cognitive Psychology, 28(2), 279–284. https://doi.org/10.1002/acp.2994',
+  sixChecks: [
+    { id: 'one_idea', label: '1. One single idea', desc: 'Answers Yacine’s question in one focused paragraph without rambling.' },
+    { id: 'cited', label: '2. In-text citation', desc: 'Properly cites (Perham & Currie, 2014) when stating the experimental results.' },
+    { id: 'own_words', label: '3. Own words', desc: 'True paraphrase throughout — zero copied sentences from the paper’s abstract.' },
+    { id: 'precise', label: '4. Precise details', desc: 'Names conditions (quiet, instrumental, liked/disliked lyrical) or sample size (30 students).' },
+    { id: 'careful', label: '5. Careful verbs', desc: 'Uses cautious scientific language ("suggests", "may", "found") instead of "proves".' },
+    { id: 'reference', label: '6. Full APA reference', desc: 'Includes the complete APA reference at the bottom with DOI or journal details.' },
+  ],
+  steps: [
+    { id: 0, title: 'Yacine’s message', time: '3 min', desc: 'Read his request & discover what a trusted answer requires' },
+    { id: 1, title: 'Spot the problems', time: '10 min', desc: 'The detective step: find 7 mistakes in a bad answer' },
+    { id: 2, title: 'Paraphrase the result', time: '8 min', desc: 'Close the paper trick: rewrite 2 key sentences from memory' },
+    { id: 3, title: 'Build the PEEL paragraph', time: '15 min', desc: 'Assemble Point, Evidence, Explain, Link + APA reference' },
+    { id: 4, title: 'Swap and review', time: '12 min', desc: 'Anonymous peer review: 6 checks, 1 star, and 1 wish' },
+    { id: 5, title: 'Case File #3', time: '8 min', desc: 'Final paragraph ready for Yacine, read aloud & mentor approval' },
+  ],
+};
+

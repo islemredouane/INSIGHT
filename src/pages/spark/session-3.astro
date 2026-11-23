@@ -1,0 +1,1722 @@
+---
+// SPARK · The Music Case (Part 3) — Session 3 Game (Steps 0-5).
+// "Write for Yacine" · From reading to writing · 60 minutes · PEEL Paragraph & Peer Review.
+// No red ✗, no blocking states, 100% responsive and aligned to the INSIGHT design system.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sparkSession3 } from '../../data/spark';
+
+const steps = [
+  '00 · Yacine’s Message',
+  '01 · Spot the Problems',
+  '02 · Paraphrase Key Result',
+  '03 · Build PEEL Paragraph',
+  '04 · Swap & Review',
+  '05 · Case File #3',
+];
+---
+<BaseLayout
+  title="The Music Case (Part 3): Write for Yacine · SPARK"
+  description="SPARK 2026 Session 3: Write for Yacine. Detective mistake hunt, close-the-paper paraphrasing, PEEL paragraph builder, and anonymous peer review."
+  noindex
+>
+  <!-- Top Bar -->
+  <section class="bg-ink text-white pt-24 xl:pt-32 pb-8 border-b border-white/10">
+    <div class="max-w-[1100px] mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="eyebrow text-peri">SPARK 2026 · Session 3</p>
+        <div class="flex items-center gap-3 mt-1">
+          <h1 id="team-label" class="font-display text-xl sm:text-2xl font-bold">The Music Case · Part 3: Write for Yacine</h1>
+          <span id="team-badge" class="px-2.5 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-wider rounded bg-blue/20 text-peri border border-blue/40">
+            Team Loading…
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-[13px]">
+        <!-- Mentor Reveal Controls (Password-Protected) -->
+        <div class="relative">
+          <button
+            type="button"
+            id="mentor-controls-toggle"
+            aria-expanded="false"
+            aria-controls="mentor-controls-menu"
+            class="px-2.5 py-1 text-[11px] font-mono font-semibold rounded bg-white/10 hover:bg-white/20 text-silver transition flex items-center gap-1.5 border border-white/15"
+          >
+            <span>👑 Mentor Reveal:</span>
+            <span id="unlocked-step-indicator" class="text-peri">Step 0/5</span>
+          </button>
+          <div
+            id="mentor-controls-menu"
+            class="hidden absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white text-ink border border-navy/10 rounded-xl shadow-2xl p-4 z-30 space-y-3 text-left"
+          >
+            <!-- Mentor Auth Gate (visible when not logged in as mentor) -->
+            <form id="mentor-inline-login" class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <p class="font-mono text-[10px] uppercase text-blue font-bold tracking-wider">👑 Mentor Only</p>
+                <span class="text-[10px] font-mono text-muted">Password required</span>
+              </div>
+              <p class="text-[12px] text-body leading-snug">
+                Sign in with the SPARK mentor password to unlock steps and reveal answer keys after teams finish.
+              </p>
+              <input
+                id="mentor-inline-password"
+                type="password"
+                class="field !mt-0 !h-9 !py-1 !text-[13px]"
+                placeholder="Mentor password…"
+                autocomplete="current-password"
+                required
+              />
+              <p id="mentor-inline-error" class="hidden text-[12px] text-signal font-medium"></p>
+              <button type="submit" id="mentor-inline-submit" class="btn btn-sm btn-primary w-full justify-center">
+                Unlock Mentor Controls
+              </button>
+            </form>
+
+            <!-- Mentor Controls (visible ONLY once authenticated as mentor) -->
+            <div id="mentor-controls-authed" class="hidden space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-navy/10">
+                <span id="mentor-authed-badge" class="font-mono text-[10px] uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
+                  ✓ Mentor Active
+                </span>
+                <button type="button" id="btn-mentor-logout" class="text-[11px] text-muted hover:text-ink underline">
+                  Lock controls
+                </button>
+              </div>
+
+              <!-- Step Locks -->
+              <div class="space-y-1.5">
+                <p class="font-mono text-[10px] uppercase text-muted tracking-wider">1. Room Step Access</p>
+                <button type="button" id="btn-reveal-next" class="btn btn-sm btn-primary w-full text-left justify-start">
+                  🔓 Unlock Next Step
+                </button>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button type="button" id="btn-reveal-all" class="btn btn-sm btn-secondary w-full justify-center btn-on-light !px-2 !text-[11px]">
+                    ⚡ Unlock All
+                  </button>
+                  <button type="button" id="btn-lock-all" class="btn btn-sm btn-secondary w-full justify-center text-signal border-signal/20 hover:bg-signal/5 !px-2 !text-[11px]">
+                    🔒 Reset (0)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Answer Key Reveals -->
+              <div class="pt-2 border-t border-navy/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <p class="font-mono text-[10px] uppercase text-muted tracking-wider">2. Answer Key Reveals</p>
+                  <button type="button" id="btn-reveal-current-answers" class="text-[11px] font-semibold text-blue hover:underline">
+                    Reveal current
+                  </button>
+                </div>
+                <div class="space-y-1 text-[12px]">
+                  {[
+                    { step: 0, label: 'Step 0 · Message & 4 Pillars' },
+                    { step: 1, label: 'Step 1 · 7 Mistake Explanations' },
+                    { step: 2, label: 'Step 2 · Model Paraphrases' },
+                    { step: 3, label: 'Step 3 · Model PEEL Paragraph' },
+                    { step: 4, label: 'Step 4 · Peer Advice & Checks' },
+                    { step: 5, label: 'Step 5 · Approval Criteria' },
+                  ].map((item) => (
+                    <label class="flex items-center justify-between gap-2 px-2 py-1.5 rounded hover:bg-paper cursor-pointer">
+                      <span class="text-ink font-medium">{item.label}</span>
+                      <input
+                        type="checkbox"
+                        class="s3-reveal-step-toggle accent-blue"
+                        data-step={item.step}
+                      />
+                    </label>
+                  ))}
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 pt-1">
+                  <button type="button" id="btn-reveal-keys-all" class="btn btn-sm btn-secondary w-full justify-center btn-on-light !px-2 !text-[10px]">
+                    Reveal All Keys
+                  </button>
+                  <button type="button" id="btn-hide-keys-all" class="btn btn-sm btn-secondary w-full justify-center btn-on-light !px-2 !text-[10px]">
+                    Hide All Keys
+                  </button>
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-navy/10 text-center">
+                <a href="/spark/mentor" target="_blank" class="text-[11px] text-blue hover:underline font-mono">
+                  Open Full Mentor Dashboard ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="btn-switch-team"
+          class="text-silver hover:text-white transition font-mono text-[11px] underline"
+        >
+          Change Team
+        </button>
+        <span id="live-save-status" class="text-silver text-[11px] font-mono">
+          Synced live
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step Progress Bar -->
+  <nav class="bg-paper border-b border-navy/10 sticky top-16 z-20 shadow-sm" aria-label="Investigation Steps">
+    <div class="max-w-[1100px] mx-auto px-5">
+      <ol class="flex items-center gap-1 sm:gap-2 py-3 overflow-x-auto text-[12px] sm:text-[13px] font-mono">
+        {steps.map((label, i) => (
+          <li class="flex items-center shrink-0">
+            <button
+              type="button"
+              class={`step-tab px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5 ${
+                i === 0
+                  ? 'bg-blue text-white shadow-sm'
+                  : 'bg-white text-muted hover:text-ink border border-navy/10'
+              }`}
+              data-step={i}
+            >
+              <span class="step-num text-[10px] opacity-75">{String(i).padStart(2, '0')}</span>
+              <span class="step-name">{label.split(' · ')[1]}</span>
+              <span class="step-lock text-[10px] hidden">🔒</span>
+            </button>
+            {i < steps.length - 1 && (
+              <span class="text-muted/40 mx-1 select-none">/</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </nav>
+
+  <!-- Main Game Panels Container -->
+  <main class="max-w-[1100px] mx-auto px-5 py-8 sm:py-12 min-h-[60vh]">
+
+    <!-- Team Sign-In Banner (if guest / no team) -->
+    <div id="guest-team-banner" class="hidden mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-amber-600 text-lg">⚠️</span>
+        <p class="text-amber-900 text-[13px] leading-snug">
+          <strong>Playing in guest preview mode.</strong> Sign in with your 6-letter team code to autosave your detective tags, paraphrases, and peer review.
+        </p>
+      </div>
+      <button type="button" id="btn-guest-login" class="btn btn-sm btn-primary shrink-0">
+        Sign in with Team Code →
+      </button>
+    </div>
+
+    <!-- =========================================================================
+         STEP 0: YACINE'S MESSAGE (3 MIN · WARM-UP)
+         ========================================================================= -->
+    <section id="panel-0" class="game-panel space-y-8">
+      <!-- Phone Message Frame -->
+      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm">
+        <div class="flex items-center justify-between border-b border-navy/10 pb-4 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue/10 text-blue font-bold flex items-center justify-center font-display text-lg">
+              Y
+            </div>
+            <div>
+              <p class="font-bold text-ink text-sm sm:text-base">Yacine</p>
+              <p class="text-[11px] font-mono text-muted">Incoming SMS · Just now</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full font-semibold">
+            ● Urgent Request
+          </span>
+        </div>
+
+        <div class="max-w-xl mx-auto bg-paper/60 p-5 rounded-2xl border border-navy/5 relative">
+          <p class="text-body text-base sm:text-lg italic leading-relaxed font-serif">
+            "{sparkSession3.yacineMessage}"
+          </p>
+        </div>
+
+        <div class="mt-6 p-4 bg-blue/5 border border-blue/15 rounded-xl flex items-start gap-3">
+          <span class="text-blue text-lg mt-0.5">💡</span>
+          <div>
+            <p class="font-bold text-ink text-sm">Mentor Prompt</p>
+            <p class="text-body text-[13px] mt-0.5 leading-relaxed">
+              "{sparkSession3.mentorCue}"
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Pillars of a Trusted Paragraph -->
+      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">The Research Standard</span>
+          <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">What makes a paragraph something he can trust?</h2>
+          <p class="text-body text-[14px] mt-1">
+            Yacine needs an honest, evidence-based answer — not a blog post, personal feeling, or distorted overclaim.
+          </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          {sparkSession3.fourPillars.map((p) => (
+            <div class="p-4 bg-paper rounded-xl border border-navy/10 flex flex-col justify-between">
+              <div>
+                <p class="font-bold text-ink text-[14px]">{p.title}</p>
+                <p class="text-body text-[13px] mt-1.5 leading-relaxed">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+          <p class="text-[13px] text-muted font-mono">Ready to write for Yacine? Let's inspect a bad answer first.</p>
+          <button type="button" class="btn btn-primary btn-next-step" data-next="1">
+            Step 1 · Spot the Problems →
+          </button>
+        </div>
+      </div>
+
+      <!-- Answer Key Box (Key 0) -->
+      <div id="key-box-0" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <span>👑 Mentor Key Revealed · Step 0</span>
+        </div>
+        <p class="text-emerald-950 text-[13px] leading-relaxed">
+          The goal of Session 3 is to bridge reading and writing: using <strong>Perham & Currie (2014)</strong> to craft a rigorous, 1-paragraph synthesis that answers Yacine honestly. Remind students that research writing is not about winning an argument — it's about accuracy.
+        </p>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         STEP 1: SPOT THE PROBLEMS (10 MIN · DETECTIVE STEP)
+         ========================================================================= -->
+    <section id="panel-1" class="game-panel hidden space-y-8">
+      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-4">
+          <div>
+            <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">The Detective Step · 10 min</span>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">Spot the 7 Mistakes in the Bad Answer</h2>
+            <p class="text-body text-[14px] mt-1">
+              Yacine’s friend sent him this hasty summary. Click on each problematic segment below and tag it with the correct diagnosis.
+            </p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-mono text-muted uppercase">Detective Score:</span>
+            <p id="mistakes-counter" class="font-mono font-bold text-xl text-blue">0 / 7 Tagged</p>
+          </div>
+        </div>
+
+        <!-- Bad Answer Interactive Card -->
+        <div class="p-6 bg-paper rounded-2xl border border-navy/10 space-y-4">
+          <p class="text-[11px] font-mono uppercase text-muted tracking-wider">Tap a phrase to diagnose its problem:</p>
+          
+          <div class="text-[17px] sm:text-[18px] leading-relaxed font-serif text-ink select-none">
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m1">
+              "Music is really bad for studying!!"
+            </span>{" "}
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m2">
+              Perham and Currie
+            </span>{" "}
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m3">
+              proved
+            </span>{" "}
+            that{" "}
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m4">
+              listening to music is always distracting.
+            </span>{" "}
+            In their study,{" "}
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m5">
+              songs with lyrics made reading worse, and the songs students liked were just as bad as the songs they disliked.
+            </span>{" "}
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m6">
+              So Yacine should never listen to any music.
+            </span>{" "}
+            <span class="detective-target cursor-pointer px-1 py-0.5 rounded transition border-b-2 border-dashed border-signal/60 hover:bg-signal/10" data-id="m7">
+              Lots of students
+            </span>{" "}
+            did the test.
+          </div>
+        </div>
+
+        <!-- Tagging Interface & Status Table -->
+        <div class="space-y-3">
+          <p class="font-mono text-[11px] uppercase text-muted tracking-wider">Detected Issues List:</p>
+          <div class="grid gap-2.5" id="mistakes-list">
+            {sparkSession3.badAnswerMistakes.map((m) => (
+              <div class="p-3 bg-white border border-navy/10 rounded-xl flex flex-wrap items-center justify-between gap-3 text-[13px]" data-row-id={m.id}>
+                <div class="max-w-md">
+                  <span class="font-mono text-[11px] text-muted mr-1.5">[{m.id.toUpperCase()}]</span>
+                  <span class="font-medium text-ink italic">"{m.text}"</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select class="field !mt-0 !h-8 !py-0.5 !text-[12px] mistake-selector" data-mistake-id={m.id}>
+                    <option value="">Choose diagnosis…</option>
+                    {sparkSession3.mistakeLabels.map((lbl) => (
+                      <option value={lbl}>{lbl}</option>
+                    ))}
+                  </select>
+                  <span class="mistake-badge hidden px-2 py-0.5 rounded text-[11px] font-mono font-semibold"></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+          <p class="text-[13px] text-muted">
+            Mentor tip: <em>"Finding 5 out of 7 is good! Wait for the mentor to reveal the answers after 7 minutes."</em>
+          </p>
+          <button type="button" class="btn btn-primary btn-next-step" data-next="2">
+            Step 2 · Paraphrase the Result →
+          </button>
+        </div>
+      </div>
+
+      <!-- Answer Key Box (Key 1) -->
+      <div id="key-box-1" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <span>👑 Mentor Key Revealed · Step 1 Detective Answers (7/7)</span>
+        </div>
+        <div class="grid gap-3 text-[13px]">
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>1. "Music is really bad for studying!!"</strong> → <span class="text-blue font-semibold">Not neutral</span> (Personal emotion with exclamation marks).
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>2. "Perham and Currie"</strong> → <span class="text-blue font-semibold">Missing citation</span> (No publication year, no APA format).
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>3. "proved"</strong> → <span class="text-blue font-semibold">Too strong</span> (A single study never proves anything universally; say "found").
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>4. "listening to music is always distracting"</strong> → <span class="text-blue font-semibold">Wrong</span> (Music without lyrics was as effective as silence!).
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>5. "songs with lyrics made reading worse..."</strong> → <span class="text-blue font-semibold">Copied</span> (Word-for-word copy of the paper's abstract).
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>6. "So Yacine should never listen to any music"</strong> → <span class="text-blue font-semibold">Wrong / too strong</span> (Paper only shows vocal lyric songs impaired reading).
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <strong>7. "Lots of students"</strong> → <span class="text-blue font-semibold">Vague</span> (It was exactly 30 university students).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         STEP 2: PARAPHRASE THE KEY RESULT (8 MIN · CLOSE THE PAPER)
+         ========================================================================= -->
+    <section id="panel-2" class="game-panel hidden space-y-8">
+      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Step 2 · 8 min · The "Close the Paper" Trick</span>
+          <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">Paraphrase 2 Key Sentences from Memory</h2>
+          <p class="text-body text-[14px] mt-1">
+            Real research writing never copies words. Read the sentence below, hit <strong>"I've understood it: hide it 🙈"</strong>, and write your version from memory.
+          </p>
+        </div>
+
+        <div class="grid gap-6">
+          {sparkSession3.paraphraseSentences.map((p, idx) => (
+            <div class="p-6 bg-paper rounded-2xl border border-navy/10 space-y-4" data-paraphrase-id={p.id}>
+              <div class="flex items-center justify-between border-b border-navy/10 pb-3">
+                <span class="font-bold text-ink text-sm sm:text-base">{p.title}</span>
+                <span class="text-[11px] font-mono text-muted peek-counter-badge" id={`peek-badge-${p.id}`}>
+                  Peeks: 0
+                </span>
+              </div>
+
+              <!-- Original Sentence Card -->
+              <div class="original-box p-4 bg-white rounded-xl border border-navy/10 transition-all duration-300">
+                <p class="text-xs font-mono uppercase text-muted mb-1">Original from paper:</p>
+                <p class="text-[15px] sm:text-[16px] text-ink font-serif italic leading-relaxed">
+                  "{p.original}"
+                </p>
+                <p class="text-[12px] text-body mt-2 text-muted">
+                  💡 <em>Hint: {p.hint}</em>
+                </p>
+              </div>
+
+              <!-- Close the Paper Toggle Action -->
+              <div class="flex items-center gap-3">
+                <button type="button" class="btn btn-sm btn-secondary btn-on-light btn-hide-original" data-target={p.id}>
+                  🙈 I've understood it: hide it
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary btn-on-light btn-peek-original hidden" data-target={p.id}>
+                  👁️ Peek at original
+                </button>
+                <span class="text-[12px] text-muted font-mono original-status-label">
+                  Original visible
+                </span>
+              </div>
+
+              <!-- Student Paraphrase Input -->
+              <div class="space-y-2">
+                <label class="block text-[13px] font-semibold text-ink">
+                  Your team's paraphrase (include in-text citation: <em>(Perham & Currie, 2014)</em>):
+                </label>
+                <textarea
+                  id={`paraphrase-input-${p.id}`}
+                  rows="3"
+                  class="field w-full text-[14px] font-serif leading-relaxed"
+                  placeholder="Rewrite in your own words with the citation…"
+                ></textarea>
+              </div>
+
+              <!-- Quality Self-Checks -->
+              <div class="pt-2 flex flex-wrap gap-4 text-[12px] text-muted">
+                <span>✓ Same meaning</span>
+                <span>✓ New words</span>
+                <span>✓ New sentence structure</span>
+                <span>✓ Citation: (Perham & Currie, 2014)</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+          <button type="button" id="btn-save-paraphrases" class="btn btn-secondary btn-on-light">
+            💾 Save Paraphrases
+          </button>
+          <button type="button" class="btn btn-primary btn-next-step" data-next="3">
+            Step 3 · Build the PEEL Paragraph →
+          </button>
+        </div>
+      </div>
+
+      <!-- Answer Key Box (Key 2) -->
+      <div id="key-box-2" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <span>👑 Mentor Key Revealed · Step 2 Model Paraphrases</span>
+        </div>
+        <div class="space-y-3 text-[13px]">
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <p class="font-bold text-emerald-900">Sentence 1 (Findings) Model Paraphrase:</p>
+            <p class="italic text-ink mt-1">
+              "Reading was easiest in silence or with instrumental music, and hardest with any songs that had lyrics (Perham & Currie, 2014)."
+            </p>
+          </div>
+          <div class="p-3 bg-white/80 rounded-lg border border-emerald-200">
+            <p class="font-bold text-emerald-900">Sentence 2 (Mechanism) Model Paraphrase:</p>
+            <p class="italic text-ink mt-1">
+              "Because the mind must work to ignore the words of a song, less effort is left for understanding the text (Perham & Currie, 2014)."
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         STEP 3: BUILD THE PEEL PARAGRAPH (15 MIN · THE MAIN PART)
+         ========================================================================= -->
+    <section id="panel-3" class="game-panel hidden space-y-8">
+      <div class="grid lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Cols: Writing Workshop -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-4">
+              <div>
+                <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Step 3 · 15 min · The Main Part</span>
+                <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">Build the PEEL Paragraph</h2>
+                <p class="text-body text-[14px] mt-1">
+                  Answer Yacine’s question in one rigorous paragraph: Point, Evidence, Explain, Link + APA Reference.
+                </p>
+              </div>
+            </div>
+
+            <!-- 4 PEEL Writing Boxes -->
+            <div class="space-y-5">
+              {sparkSession3.peelGuide.map((item) => (
+                <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-6 h-6 rounded bg-blue text-white font-mono font-bold text-xs flex items-center justify-center">
+                        {item.letter}
+                      </span>
+                      <span class="font-bold text-ink text-sm">{item.name}</span>
+                    </div>
+                    {item.id === 'e' && (
+                      <button type="button" class="btn-insert-paraphrase text-[11px] font-mono text-blue hover:underline" data-source="p1">
+                        + Insert Paraphrase 1
+                      </button>
+                    )}
+                    {item.id === 'explain' && (
+                      <button type="button" class="btn-insert-paraphrase text-[11px] font-mono text-blue hover:underline" data-source="p2">
+                        + Insert Paraphrase 2
+                      </button>
+                    )}
+                  </div>
+                  <p class="text-[12px] text-body">{item.prompt}</p>
+                  <textarea
+                    id={`peel-input-${item.id}`}
+                    rows="3"
+                    class="field w-full text-[14px] font-serif leading-relaxed"
+                    placeholder={item.placeholder}
+                  ></textarea>
+                </div>
+              ))}
+
+              <!-- APA Reference Box -->
+              <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded bg-navy text-white font-mono font-bold text-xs flex items-center justify-center">
+                      Ref
+                    </span>
+                    <span class="font-bold text-ink text-sm">APA 7th Reference</span>
+                  </div>
+                  <button type="button" id="btn-insert-apa-template" class="text-[11px] font-mono text-blue hover:underline">
+                    + Fill Reference
+                  </button>
+                </div>
+                <p class="text-[12px] text-body">
+                  Full citation for Perham & Currie (2014) with author, year, journal title, volume, pages, and DOI:
+                </p>
+                <textarea
+                  id="peel-input-ref"
+                  rows="2"
+                  class="field w-full text-[13px] font-mono"
+                  placeholder="Perham, N., & Currie, H. (2014). …"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Live Combined Paragraph Preview -->
+            <div class="p-5 bg-white border-2 border-blue/20 rounded-xl space-y-3">
+              <span class="font-mono text-xs uppercase text-blue font-bold tracking-wider">
+                Live Combined Paragraph Preview
+              </span>
+              <p id="combined-preview-body" class="text-[15px] sm:text-[16px] text-ink font-serif leading-relaxed italic">
+                (Type in the P, E, E, L boxes above to preview your complete paragraph here…)
+              </p>
+              <p id="combined-preview-ref" class="text-[12px] text-muted font-mono border-t border-navy/10 pt-2"></p>
+            </div>
+
+            <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+              <button type="button" id="btn-save-peel" class="btn btn-secondary btn-on-light">
+                💾 Save PEEL Draft
+              </button>
+              <button type="button" class="btn btn-primary btn-next-step" data-next="4">
+                Step 4 · Swap & Review →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Col: Session 2 Reading Card & Dossier Drawer -->
+        <div class="space-y-6">
+          <div class="bg-white border border-navy/10 rounded-2xl p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-navy/10 pb-3">
+              <div>
+                <p class="font-mono text-[11px] uppercase text-blue font-bold">Investigation Drawer</p>
+                <h3 class="font-display text-base font-bold text-ink">Session 2 Reading Card</h3>
+              </div>
+              <span class="text-xs font-mono text-muted">Perham & Currie</span>
+            </div>
+
+            <div class="space-y-3 text-[12px]" id="s2-card-preview-drawer">
+              <div class="p-2.5 bg-paper rounded border border-navy/10">
+                <p class="font-bold text-ink">Who:</p>
+                <p id="s2-drawer-who" class="text-body italic">Loading from Session 2…</p>
+              </div>
+              <div class="p-2.5 bg-paper rounded border border-navy/10">
+                <p class="font-bold text-ink">What tested:</p>
+                <p id="s2-drawer-what" class="text-body italic">Loading…</p>
+              </div>
+              <div class="p-2.5 bg-paper rounded border border-navy/10">
+                <p class="font-bold text-ink">Main finding:</p>
+                <p id="s2-drawer-finding" class="text-body italic">Loading…</p>
+              </div>
+              <div class="p-2.5 bg-paper rounded border border-navy/10">
+                <p class="font-bold text-ink">Their explanation (Why?):</p>
+                <p id="s2-drawer-explanation" class="text-body italic">Loading…</p>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-navy/10 space-y-2">
+              <p class="text-[11px] font-mono text-muted uppercase">PDF Papers:</p>
+              <div class="flex flex-col gap-1.5 text-[12px]">
+                <a href="/events/spark-2026/Perham_Currie_2014_Easy_Copy.pdf" target="_blank" class="text-blue hover:underline">
+                  📄 Open Easy Copy PDF ↗
+                </a>
+                <a href="/events/spark-2026/Perham_Currie_2014_SPARK_Student_Copy.pdf" target="_blank" class="text-blue hover:underline">
+                  📑 Open Full Student Copy PDF ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Answer Key Box (Key 3) -->
+      <div id="key-box-3" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <span>👑 Mentor Key Revealed · Step 3 Model PEEL Paragraph</span>
+        </div>
+        <div class="p-4 bg-white/90 rounded-xl border border-emerald-200 space-y-2 text-[14px] leading-relaxed">
+          <p><strong>P:</strong> Listening to songs with lyrics while reading may make it harder to understand the text, even when the songs are your favourites.</p>
+          <p><strong>E:</strong> In one study, 30 university students read texts and answered questions in four conditions; they understood best in quiet and with music without lyrics, and worst with songs with lyrics, whether they liked those songs or not (Perham & Currie, 2014).</p>
+          <p><strong>E:</strong> The authors suggest that lyrics are words too, so the brain processes their meaning and has to work to block them, which leaves less attention for the text.</p>
+          <p><strong>L:</strong> This was a small study with one reading task, but it suggests that Yacine could study in silence or with music without lyrics when he needs to read and understand.</p>
+          <p class="text-[12px] font-mono text-muted border-t border-emerald-200 pt-2">
+            <strong>Ref:</strong> {sparkSession3.apaReference}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         STEP 4: SWAP AND REVIEW (12 MIN · THE FUN PART)
+         ========================================================================= -->
+    <section id="panel-4" class="game-panel hidden space-y-8">
+      <div class="grid lg:grid-cols-2 gap-8">
+
+        <!-- Left: Review Another Team's Paragraph -->
+        <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-4">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Step 4 · 12 min · Anonymous Peer Review</span>
+              <h2 class="font-display text-xl font-bold text-ink mt-1">Review Another Team’s Draft</h2>
+              <p class="text-body text-[13px] mt-1">
+                Read their draft, tick the 6 checks, and give 1 star and 1 wish.
+              </p>
+            </div>
+            <span id="peer-target-code-badge" class="px-2.5 py-0.5 text-[11px] font-mono rounded bg-blue/10 text-blue font-semibold">
+              Anonymous Target
+            </span>
+          </div>
+
+          <!-- Peer Target Paragraph Card -->
+          <div class="p-5 bg-paper rounded-xl border border-navy/10 space-y-3">
+            <p class="font-mono text-[10px] uppercase text-muted tracking-wider">Target Team's Draft Paragraph:</p>
+            <p id="peer-target-paragraph" class="text-[15px] text-ink font-serif leading-relaxed italic">
+              Loading another team's draft…
+            </p>
+            <p id="peer-target-reference" class="text-[12px] text-muted font-mono border-t border-navy/10 pt-2"></p>
+          </div>
+
+          <!-- The 6 Checks -->
+          <div class="space-y-3">
+            <p class="font-mono text-[11px] uppercase text-muted tracking-wider">The 6 Checks:</p>
+            <div class="space-y-2">
+              {sparkSession3.sixChecks.map((chk) => (
+                <label class="flex items-start gap-3 p-3 bg-paper/60 hover:bg-paper rounded-lg border border-navy/10 cursor-pointer transition">
+                  <input
+                    type="checkbox"
+                    class="peer-check-input accent-blue mt-0.5 shrink-0"
+                    value={chk.id}
+                  />
+                  <div>
+                    <span class="font-bold text-ink text-[13px]">{chk.label}</span>
+                    <p class="text-[12px] text-body leading-snug">{chk.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <!-- 1 Star & 1 Wish -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[13px] font-bold text-ink mb-1 flex items-center gap-1.5">
+                <span>🌟 1 Star</span>
+                <span class="text-muted font-normal text-[12px]">(Something they did really well):</span>
+              </label>
+              <textarea
+                id="peer-star-input"
+                rows="2"
+                class="field w-full text-[13px]"
+                placeholder="e.g. Their Evidence sentence is super clear and cites Perham & Currie correctly…"
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="block text-[13px] font-bold text-ink mb-1 flex items-center gap-1.5">
+                <span>💡 1 Wish</span>
+                <span class="text-muted font-normal text-[12px]">(One actionable improvement to make):</span>
+              </label>
+              <textarea
+                id="peer-wish-input"
+                rows="2"
+                class="field w-full text-[13px]"
+                placeholder="e.g. Mention that liked songs hurt reading just as much as disliked songs…"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-navy/10 flex items-center justify-between">
+            <span id="peer-submit-status" class="text-[12px] text-muted font-mono"></span>
+            <button type="button" id="btn-submit-peer-review" class="btn btn-primary">
+              Send Review to Peers →
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Feedback Received on YOUR Paragraph + 5-Min Revision -->
+        <div class="space-y-6">
+          <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div class="flex items-center justify-between border-b border-navy/10 pb-4">
+              <div>
+                <span class="font-mono text-xs uppercase tracking-wider text-emerald-700 font-semibold">Incoming Peer Feedback</span>
+                <h3 class="font-display text-xl font-bold text-ink mt-1">Feedback on Your Paragraph</h3>
+              </div>
+              <span id="feedback-live-pill" class="px-2 py-0.5 text-[10px] font-mono rounded bg-amber-50 text-amber-800 border border-amber-200">
+                Waiting for review…
+              </span>
+            </div>
+
+            <div id="feedback-received-card" class="p-5 bg-paper rounded-xl border border-navy/10 space-y-4">
+              <div class="flex items-center gap-2">
+                <span class="text-amber-500 text-lg">🌟</span>
+                <div>
+                  <p class="font-bold text-ink text-[13px]">Their Star:</p>
+                  <p id="received-star" class="text-body text-[13px] italic mt-0.5">Awaiting peer review…</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 border-t border-navy/10 pt-3">
+                <span class="text-blue text-lg">💡</span>
+                <div>
+                  <p class="font-bold text-ink text-[13px]">Their Wish:</p>
+                  <p id="received-wish" class="text-body text-[13px] italic mt-0.5">Awaiting peer review…</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5-Minute Improvement Editor -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="font-bold text-ink text-sm">5-Minute Revision: Polish Your Final Paragraph</h4>
+                <button type="button" id="btn-copy-peel-to-improved" class="text-[11px] font-mono text-blue hover:underline">
+                  Copy from Step 3
+                </button>
+              </div>
+              <p class="text-[12px] text-body">
+                Use your peer's star and wish to make your paragraph tighter, more precise, and ready for Yacine.
+              </p>
+
+              <div class="space-y-2">
+                <label class="block text-[12px] font-semibold text-ink">P · Revised Point:</label>
+                <textarea id="improved-p" rows="2" class="field w-full text-[13px] font-serif"></textarea>
+                
+                <label class="block text-[12px] font-semibold text-ink">E · Revised Evidence:</label>
+                <textarea id="improved-e" rows="2" class="field w-full text-[13px] font-serif"></textarea>
+                
+                <label class="block text-[12px] font-semibold text-ink">E · Revised Explain:</label>
+                <textarea id="improved-explain" rows="2" class="field w-full text-[13px] font-serif"></textarea>
+                
+                <label class="block text-[12px] font-semibold text-ink">L · Revised Link:</label>
+                <textarea id="improved-l" rows="2" class="field w-full text-[13px] font-serif"></textarea>
+
+                <label class="block text-[12px] font-semibold text-ink">Ref · APA Reference:</label>
+                <textarea id="improved-ref" rows="2" class="field w-full text-[12px] font-mono"></textarea>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-navy/10 flex items-center justify-between">
+              <button type="button" id="btn-save-improved-peel" class="btn btn-secondary btn-on-light">
+                💾 Save Revised Paragraph
+              </button>
+              <button type="button" class="btn btn-primary btn-next-step" data-next="5">
+                Step 5 · Case File #3 →
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Answer Key Box (Key 4) -->
+      <div id="key-box-4" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <span>👑 Mentor Key Revealed · Step 4 Peer Review Advice</span>
+        </div>
+        <p class="text-emerald-950 text-[13px] leading-relaxed">
+          Peer review is how science advances. Good reviewers are generous with stars and precise with wishes: rather than "fix your writing", say "specify that 30 university students were tested" or "use 'suggests' instead of 'proves'".
+        </p>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         STEP 5: CASE FILE #3 (8 MIN · FINAL DOSSIER & VERDICT)
+         ========================================================================= -->
+    <section id="panel-5" class="game-panel hidden space-y-8">
+      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-4">
+          <div>
+            <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Step 5 · 8 min · The Verdict</span>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">Case File #3: Ready for Yacine</h2>
+            <p class="text-body text-[14px] mt-1">
+              Your final research-grade paragraph and APA reference are assembled below. Submit to the mentor jury for the green ✓!
+            </p>
+          </div>
+          <div id="cf3-status-container" class="flex items-center gap-2">
+            <span id="cf3-status-badge" class="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
+              Draft
+            </span>
+          </div>
+        </div>
+
+        <!-- Final Dossier Document Card -->
+        <div class="p-6 sm:p-8 bg-paper rounded-2xl border border-navy/10 space-y-6 relative overflow-hidden">
+          <div class="flex items-center justify-between border-b border-navy/10 pb-3">
+            <div>
+              <p class="text-[11px] font-mono uppercase text-muted tracking-wider">Official Case Submission</p>
+              <h3 class="font-display text-lg font-bold text-ink">To: Yacine · From: <span id="cf3-team-title">Our Research Team</span></h3>
+            </div>
+            <span class="font-mono text-xs text-blue font-semibold">Case File #3</span>
+          </div>
+
+          <div class="space-y-4">
+            <p id="cf3-final-text" class="text-[17px] sm:text-[18px] text-ink font-serif leading-relaxed italic">
+              (Complete your paragraph in Step 3 or revise in Step 4 to preview the final text here…)
+            </p>
+            <p id="cf3-final-ref" class="text-[13px] text-muted font-mono border-t border-navy/10 pt-3">
+              {sparkSession3.apaReference}
+            </p>
+          </div>
+
+          <!-- Green ✓ Mentor Approval Banner -->
+          <div id="cf3-approved-banner" class="hidden mt-6 p-5 bg-emerald-50 border-2 border-emerald-300 rounded-xl space-y-2">
+            <div class="flex items-center gap-2 text-emerald-900 font-bold text-base">
+              <span class="text-xl">✅</span>
+              <span>Case File #3 Approved by Mentor Jury!</span>
+            </div>
+            <p id="cf3-mentor-comment" class="text-[13px] text-emerald-950 italic">
+              "Excellent paragraph: neutral, sourced, and careful words."
+            </p>
+          </div>
+        </div>
+
+        <!-- Read Aloud & Room Discussion Prompt -->
+        <div class="p-4 bg-blue/5 border border-blue/15 rounded-xl flex items-start gap-3">
+          <span class="text-blue text-xl mt-0.5">📢</span>
+          <div>
+            <p class="font-bold text-ink text-sm">Read Aloud & Room Celebration</p>
+            <p class="text-body text-[13px] mt-0.5 leading-relaxed">
+              3 teams read their paragraph out loud! The room says which check each team executed best.
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+          <p class="text-[13px] text-muted font-mono">
+            Next session: from one paragraph to a full mini-paper.
+          </p>
+          <button type="button" id="btn-submit-cf3" class="btn btn-primary btn-lg">
+            🚀 Send to Yacine (Submit Case File #3)
+          </button>
+        </div>
+      </div>
+
+      <!-- Answer Key Box (Key 5) -->
+      <div id="key-box-5" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <span>👑 Mentor Key Revealed · Step 5 Approval Criteria</span>
+        </div>
+        <div class="p-4 bg-white/90 rounded-xl border border-emerald-200 text-[13px] space-y-2">
+          <p class="font-bold text-emerald-900">Mentors give the green ✓ if the paragraph:</p>
+          <ul class="list-disc list-inside space-y-1 text-ink">
+            <li>Says songs with lyrics hurt reading (not "all music" generally)</li>
+            <li>Mentions that liked songs hurt just as much as disliked songs</li>
+            <li>Includes the in-text citation (Perham & Currie, 2014)</li>
+            <li>Uses careful words ("suggests", "may", "found" — never "proves")</li>
+            <li>Contains no copied sentences from the paper</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Team Selection / Change Modal -->
+  <div id="team-modal" class="hidden fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white text-ink rounded-2xl max-w-md w-full p-6 shadow-2xl border border-navy/10 space-y-4">
+      <div class="flex items-center justify-between border-b border-navy/10 pb-3">
+        <h3 class="font-display font-bold text-lg text-ink">Sign In to Your Team</h3>
+        <button type="button" id="btn-close-team-modal" class="text-muted hover:text-ink text-xl font-mono leading-none">&times;</button>
+      </div>
+      <p class="text-body text-[13px]">
+        Enter your team's 6-letter access code (from Session 1 or 2) to continue your investigation:
+      </p>
+      <form id="team-code-form" class="space-y-3">
+        <input
+          id="team-code-input"
+          type="text"
+          maxlength="6"
+          placeholder="e.g. WKKXDF"
+          class="field uppercase tracking-widest text-center font-mono text-xl font-bold !h-12"
+          required
+        />
+        <p id="team-code-error" class="hidden text-xs text-signal font-medium"></p>
+        <button type="submit" class="btn btn-primary w-full justify-center">
+          Load Team Investigation →
+        </button>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import {
+    getSession3State,
+    saveSession3Progress,
+    getPeerTargetSession3,
+    submitPeerReviewSession3,
+    submitCaseFile3,
+    watchSession3State,
+    getStoredTeamCode,
+    storeTeamCode,
+    clearTeamCode,
+    getStoredMentor,
+    storeMentor,
+    clearMentor,
+    mentorLogin,
+    mentorS3SetStep,
+    mentorS3SetReveal,
+    escapeHtml,
+    friendlyError,
+    type Session3TeamAnswers,
+    type Session3RoomState,
+    type PeerTargetPayload,
+  } from '../../lib/spark/api';
+  import { sparkSession3 } from '../../data/spark';
+
+  // State
+  let teamCode = getStoredTeamCode();
+  let roomState: Session3RoomState = { unlocked_step: 0, revealed_steps: {} };
+  let revealedKeys: Record<string, any> = {};
+  let activePanel = 0;
+  let mentorSession = getStoredMentor();
+  let peerTarget: PeerTargetPayload | null = null;
+
+  const defaultAnswers: Session3TeamAnswers = {
+    step1_spots: {},
+    step2_p1: '',
+    step2_p2: '',
+    step2_peek1: 0,
+    step2_peek2: 0,
+    peel: { p: '', e: '', explain: '', l: '', ref: '' },
+    peel_saved: false,
+    peer_review: { checks: [], star: '', wish: '' },
+    improved_peel: { p: '', e: '', explain: '', l: '', ref: '' },
+    cf3_status: 'draft',
+  };
+
+  let answers: Session3TeamAnswers = structuredClone(defaultAnswers);
+  let autosaveTimer: any = null;
+
+  // Web Audio Synth for celebration / cues
+  function playAudioChime(type: 'unlock' | 'success' | 'tag') {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const t = ctx.currentTime;
+      if (type === 'unlock') {
+        osc.frequency.setValueAtTime(330, t);
+        osc.frequency.exponentialRampToValueAtTime(660, t + 0.15);
+        gain.gain.setValueAtTime(0.15, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+        osc.start(t);
+        osc.stop(t + 0.3);
+      } else if (type === 'success') {
+        osc.frequency.setValueAtTime(523.25, t);
+        osc.frequency.setValueAtTime(659.25, t + 0.1);
+        osc.frequency.setValueAtTime(783.99, t + 0.2);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+        osc.start(t);
+        osc.stop(t + 0.4);
+      } else {
+        osc.frequency.setValueAtTime(440, t);
+        gain.gain.setValueAtTime(0.08, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+        osc.start(t);
+        osc.stop(t + 0.1);
+      }
+    } catch {
+      // Audio not permitted or supported
+    }
+  }
+
+  // UI DOM Elements
+  const teamLabel = document.getElementById('team-label');
+  const teamBadge = document.getElementById('team-badge');
+  const guestBanner = document.getElementById('guest-team-banner');
+  const unlockedStepIndicator = document.getElementById('unlocked-step-indicator');
+  const liveSaveStatus = document.getElementById('live-save-status');
+
+  // Step Tabs
+  const stepTabs = document.querySelectorAll('.step-tab');
+  const gamePanels = document.querySelectorAll('.game-panel');
+
+  function setActiveStep(stepIndex: number) {
+    if (stepIndex < 0 || stepIndex > 5) return;
+    activePanel = stepIndex;
+    stepTabs.forEach((tab, idx) => {
+      if (idx === stepIndex) {
+        tab.classList.add('bg-blue', 'text-white', 'shadow-sm');
+        tab.classList.remove('bg-white', 'text-muted');
+      } else {
+        tab.classList.remove('bg-blue', 'text-white', 'shadow-sm');
+        tab.classList.add('bg-white', 'text-muted');
+      }
+    });
+
+    gamePanels.forEach((panel, idx) => {
+      panel.classList.toggle('hidden', idx !== stepIndex);
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // When entering Step 4, automatically request peer target if not yet loaded
+    if (stepIndex === 4 && teamCode && !peerTarget) {
+      loadPeerTarget();
+    }
+  }
+
+  stepTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const step = Number((tab as HTMLElement).dataset.step);
+      if (step > roomState.unlocked_step && !mentorSession) {
+        alert(`Step ${step} is currently locked by the mentor. Please wait for room unlock!`);
+        return;
+      }
+      setActiveStep(step);
+    });
+  });
+
+  document.querySelectorAll('.btn-next-step').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = Number((btn as HTMLElement).dataset.next);
+      if (next > roomState.unlocked_step && !mentorSession) {
+        alert(`Step ${next} is currently locked by the mentor.`);
+        return;
+      }
+      setActiveStep(next);
+    });
+  });
+
+  // Render Room State & Locks
+  function renderLocks() {
+    unlockedStepIndicator!.textContent = `Step ${roomState.unlocked_step}/5`;
+    stepTabs.forEach((tab, idx) => {
+      const lockIcon = tab.querySelector('.step-lock');
+      if (idx > roomState.unlocked_step) {
+        lockIcon?.classList.remove('hidden');
+        tab.classList.add('opacity-60');
+      } else {
+        lockIcon?.classList.add('hidden');
+        tab.classList.remove('opacity-60');
+      }
+    });
+
+    // Render answer key visibility (0..5)
+    for (let i = 0; i <= 5; i++) {
+      const keyBox = document.getElementById(`key-box-${i}`);
+      const isRevealed = Boolean(roomState.revealed_steps && roomState.revealed_steps[i]);
+      if (keyBox) {
+        keyBox.classList.toggle('hidden', !isRevealed);
+      }
+    }
+  }
+
+  // Hydrate UI Inputs from `answers` object
+  function hydrateUI() {
+    // Step 1: Detective Spots
+    let spotCount = 0;
+    sparkSession3.badAnswerMistakes.forEach((m) => {
+      const sel = document.querySelector(`.mistake-selector[data-mistake-id="${m.id}"]`) as HTMLSelectElement | null;
+      const row = document.querySelector(`[data-row-id="${m.id}"]`);
+      const badge = row?.querySelector('.mistake-badge') as HTMLElement | null;
+      const assigned = answers.step1_spots?.[m.id] || '';
+      if (sel) sel.value = assigned;
+      if (assigned) {
+        spotCount++;
+        if (badge) {
+          badge.textContent = assigned;
+          badge.classList.remove('hidden');
+          badge.classList.add('bg-blue/10', 'text-blue', 'border', 'border-blue/20');
+        }
+      } else if (badge) {
+        badge.classList.add('hidden');
+      }
+    });
+    const counter = document.getElementById('mistakes-counter');
+    if (counter) counter.textContent = `${spotCount} / 7 Tagged`;
+
+    // Step 2: Paraphrases
+    const p1 = document.getElementById('paraphrase-input-p1') as HTMLTextAreaElement | null;
+    const p2 = document.getElementById('paraphrase-input-p2') as HTMLTextAreaElement | null;
+    if (p1) p1.value = answers.step2_p1 || '';
+    if (p2) p2.value = answers.step2_p2 || '';
+
+    const b1 = document.getElementById('peek-badge-p1');
+    const b2 = document.getElementById('peek-badge-p2');
+    if (b1) b1.textContent = `Peeks: ${answers.step2_peek1 || 0}`;
+    if (b2) b2.textContent = `Peeks: ${answers.step2_peek2 || 0}`;
+
+    // Step 3: PEEL
+    const inpP = document.getElementById('peel-input-p') as HTMLTextAreaElement | null;
+    const inpE = document.getElementById('peel-input-e') as HTMLTextAreaElement | null;
+    const inpExp = document.getElementById('peel-input-explain') as HTMLTextAreaElement | null;
+    const inpL = document.getElementById('peel-input-l') as HTMLTextAreaElement | null;
+    const inpRef = document.getElementById('peel-input-ref') as HTMLTextAreaElement | null;
+
+    if (inpP) inpP.value = answers.peel?.p || '';
+    if (inpE) inpE.value = answers.peel?.e || '';
+    if (inpExp) inpExp.value = answers.peel?.explain || '';
+    if (inpL) inpL.value = answers.peel?.l || '';
+    if (inpRef) inpRef.value = answers.peel?.ref || '';
+
+    updateCombinedPreview();
+
+    // Step 4: Peer review & improved peel
+    const impP = document.getElementById('improved-p') as HTMLTextAreaElement | null;
+    const impE = document.getElementById('improved-e') as HTMLTextAreaElement | null;
+    const impExp = document.getElementById('improved-explain') as HTMLTextAreaElement | null;
+    const impL = document.getElementById('improved-l') as HTMLTextAreaElement | null;
+    const impRef = document.getElementById('improved-ref') as HTMLTextAreaElement | null;
+
+    if (impP) impP.value = answers.improved_peel?.p || answers.peel?.p || '';
+    if (impE) impE.value = answers.improved_peel?.e || answers.peel?.e || '';
+    if (impExp) impExp.value = answers.improved_peel?.explain || answers.peel?.explain || '';
+    if (impL) impL.value = answers.improved_peel?.l || answers.peel?.l || '';
+    if (impRef) impRef.value = answers.improved_peel?.ref || answers.peel?.ref || '';
+
+    // Step 5: Final text render
+    updateFinalDossier();
+  }
+
+  function updateCombinedPreview() {
+    const p = (document.getElementById('peel-input-p') as HTMLTextAreaElement)?.value || '';
+    const e = (document.getElementById('peel-input-e') as HTMLTextAreaElement)?.value || '';
+    const exp = (document.getElementById('peel-input-explain') as HTMLTextAreaElement)?.value || '';
+    const l = (document.getElementById('peel-input-l') as HTMLTextAreaElement)?.value || '';
+    const ref = (document.getElementById('peel-input-ref') as HTMLTextAreaElement)?.value || '';
+
+    const preview = document.getElementById('combined-preview-body');
+    const previewRef = document.getElementById('combined-preview-ref');
+
+    const parts = [p, e, exp, l].filter((s) => s.trim().length > 0);
+    if (preview) {
+      preview.textContent = parts.length > 0 ? parts.join(' ') : '(Type in the P, E, E, L boxes above to preview your complete paragraph here…)';
+    }
+    if (previewRef) {
+      previewRef.textContent = ref.trim() ? `Reference: ${ref}` : '';
+    }
+  }
+
+  function updateFinalDossier() {
+    const p = answers.improved_peel?.p || answers.peel?.p || '';
+    const e = answers.improved_peel?.e || answers.peel?.e || '';
+    const exp = answers.improved_peel?.explain || answers.peel?.explain || '';
+    const l = answers.improved_peel?.l || answers.peel?.l || '';
+    const ref = answers.improved_peel?.ref || answers.peel?.ref || sparkSession3.apaReference;
+
+    const parts = [p, e, exp, l].filter((s) => s.trim().length > 0);
+    const textEl = document.getElementById('cf3-final-text');
+    const refEl = document.getElementById('cf3-final-ref');
+    const badge = document.getElementById('cf3-status-badge');
+    const approvedBanner = document.getElementById('cf3-approved-banner');
+    const commentEl = document.getElementById('cf3-mentor-comment');
+
+    if (textEl && parts.length > 0) {
+      textEl.textContent = parts.join(' ');
+    }
+    if (refEl) {
+      refEl.textContent = ref;
+    }
+
+    if (badge) {
+      if (answers.cf3_status === 'approved') {
+        badge.textContent = '✓ Approved by Mentor Jury';
+        badge.className = 'px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300';
+        approvedBanner?.classList.remove('hidden');
+        if (commentEl && answers.cf3_mentor_comment) {
+          commentEl.textContent = `"${answers.cf3_mentor_comment}"`;
+        }
+      } else if (answers.cf3_status === 'pending') {
+        badge.textContent = '● Awaiting Mentor Jury ✓';
+        badge.className = 'px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300 animate-pulse';
+        approvedBanner?.classList.add('hidden');
+      } else {
+        badge.textContent = 'Draft';
+        badge.className = 'px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-paper text-muted border border-navy/15';
+        approvedBanner?.classList.add('hidden');
+      }
+    }
+  }
+
+  // Step 1: Detective Mistake Selector change
+  document.querySelectorAll('.mistake-selector').forEach((sel) => {
+    sel.addEventListener('change', () => {
+      const mId = (sel as HTMLElement).dataset.mistakeId;
+      const val = (sel as HTMLSelectElement).value;
+      if (!mId) return;
+      if (!answers.step1_spots) answers.step1_spots = {};
+      answers.step1_spots[mId] = val;
+      playAudioChime('tag');
+      hydrateUI();
+      triggerAutosave({ step1_spots: answers.step1_spots });
+    });
+  });
+
+  // Detective click on inline text triggers selection
+  document.querySelectorAll('.detective-target').forEach((target) => {
+    target.addEventListener('click', () => {
+      const mId = (target as HTMLElement).dataset.id;
+      const sel = document.querySelector(`.mistake-selector[data-mistake-id="${mId}"]`) as HTMLSelectElement | null;
+      if (sel) {
+        sel.focus();
+        sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+
+  // Step 2: Close the Paper (Hide / Peek)
+  document.querySelectorAll('.btn-hide-original').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = (btn as HTMLElement).dataset.target;
+      const card = document.querySelector(`[data-paraphrase-id="${targetId}"]`);
+      const originalBox = card?.querySelector('.original-box');
+      const peekBtn = card?.querySelector('.btn-peek-original');
+      const statusLabel = card?.querySelector('.original-status-label');
+
+      originalBox?.classList.add('hidden');
+      btn.classList.add('hidden');
+      peekBtn?.classList.remove('hidden');
+      if (statusLabel) statusLabel.textContent = 'Hidden 🙈 (Writing from memory)';
+      playAudioChime('tag');
+    });
+  });
+
+  document.querySelectorAll('.btn-peek-original').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = (btn as HTMLElement).dataset.target;
+      const card = document.querySelector(`[data-paraphrase-id="${targetId}"]`);
+      const originalBox = card?.querySelector('.original-box');
+      const hideBtn = card?.querySelector('.btn-hide-original');
+      const statusLabel = card?.querySelector('.original-status-label');
+
+      originalBox?.classList.remove('hidden');
+      btn.classList.add('hidden');
+      hideBtn?.classList.remove('hidden');
+      if (statusLabel) statusLabel.textContent = 'Original visible';
+
+      if (targetId === 'p1') {
+        answers.step2_peek1 = (answers.step2_peek1 || 0) + 1;
+        triggerAutosave({ step2_peek1: answers.step2_peek1 });
+      } else {
+        answers.step2_peek2 = (answers.step2_peek2 || 0) + 1;
+        triggerAutosave({ step2_peek2: answers.step2_peek2 });
+      }
+      hydrateUI();
+    });
+  });
+
+  document.getElementById('btn-save-paraphrases')?.addEventListener('click', () => {
+    const p1 = (document.getElementById('paraphrase-input-p1') as HTMLTextAreaElement)?.value || '';
+    const p2 = (document.getElementById('paraphrase-input-p2') as HTMLTextAreaElement)?.value || '';
+    answers.step2_p1 = p1;
+    answers.step2_p2 = p2;
+    triggerAutosave({ step2_p1: p1, step2_p2: p2 }, true);
+  });
+
+  // Step 3: Insert Paraphrases & APA Reference shortcuts
+  document.querySelectorAll('.btn-insert-paraphrase').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const src = (btn as HTMLElement).dataset.source;
+      if (src === 'p1') {
+        const val = answers.step2_p1 || (document.getElementById('paraphrase-input-p1') as HTMLTextAreaElement)?.value || '';
+        const inp = document.getElementById('peel-input-e') as HTMLTextAreaElement | null;
+        if (inp && val) {
+          inp.value = val;
+          answers.peel.e = val;
+          updateCombinedPreview();
+          triggerAutosave({ peel: answers.peel });
+        }
+      } else if (src === 'p2') {
+        const val = answers.step2_p2 || (document.getElementById('paraphrase-input-p2') as HTMLTextAreaElement)?.value || '';
+        const inp = document.getElementById('peel-input-explain') as HTMLTextAreaElement | null;
+        if (inp && val) {
+          inp.value = val;
+          answers.peel.explain = val;
+          updateCombinedPreview();
+          triggerAutosave({ peel: answers.peel });
+        }
+      }
+    });
+  });
+
+  document.getElementById('btn-insert-apa-template')?.addEventListener('click', () => {
+    const inp = document.getElementById('peel-input-ref') as HTMLTextAreaElement | null;
+    if (inp) {
+      inp.value = sparkSession3.apaReference;
+      answers.peel.ref = sparkSession3.apaReference;
+      updateCombinedPreview();
+      triggerAutosave({ peel: answers.peel });
+    }
+  });
+
+  ['p', 'e', 'explain', 'l', 'ref'].forEach((f) => {
+    const inp = document.getElementById(`peel-input-${f}`) as HTMLTextAreaElement | null;
+    inp?.addEventListener('input', () => {
+      (answers.peel as any)[f] = inp.value;
+      updateCombinedPreview();
+      debouncedAutosave({ peel: answers.peel, peel_saved: true });
+    });
+  });
+
+  document.getElementById('btn-save-peel')?.addEventListener('click', () => {
+    triggerAutosave({ peel: answers.peel, peel_saved: true }, true);
+  });
+
+  // Step 4: Peer Target & Review
+  async function loadPeerTarget() {
+    if (!teamCode) return;
+    try {
+      const target = await getPeerTargetSession3(teamCode);
+      peerTarget = target;
+      const codeBadge = document.getElementById('peer-target-code-badge');
+      const paragraphEl = document.getElementById('peer-target-paragraph');
+      const refEl = document.getElementById('peer-target-reference');
+
+      if (codeBadge) codeBadge.textContent = `Draft Team: ${target.target_team_code}`;
+      const p = target.peel;
+      const fullText = [p.p, p.e, p.explain, p.l].filter((s) => s && s.trim()).join(' ');
+      if (paragraphEl) {
+        paragraphEl.textContent = fullText || '(This team has not yet written their PEEL draft.)';
+      }
+      if (refEl) {
+        refEl.textContent = p.ref ? `Reference: ${p.ref}` : 'Reference: [Missing]';
+      }
+    } catch (err) {
+      console.warn('Failed to load peer target:', err);
+    }
+  }
+
+  document.getElementById('btn-submit-peer-review')?.addEventListener('click', async () => {
+    if (!teamCode || !peerTarget) {
+      alert('Please wait for an anonymous peer draft to load before submitting review.');
+      return;
+    }
+    const checks: string[] = [];
+    document.querySelectorAll('.peer-check-input:checked').forEach((chk) => {
+      checks.push((chk as HTMLInputElement).value);
+    });
+    const star = (document.getElementById('peer-star-input') as HTMLTextAreaElement)?.value || '';
+    const wish = (document.getElementById('peer-wish-input') as HTMLTextAreaElement)?.value || '';
+
+    if (!star.trim() || !wish.trim()) {
+      alert('Please provide at least 1 star (something done well) and 1 wish (improvement) for your peer team!');
+      return;
+    }
+
+    try {
+      const statusLabel = document.getElementById('peer-submit-status');
+      if (statusLabel) statusLabel.textContent = 'Submitting…';
+      await submitPeerReviewSession3(teamCode, {
+        target_team_id: peerTarget.target_team_id,
+        target_team_code: peerTarget.target_team_code,
+        checks,
+        star,
+        wish,
+      });
+      if (statusLabel) statusLabel.textContent = '✓ Review delivered to peers!';
+      playAudioChime('success');
+      alert('Your peer review has been delivered anonymously to your peer team! Now inspect incoming feedback on your own paragraph on the right.');
+    } catch (err: any) {
+      alert(friendlyError(err));
+    }
+  });
+
+  document.getElementById('btn-copy-peel-to-improved')?.addEventListener('click', () => {
+    answers.improved_peel = structuredClone(answers.peel);
+    hydrateUI();
+    triggerAutosave({ improved_peel: answers.improved_peel }, true);
+  });
+
+  ['p', 'e', 'explain', 'l', 'ref'].forEach((f) => {
+    const inp = document.getElementById(`improved-${f}`) as HTMLTextAreaElement | null;
+    inp?.addEventListener('input', () => {
+      (answers.improved_peel as any)[f] = inp.value;
+      updateFinalDossier();
+      debouncedAutosave({ improved_peel: answers.improved_peel });
+    });
+  });
+
+  document.getElementById('btn-save-improved-peel')?.addEventListener('click', () => {
+    triggerAutosave({ improved_peel: answers.improved_peel }, true);
+  });
+
+  // Step 5: Submit Case File #3
+  document.getElementById('btn-submit-cf3')?.addEventListener('click', async () => {
+    if (!teamCode) {
+      alert('Please sign in with your team code to submit Case File #3.');
+      return;
+    }
+    const finalP = answers.improved_peel?.p ? answers.improved_peel : answers.peel;
+    if (!finalP.p.trim() || !finalP.e.trim()) {
+      alert('Your PEEL paragraph is incomplete! Please write at least your Point and Evidence before submitting to Yacine.');
+      return;
+    }
+
+    try {
+      const res = await submitCaseFile3(teamCode, finalP);
+      answers.cf3_status = res.cf3_status;
+      hydrateUI();
+      playAudioChime('success');
+      alert('🚀 Case File #3 sent to the mentor jury! When the mentor gives the green ✓, your approval badge will celebrate here.');
+    } catch (err: any) {
+      alert(friendlyError(err));
+    }
+  });
+
+  // Debounced Autosave
+  function debouncedAutosave(patch: Record<string, unknown>) {
+    clearTimeout(autosaveTimer);
+    liveSaveStatus!.textContent = 'Editing…';
+    autosaveTimer = setTimeout(() => {
+      triggerAutosave(patch);
+    }, 800);
+  }
+
+  async function triggerAutosave(patch: Record<string, unknown>, notify = false) {
+    if (!teamCode) return;
+    try {
+      liveSaveStatus!.textContent = 'Saving…';
+      await saveSession3Progress(teamCode, patch);
+      liveSaveStatus!.textContent = 'Synced live';
+      if (notify) alert('Changes saved successfully!');
+    } catch (err) {
+      console.warn('Autosave hiccup:', err);
+      liveSaveStatus!.textContent = 'Sync issue (retrying)';
+    }
+  }
+
+  // Mentor Inline Controls
+  const mentorToggle = document.getElementById('mentor-controls-toggle');
+  const mentorMenu = document.getElementById('mentor-controls-menu');
+  const mentorInlineLogin = document.getElementById('mentor-inline-login');
+  const mentorInlineAuthed = document.getElementById('mentor-controls-authed');
+
+  mentorToggle?.addEventListener('click', () => {
+    mentorMenu?.classList.toggle('hidden');
+  });
+
+  function updateMentorUI() {
+    if (mentorSession) {
+      mentorInlineLogin?.classList.add('hidden');
+      mentorInlineAuthed?.classList.remove('hidden');
+    } else {
+      mentorInlineLogin?.classList.remove('hidden');
+      mentorInlineAuthed?.classList.add('hidden');
+    }
+  }
+
+  document.getElementById('mentor-inline-login')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = (document.getElementById('mentor-inline-password') as HTMLInputElement)?.value;
+    const errEl = document.getElementById('mentor-inline-error');
+    try {
+      const s = await mentorLogin(pw);
+      storeMentor(s);
+      mentorSession = s;
+      updateMentorUI();
+      renderLocks();
+      playAudioChime('unlock');
+    } catch (err: any) {
+      if (errEl) {
+        errEl.textContent = friendlyError(err);
+        errEl.classList.remove('hidden');
+      }
+    }
+  });
+
+  document.getElementById('btn-mentor-logout')?.addEventListener('click', () => {
+    clearMentor();
+    mentorSession = null;
+    updateMentorUI();
+  });
+
+  document.getElementById('btn-reveal-next')?.addEventListener('click', async () => {
+    if (!mentorSession) return;
+    const next = Math.min(5, roomState.unlocked_step + 1);
+    await mentorS3SetStep(mentorSession.token, next);
+    roomState.unlocked_step = next;
+    renderLocks();
+    playAudioChime('unlock');
+  });
+
+  document.getElementById('btn-reveal-all')?.addEventListener('click', async () => {
+    if (!mentorSession) return;
+    await mentorS3SetStep(mentorSession.token, 5);
+    roomState.unlocked_step = 5;
+    renderLocks();
+  });
+
+  document.getElementById('btn-lock-all')?.addEventListener('click', async () => {
+    if (!mentorSession) return;
+    await mentorS3SetStep(mentorSession.token, 0);
+    roomState.unlocked_step = 0;
+    renderLocks();
+  });
+
+  document.querySelectorAll('.s3-reveal-step-toggle').forEach((chk) => {
+    chk.addEventListener('change', async () => {
+      if (!mentorSession) return;
+      const step = Number((chk as HTMLElement).dataset.step);
+      const rev = (chk as HTMLInputElement).checked;
+      const res = await mentorS3SetReveal(mentorSession.token, step, rev);
+      roomState.revealed_steps = res;
+      renderLocks();
+    });
+  });
+
+  document.getElementById('btn-reveal-keys-all')?.addEventListener('click', async () => {
+    if (!mentorSession) return;
+    const res = await mentorS3SetReveal(mentorSession.token, -1, true);
+    roomState.revealed_steps = res;
+    renderLocks();
+  });
+
+  document.getElementById('btn-hide-keys-all')?.addEventListener('click', async () => {
+    if (!mentorSession) return;
+    const res = await mentorS3SetReveal(mentorSession.token, -1, false);
+    roomState.revealed_steps = res;
+    renderLocks();
+  });
+
+  // Team Modal Logic
+  const teamModal = document.getElementById('team-modal');
+  document.getElementById('btn-switch-team')?.addEventListener('click', () => teamModal?.classList.remove('hidden'));
+  document.getElementById('btn-guest-login')?.addEventListener('click', () => teamModal?.classList.remove('hidden'));
+  document.getElementById('btn-close-team-modal')?.addEventListener('click', () => teamModal?.classList.add('hidden'));
+
+  document.getElementById('team-code-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = (document.getElementById('team-code-input') as HTMLInputElement)?.value.trim().toUpperCase();
+    const err = document.getElementById('team-code-error');
+    try {
+      const payload = await getSession3State(code);
+      if (!payload || !payload.team) {
+        if (err) {
+          err.textContent = 'Team code not found. Check spelling or ask your mentor.';
+          err.classList.remove('hidden');
+        }
+        return;
+      }
+      storeTeamCode(code);
+      teamCode = code;
+      teamModal?.classList.add('hidden');
+      await boot();
+    } catch (e: any) {
+      if (err) {
+        err.textContent = friendlyError(e);
+        err.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Boot & Watcher
+  async function boot() {
+    updateMentorUI();
+    try {
+      const payload = await getSession3State(teamCode);
+      if (payload) {
+        roomState = payload.state;
+        revealedKeys = payload.revealed_keys || {};
+
+        if (payload.team) {
+          teamLabel!.textContent = `${payload.team.name} (${payload.team.code})`;
+          teamBadge!.textContent = `Team ${payload.team.code}`;
+          guestBanner?.classList.add('hidden');
+          const cf3Title = document.getElementById('cf3-team-title');
+          if (cf3Title) cf3Title.textContent = `${payload.team.name} (${payload.team.code})`;
+        } else {
+          teamLabel!.textContent = 'The Music Case · Part 3';
+          teamBadge!.textContent = 'Guest Preview';
+          guestBanner?.classList.remove('hidden');
+        }
+
+        if (payload.answers) {
+          answers = {
+            ...structuredClone(defaultAnswers),
+            ...payload.answers,
+            step1_spots: { ...(payload.answers.step1_spots || {}) },
+            peel: { ...defaultAnswers.peel, ...(payload.answers.peel || {}) },
+            improved_peel: { ...defaultAnswers.improved_peel, ...(payload.answers.improved_peel || {}) },
+          };
+        }
+
+        // Render S2 Reading card in drawer
+        if (payload.s2_reading_card) {
+          const c = payload.s2_reading_card;
+          const who = document.getElementById('s2-drawer-who');
+          const what = document.getElementById('s2-drawer-what');
+          const finding = document.getElementById('s2-drawer-finding');
+          const exp = document.getElementById('s2-drawer-explanation');
+          if (who && c.who) who.textContent = c.who;
+          if (what && c.what_tested) what.textContent = c.what_tested;
+          if (finding && c.main_finding) finding.textContent = c.main_finding;
+          if (exp && c.explanation) exp.textContent = c.explanation;
+        }
+
+        // Render peer feedback if already received
+        if (payload.peer_feedback_received) {
+          const f = payload.peer_feedback_received;
+          const starEl = document.getElementById('received-star');
+          const wishEl = document.getElementById('received-wish');
+          const pill = document.getElementById('feedback-live-pill');
+          if (starEl) starEl.textContent = f.star;
+          if (wishEl) wishEl.textContent = f.wish;
+          if (pill) {
+            pill.textContent = `Feedback from Team ${f.reviewer_code}`;
+            pill.className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-emerald-50 text-emerald-800 border border-emerald-200';
+          }
+        }
+
+        hydrateUI();
+        renderLocks();
+      }
+    } catch (err) {
+      console.warn('Boot fetch issue:', err);
+    }
+
+    watchSession3State((freshState) => {
+      roomState = freshState;
+      renderLocks();
+    });
+
+    // Check periodically for Case File #3 approval or peer review arrival
+    setInterval(async () => {
+      if (!teamCode) return;
+      try {
+        const fresh = await getSession3State(teamCode);
+        if (fresh?.answers) {
+          if (answers.cf3_status !== fresh.answers.cf3_status) {
+            answers.cf3_status = fresh.answers.cf3_status;
+            answers.cf3_mentor_comment = fresh.answers.cf3_mentor_comment;
+            if (answers.cf3_status === 'approved') playAudioChime('success');
+            updateFinalDossier();
+          }
+        }
+        if (fresh?.peer_feedback_received) {
+          const f = fresh.peer_feedback_received;
+          const starEl = document.getElementById('received-star');
+          const wishEl = document.getElementById('received-wish');
+          const pill = document.getElementById('feedback-live-pill');
+          if (starEl) starEl.textContent = f.star;
+          if (wishEl) wishEl.textContent = f.wish;
+          if (pill) {
+            pill.textContent = `Feedback from Team ${f.reviewer_code}`;
+            pill.className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-emerald-50 text-emerald-800 border border-emerald-200';
+          }
+        }
+      } catch {
+        /* transient hiccup */
+      }
+    }, 5000);
+  }
+
+  boot();
+</script>

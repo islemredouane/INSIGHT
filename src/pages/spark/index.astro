@@ -22,6 +22,15 @@ const session2Steps = [
   { num: '05', title: 'Case File #2', desc: 'Answer homework questions, formulate your verdict for Yacine, note crucial limitations, and close the case.' },
 ];
 
+const session3Steps = [
+  { num: '00', title: 'Yacine’s Message', desc: 'Read his urgent question and discover what makes a scientific paragraph something he can truly trust.' },
+  { num: '01', title: 'Spot the Problems', desc: 'The detective step: identify 7 hidden mistakes in a friend’s biased, copied, and overly strong summary.' },
+  { num: '02', title: 'Paraphrase Key Result', desc: 'Close the paper and rewrite 2 core findings from memory with proper APA in-text citations.' },
+  { num: '03', title: 'Build PEEL Paragraph', desc: 'Craft Point, Evidence, Explain, Link + full APA reference using the Session 2 reading card drawer.' },
+  { num: '04', title: 'Swap & Review', desc: 'Anonymous peer review: 6 checks, 1 star, 1 wish, and live incoming peer feedback for 5-minute revisions.' },
+  { num: '05', title: 'Case File #3', desc: 'Final research paragraph for Yacine, read aloud celebration, and mentor jury green ✓ approval.' },
+];
+
 const sparkSchema = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
@@ -45,10 +54,11 @@ const sparkSchema = {
   <PageHeader
     eyebrow="SPARK 2026 · Scientific Investigation"
     title="The Music Case."
-    lead="Does listening to music while studying help or hurt? Your team investigates like real researchers across two interactive sessions."
+    lead="Does listening to music while studying help or hurt? Your team investigates like real researchers across three interactive sessions."
   >
     <div class="hero-in mt-8 flex flex-wrap gap-4" style="--hd:.8s">
-      <a href="/spark/session-2" class="btn btn-primary">Enter Session 2 (New!) →</a>
+      <a href="/spark/session-3" class="btn btn-primary">Enter Session 3 (Live Now!) →</a>
+      <a href="/spark/session-2" class="btn btn-secondary">Play Session 2 →</a>
       <a href="/spark/case" class="btn btn-secondary">Play Session 1 →</a>
       <a href="/events/spark-2026" class="btn btn-secondary">SPARK 2026 overview →</a>
     </div>
@@ -57,62 +67,82 @@ const sparkSchema = {
   <!-- Session Selector Banner -->
   <section class="bg-paper text-ink py-16 sm:py-20 border-b border-navy/10">
     <div class="max-w-[1240px] mx-auto px-6 md:px-12">
-      <SectionHeader eyebrow="Choose Your Stage" title="Two sessions of empirical discovery." />
+      <SectionHeader eyebrow="Choose Your Stage" title="Three sessions of empirical discovery." />
       
-      <div class="mt-12 grid md:grid-cols-2 gap-8">
+      <div class="mt-12 grid md:grid-cols-3 gap-6">
         <!-- Session 1 Card -->
-        <article class="p-8 sm:p-10 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition flex flex-col justify-between">
+        <article class="p-6 sm:p-8 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition flex flex-col justify-between">
           <div>
             <span class="font-mono text-xs uppercase tracking-wider text-muted font-semibold">Session 1 · Hour 1</span>
-            <h3 class="font-display text-2xl font-bold text-ink mt-2">Part 1: Find the Papers</h3>
-            <p class="mt-3 text-[15px] text-body leading-relaxed">
+            <h3 class="font-display text-xl font-bold text-ink mt-2">Part 1: Find the Papers</h3>
+            <p class="mt-2 text-[14px] text-body leading-relaxed">
               Explore the research question, build Boolean search queries, triage 8 peer-reviewed paper cards, and follow backward citations to find the landmark 2014 study.
             </p>
-            <ul class="mt-6 space-y-2 text-[14px] text-body">
-              <li class="flex items-center gap-2">✓ Question Lab & 4-part breakdown</li>
-              <li class="flex items-center gap-2">✓ 8 Paper Cards triage (Keep / Maybe / Not for us)</li>
-              <li class="flex items-center gap-2">✓ The Citation Trail & Key paper discovery</li>
+            <ul class="mt-4 space-y-1.5 text-[13px] text-body">
+              <li class="flex items-center gap-2">✓ Question Lab &amp; 4-part breakdown</li>
+              <li class="flex items-center gap-2">✓ 8 Paper Cards triage</li>
+              <li class="flex items-center gap-2">✓ The Citation Trail discovery</li>
             </ul>
           </div>
-          <div class="mt-8 pt-6 border-t border-navy/10 flex items-center justify-between">
-            <span class="text-[13px] font-mono text-muted">Steps 00 – 05</span>
-            <a href="/spark/case" class="btn btn-sm btn-secondary btn-on-light">Open Session 1 →</a>
+          <div class="mt-6 pt-4 border-t border-navy/10 flex items-center justify-between">
+            <span class="text-[12px] font-mono text-muted">Steps 00 – 05</span>
+            <a href="/spark/case" class="btn btn-sm btn-secondary btn-on-light">Session 1 →</a>
           </div>
         </article>
 
         <!-- Session 2 Card -->
-        <article class="p-8 sm:p-10 bg-white border-2 border-blue/40 rounded-2xl shadow-md hover:border-blue transition flex flex-col justify-between relative overflow-hidden">
-          <div class="absolute top-0 right-0 bg-blue text-white text-[11px] font-mono uppercase tracking-wider font-bold py-1 px-3 rounded-bl-lg">
-            Current Session
-          </div>
+        <article class="p-6 sm:p-8 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition flex flex-col justify-between">
           <div>
-            <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Session 2 · Hour 2</span>
-            <h3 class="font-display text-2xl font-bold text-ink mt-2">Part 2: Open the Key Paper</h3>
-            <p class="mt-3 text-[15px] text-body leading-relaxed">
-              Open <em>Perham & Currie (2014)</em>, hunt for method and results with 3 highlighters, rank conditions, discover the empirical surprise, and synthesize Case File #2.
+            <span class="font-mono text-xs uppercase tracking-wider text-muted font-semibold">Session 2 · Hour 2</span>
+            <h3 class="font-display text-xl font-bold text-ink mt-2">Part 2: Open the Paper</h3>
+            <p class="mt-2 text-[14px] text-body leading-relaxed">
+              Open <em>Perham &amp; Currie (2014)</em>, hunt for method &amp; results with 3 highlighters, rank conditions, discover empirical surprises, and complete Case File #2.
             </p>
-            <ul class="mt-6 space-y-2 text-[14px] text-body">
-              <li class="flex items-center gap-2">✓ Paper Mapping & Four-Part Trick</li>
-              <li class="flex items-center gap-2">✓ Highlighter Hunt & Interactive Word Jar</li>
-              <li class="flex items-center gap-2">✓ Condition Ranking & Reality Comparison</li>
-              <li class="flex items-center gap-2">✓ 8-Box Reading Card & Verdict for Yacine</li>
+            <ul class="mt-4 space-y-1.5 text-[13px] text-body">
+              <li class="flex items-center gap-2">✓ Paper Mapping &amp; 4-Part Trick</li>
+              <li class="flex items-center gap-2">✓ Highlighter Hunt &amp; Word Jar</li>
+              <li class="flex items-center gap-2">✓ Reading Card &amp; Verdict for Yacine</li>
             </ul>
           </div>
-          <div class="mt-8 pt-6 border-t border-navy/10 flex items-center justify-between">
-            <span class="text-[13px] font-mono text-blue font-semibold">Steps 00 – 05</span>
-            <a href="/spark/session-2" class="btn btn-sm btn-primary">Enter Session 2 →</a>
+          <div class="mt-6 pt-4 border-t border-navy/10 flex items-center justify-between">
+            <span class="text-[12px] font-mono text-muted">Steps 00 – 05</span>
+            <a href="/spark/session-2" class="btn btn-sm btn-secondary btn-on-light">Session 2 →</a>
+          </div>
+        </article>
+
+        <!-- Session 3 Card (Current Live) -->
+        <article class="p-6 sm:p-8 bg-white border-2 border-blue rounded-2xl shadow-md hover:border-blue transition flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-blue text-white text-[11px] font-mono uppercase tracking-wider font-bold py-1 px-3 rounded-bl-lg">
+            Live Session
+          </div>
+          <div>
+            <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Session 3 · Hour 3</span>
+            <h3 class="font-display text-xl font-bold text-ink mt-2">Part 3: Write for Yacine</h3>
+            <p class="mt-2 text-[14px] text-body leading-relaxed">
+              From reading to writing: spot mistakes in a bad answer, paraphrase from memory, build a rigorous PEEL paragraph, and swap drafts for peer review.
+            </p>
+            <ul class="mt-4 space-y-1.5 text-[13px] text-body">
+              <li class="flex items-center gap-2">✓ Detective: 7 Bad Answer Mistakes</li>
+              <li class="flex items-center gap-2">✓ "Close the Paper" Paraphrasing</li>
+              <li class="flex items-center gap-2">✓ PEEL Paragraph Builder &amp; Drawer</li>
+              <li class="flex items-center gap-2">✓ Anonymous Peer Review Swap</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-navy/10 flex items-center justify-between">
+            <span class="text-[12px] font-mono text-blue font-semibold">Steps 00 – 05</span>
+            <a href="/spark/session-3" class="btn btn-sm btn-primary">Enter Session 3 →</a>
           </div>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- Session 2 Step Breakdown -->
+  <!-- Session 3 Step Breakdown -->
   <section class="bg-paper text-ink py-20 sm:py-28">
     <div class="max-w-[1240px] mx-auto px-6 md:px-12">
-      <SectionHeader eyebrow="Session 2 Roadmap" title="Six steps from opening the paper to the verdict." />
+      <SectionHeader eyebrow="Session 3 Roadmap" title="Six steps from detective reading to the trusted paragraph." />
       <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {session2Steps.map((s) => (
+        {session3Steps.map((s) => (
           <article class="p-8 bg-white border border-navy/10 rounded-2xl shadow-sm hover:border-blue/40 transition">
             <span class="font-mono text-sm font-semibold text-blue">{s.num}</span>
             <h3 class="mt-4 font-display text-xl font-bold text-ink">{s.title}</h3>
@@ -122,7 +152,7 @@ const sparkSchema = {
       </div>
 
       <div class="mt-16 text-center">
-        <a href="/spark/session-2" class="btn btn-lg btn-primary inline-flex">Launch Session 2 Game →</a>
+        <a href="/spark/session-3" class="btn btn-lg btn-primary inline-flex">Launch Session 3 Game →</a>
       </div>
     </div>
   </section>

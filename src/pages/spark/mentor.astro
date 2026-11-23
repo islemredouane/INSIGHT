@@ -1,13 +1,15 @@
 ---
-// SPARK · The Music Case — mentor panel. Password-gated; supports Session 2 (Live) and Session 1 (Archive).
+// SPARK · The Music Case — mentor panel. Password-gated; supports Session 3 (Live), Session 2 (Archive), and Session 1 (Archive).
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { sparkSession2 } from '../../data/spark';
+import { sparkSession2, sparkSession3 } from '../../data/spark';
 
 const s2ReadingBoxes = sparkSession2.readingCardBoxes.map((b) => ({ id: b.id, title: b.title }));
 const s2PaperPartsCount = sparkSession2.paperParts.length;
 const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   sparkSession2.conditions.map((c) => [c.id, `${c.icon} ${c.title}`])
 );
+const s3MistakesCount = sparkSession3.badAnswerMistakes.length;
+const s3SixChecks = sparkSession3.sixChecks;
 ---
 <BaseLayout title="Mentor panel · SPARK" description="SPARK 2026 mentor panel." noindex>
   <section class="bg-ink text-white pt-24 xl:pt-32 pb-8 border-b border-white/10">
@@ -17,6 +19,9 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
         <h1 class="mt-1 font-display text-2xl font-bold">Mentor Panel</h1>
       </div>
       <div id="mentor-badge" class="hidden text-[13px] text-silver/80 flex items-center gap-3">
+        <a href="/spark/session-3" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-blue text-white text-[12px] font-semibold transition-colors">
+          Open Session 3 ↗
+        </a>
         <a href="/spark/session-2" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[12px] font-medium transition-colors">
           Open Session 2 ↗
         </a>
@@ -46,16 +51,24 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       <!-- Main Panel -->
       <div id="panel" class="hidden space-y-6">
 
-        <!-- Top Session Switcher: Session 2 (Live) vs Session 1 (Archive) -->
+        <!-- Top Session Switcher: Session 3 (Live) vs Session 2 (Archive) vs Session 1 (Archive) -->
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white border border-navy/10 p-2 rounded-lg shadow-sm">
           <div class="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              id="switch-session-2"
+              id="switch-session-3"
               class="px-4 py-2 rounded-md text-[14px] font-semibold bg-ink text-white flex items-center gap-2 transition-colors"
             >
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Session 2 · Live</span>
+              <span>Session 3 · Live</span>
+              <span id="s3-top-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button
+              type="button"
+              id="switch-session-2"
+              class="px-4 py-2 rounded-md text-[14px] font-medium text-muted hover:text-ink hover:bg-paper transition-colors flex items-center gap-2"
+            >
+              <span>Session 2 · Archive</span>
               <span id="s2-top-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
             </button>
             <button
@@ -73,9 +86,213 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
         </div>
 
         <!-- =========================================================================
-             SESSION 2 · LIVE PANEL (Default)
+             SESSION 3 · LIVE PANEL (Default)
              ========================================================================= -->
-        <div id="session-2-wrap" class="space-y-6">
+        <div id="session-3-wrap" class="space-y-6">
+
+          <!-- Session 3 Control Bar: Room Step + Live Answer Key Reveals -->
+          <div class="bg-white border border-navy/10 p-5 rounded-lg shadow-sm space-y-4">
+            <!-- Row 1: Room Step Progress -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-muted uppercase font-mono text-[11px] tracking-wider">Session 3 Room Step:</span>
+                <span id="s3-current-step" class="font-display font-bold text-blue text-base">Step 0 · Yacine’s Message</span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="s3-unlock-next" class="btn btn-sm btn-primary">Unlock next step →</button>
+                <button type="button" id="s3-admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light text-signal border-signal/40 hover:bg-signal/5">
+                  Reset Session 3 (Admin)
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
+                <span class="text-[12px] text-muted font-mono uppercase mr-1">Jump:</span>
+                <div class="flex gap-1" id="s3-jump-steps"></div>
+              </div>
+            </div>
+
+            <!-- Row 2: Live Room Answer Key Reveals -->
+            <div class="pt-4 border-t border-navy/10 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-[12px] font-mono uppercase tracking-wider font-bold text-ink">👑 Live Answer Key Reveals (All Student Screens)</span>
+                  <p class="text-[12px] text-muted">Reveal or hide answer keys live on all student laptops. Keys 0 to 5 cover message, mistakes, paraphrases, PEEL model, peer checks, and approval criteria.</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" id="s3-reveal-all" class="px-2.5 py-1 rounded text-[12px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                    Reveal All
+                  </button>
+                  <button type="button" id="s3-hide-all" class="px-2.5 py-1 rounded text-[12px] font-semibold bg-paper text-muted border border-navy/15 hover:text-ink transition-colors">
+                    Hide All
+                  </button>
+                </div>
+              </div>
+              <div id="s3-reveal-controls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Session 3 Quick Stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Teams Active</p>
+              <p id="s3-stat-teams" class="font-display font-bold text-2xl text-ink mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Mistakes Tagged</p>
+              <p id="s3-stat-spots" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">PEEL Saved</p>
+              <p id="s3-stat-peel" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Peer Reviews</p>
+              <p id="s3-stat-peer" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-amber-200 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-amber-800">CF3 Pending</p>
+              <p id="s3-stat-pending" class="font-display font-bold text-2xl text-amber-600 mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-emerald-200 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-emerald-800">CF3 Approved</p>
+              <p id="s3-stat-approved" class="font-display font-bold text-2xl text-emerald-600 mt-0.5">0</p>
+            </div>
+          </div>
+
+          <!-- Session 3 Sub-tabs -->
+          <div class="flex flex-wrap border-b border-navy/15 gap-4">
+            <button type="button" id="s3-tab-overview" class="py-2.5 px-4 font-semibold text-[14px] border-b-2 border-blue text-blue transition-colors">
+              Teams Overview
+            </button>
+            <button type="button" id="s3-tab-cf3" class="py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
+              <span>Case File #3 Review</span>
+              <span id="s3-cards-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button type="button" id="s3-tab-peer" class="py-2.5 px-4 font-medium text-[14px] border-b-2 border-transparent text-muted hover:text-ink transition-colors flex items-center gap-2">
+              <span>🤝 Peer Swaps &amp; Answer Key</span>
+            </button>
+          </div>
+
+          <!-- S3 SUB-TAB 1: TEAMS OVERVIEW -->
+          <div id="s3-view-overview" class="space-y-4">
+            <div class="overflow-x-auto bg-white border border-navy/10 rounded-lg shadow-sm">
+              <table class="w-full text-[13px] text-left">
+                <thead class="bg-paper border-b border-navy/10 text-muted uppercase text-[11px] font-mono tracking-wider">
+                  <tr>
+                    <th class="p-3.5">Team</th>
+                    <th class="p-3.5">Members</th>
+                    <th class="p-3.5">Step 1 Mistakes</th>
+                    <th class="p-3.5">Step 2 Paraphrases</th>
+                    <th class="p-3.5">Step 3 PEEL</th>
+                    <th class="p-3.5">Step 4 Peer Review</th>
+                    <th class="p-3.5">Case File #3</th>
+                    <th class="p-3.5">Updated</th>
+                    <th class="p-3.5 text-right">Inspect</th>
+                  </tr>
+                </thead>
+                <tbody id="s3-teams-body" class="divide-y divide-navy/10">
+                  <tr><td colspan="9" class="p-6 text-center text-muted">Loading live Session 3 teams…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- S3 SUB-TAB 2: CASE FILE #3 REVIEW -->
+          <div id="s3-view-cf3" class="hidden space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-lg border border-navy/10 shadow-sm">
+              <div>
+                <h2 class="font-display font-bold text-lg text-ink">Step 5 — Case File #3 Submissions</h2>
+                <p class="text-[13px] text-muted">Review each team's final PEEL paragraph for Yacine. Approving pops up a live green ✓ on their screen.</p>
+              </div>
+              <div class="flex gap-2 text-[13px]">
+                <button type="button" class="s3-cf3-filter-btn px-3 py-1 rounded bg-navy/10 font-medium" data-filter="all">All</button>
+                <button type="button" class="s3-cf3-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="pending">Pending review</button>
+                <button type="button" class="s3-cf3-filter-btn px-3 py-1 rounded text-muted hover:bg-navy/5" data-filter="approved">Approved</button>
+              </div>
+            </div>
+
+            <div id="s3-cf3-list" class="space-y-4">
+              <p class="text-center py-12 text-muted">Loading Case File #3 submissions…</p>
+            </div>
+          </div>
+
+          <!-- S3 SUB-TAB 3: PEER SWAPS & ANSWER KEY -->
+          <div id="s3-view-peer" class="hidden space-y-6">
+            <div class="grid lg:grid-cols-3 gap-5">
+              <!-- Anonymous Peer Swaps Feed -->
+              <div class="lg:col-span-2 bg-white border border-navy/10 p-6 rounded-lg shadow-sm space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-navy/10 pb-3">
+                  <div>
+                    <h2 class="font-display font-bold text-lg text-ink">🤝 Live Peer Review Swap Feed</h2>
+                    <p class="text-[13px] text-muted">Track which teams reviewed each other, their stars and wishes.</p>
+                  </div>
+                  <span id="s3-peer-count-badge" class="font-mono text-[12px] bg-blue/10 text-blue border border-blue/20 px-2.5 py-1 rounded">0 reviews</span>
+                </div>
+                <div id="s3-peer-list" class="space-y-3">
+                  <p class="text-[13px] text-muted italic">No peer reviews submitted yet.</p>
+                </div>
+              </div>
+
+              <!-- Session 3 Export -->
+              <div class="bg-white border border-navy/10 p-6 rounded-lg shadow-sm flex flex-col justify-between space-y-4">
+                <div>
+                  <h3 class="font-display font-bold text-base text-ink">Session 3 Export</h3>
+                  <p class="text-[13px] text-muted mt-1">Download all teams' Session 3 data (Mistakes, Paraphrases, Peeks, PEEL drafts, Peer Reviews &amp; Case File #3) as CSV.</p>
+                </div>
+                <button type="button" id="s3-export-csv" class="btn btn-sm btn-primary w-full">
+                  Export Session 3 CSV ↓
+                </button>
+              </div>
+            </div>
+
+            <!-- Private Mentor Answer Key Reference -->
+            <div class="bg-white border border-navy/10 p-6 rounded-lg shadow-sm space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-navy/10 pb-3">
+                <div>
+                  <h2 class="font-display font-bold text-lg text-ink">🔑 Model Answers &amp; Approval Checklist (Session 3)</h2>
+                  <p class="text-[12px] text-muted">Reference answers for mentors: 7 bad-answer mistakes, 2 model paraphrases, model PEEL paragraph, and approval rules.</p>
+                </div>
+                <button type="button" id="s3-toggle-key-ref" class="btn btn-sm btn-secondary btn-on-light">
+                  Show Answer Key
+                </button>
+              </div>
+              <div id="s3-mentor-key-body" class="hidden space-y-4 text-[13px]">
+                <div class="p-4 bg-paper rounded border border-navy/10 space-y-2">
+                  <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 1 · 7 Mistake Answers</p>
+                  <ul class="list-disc list-inside space-y-1 text-ink">
+                    <li><strong>"Music is really bad for studying!!"</strong> → Not neutral (emotional "!!")</li>
+                    <li><strong>"Perham and Currie"</strong> → Missing citation (no year 2014)</li>
+                    <li><strong>"proved"</strong> → Too strong (a study never proves; say "found")</li>
+                    <li><strong>"listening to music is always distracting"</strong> → Wrong (instrumental music was equal to quiet)</li>
+                    <li><strong>"songs with lyrics made reading worse..."</strong> → Copied (word-for-word abstract copy)</li>
+                    <li><strong>"So Yacine should never listen to any music"</strong> → Wrong / too strong (only lyrics hurt reading)</li>
+                    <li><strong>"Lots of students"</strong> → Vague (exactly 30 university students)</li>
+                  </ul>
+                </div>
+                <div class="p-4 bg-paper rounded border border-navy/10 space-y-2">
+                  <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 2 · Model Paraphrases</p>
+                  <p><strong>Sentence 1 (Findings):</strong> <em>"Reading was easiest in silence or with instrumental music, and hardest with any songs that had lyrics (Perham &amp; Currie, 2014)."</em></p>
+                  <p><strong>Sentence 2 (Mechanism):</strong> <em>"Because the mind must work to ignore the words of a song, less effort is left for understanding the text (Perham &amp; Currie, 2014)."</em></p>
+                </div>
+                <div class="p-4 bg-paper rounded border border-navy/10 space-y-2">
+                  <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 3 &amp; 5 · Model PEEL Paragraph</p>
+                  <p><strong>P:</strong> Listening to songs with lyrics while reading may make it harder to understand the text, even when the songs are your favourites.</p>
+                  <p><strong>E:</strong> In one study, 30 university students read texts and answered questions in four conditions; they understood best in quiet and with music without lyrics, and worst with songs with lyrics, whether they liked those songs or not (Perham &amp; Currie, 2014).</p>
+                  <p><strong>E:</strong> The authors suggest that lyrics are words too, so the brain processes their meaning and has to work to block them, which leaves less attention for the text.</p>
+                  <p><strong>L:</strong> This was a small study with one reading task, but it suggests that Yacine could study in silence or with music without lyrics when he needs to read and understand.</p>
+                  <p class="text-[12px] font-mono text-muted"><strong>Ref:</strong> {sparkSession3.apaReference}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- =========================================================================
+             SESSION 2 · ARCHIVE PANEL
+             ========================================================================= -->
+        <div id="session-2-wrap" class="hidden space-y-6">
 
           <!-- Session 2 Control Bar: Room Step + Live Answer Key Reveals -->
           <div class="bg-white border border-navy/10 p-5 rounded-lg shadow-sm space-y-4">
@@ -350,6 +567,22 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     </div>
   </section>
 
+  <!-- Session 3 Team Inspect Modal -->
+  <div id="s3-inspect-modal" class="hidden fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white text-ink rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
+      <div class="px-6 py-4 bg-ink text-white flex items-center justify-between gap-4">
+        <div>
+          <h3 id="s3-inspect-title" class="font-display font-bold text-lg text-white">Team Details</h3>
+          <p id="s3-inspect-subtitle" class="text-[12px] text-silver/80 font-mono mt-0.5"></p>
+        </div>
+        <button type="button" id="s3-inspect-close" class="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-sm font-semibold">
+          Close ✕
+        </button>
+      </div>
+      <div id="s3-inspect-body" class="p-6 overflow-y-auto space-y-5 text-[14px] text-ink"></div>
+    </div>
+  </div>
+
   <!-- Session 2 Team Inspect Modal -->
   <div id="s2-inspect-modal" class="hidden fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white text-ink rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
@@ -379,9 +612,12 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     mentorSetStep, mentorRevealMission, mentorNotes, mentorExport,
     mentorS2Overview, mentorS2SetStep, mentorS2SetReveal, mentorS2ApproveCard,
     mentorS2Export, mentorSession2Key,
+    mentorS3Overview, mentorS3SetStep, mentorS3SetReveal, mentorS3ApproveCaseFile,
+    mentorS3Export, adminS3Reset,
     adminReset, adminS2Reset, getStoredMentor, storeMentor, clearMentor, friendlyError, escapeHtml,
     type MentorOverview, type MentorSession, type MentorQuestionItem,
     type MentorS2Overview, type MentorS2TeamRow, type Session2AnswerKey,
+    type MentorS3Overview, type MentorS3TeamRow,
   } from '../../lib/spark/api';
 
   const READING_BOXES: { id: string; title: string }[] = (window as any).__S2_READING_BOXES || [];
@@ -412,6 +648,23 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     'Key 5 · Case File #2',
   ];
 
+  const s3StepLabels = [
+    'Yacine’s Message',
+    'Spot the Problems',
+    'Paraphrase Result',
+    'PEEL Paragraph',
+    'Swap & Review',
+    'Case File #3',
+  ];
+  const s3RevealLabels = [
+    'Key 0 · Message',
+    'Key 1 · Mistakes',
+    'Key 2 · Paraphrases',
+    'Key 3 · PEEL Model',
+    'Key 4 · Peer Advice',
+    'Key 5 · Approval',
+  ];
+
   const loginForm = document.getElementById('login-form') as HTMLFormElement;
   const panel = document.getElementById('panel')!;
   const mentorBadge = document.getElementById('mentor-badge')!;
@@ -421,6 +674,12 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   let currentQuestions: MentorQuestionItem[] = [];
   let questionFilter: 'all' | 'pending' | 'approved' = 'all';
 
+  // Session 3 state
+  let s3Data: MentorS3Overview | null = null;
+  let s3Cf3Filter: 'all' | 'pending' | 'approved' = 'all';
+  let s3InspectTeamId: string | null = null;
+  let s3InspectLastHash = '';
+
   // Session 2 state
   let s2Data: MentorS2Overview | null = null;
   let s2CardFilter: 'all' | 'pending' | 'approved' = 'all';
@@ -429,30 +688,80 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   let s2AnswerKeyCache: Session2AnswerKey | null = null;
 
   // Top Session Switcher
+  const switchS3 = document.getElementById('switch-session-3')!;
   const switchS2 = document.getElementById('switch-session-2')!;
   const switchS1 = document.getElementById('switch-session-1')!;
+  const wrapS3 = document.getElementById('session-3-wrap')!;
   const wrapS2 = document.getElementById('session-2-wrap')!;
   const wrapS1 = document.getElementById('session-1-wrap')!;
 
-  function selectSession(num: 1 | 2) {
-    if (num === 2) {
+  function selectSession(num: 1 | 2 | 3) {
+    if (num === 3) {
+      wrapS3.classList.remove('hidden');
+      wrapS2.classList.add('hidden');
+      wrapS1.classList.add('hidden');
+      switchS3.classList.add('bg-ink', 'text-white', 'font-semibold');
+      switchS3.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+      switchS2.classList.remove('bg-ink', 'text-white', 'font-semibold');
+      switchS2.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+      switchS1.classList.remove('bg-ink', 'text-white', 'font-semibold');
+      switchS1.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+    } else if (num === 2) {
       wrapS2.classList.remove('hidden');
+      wrapS3.classList.add('hidden');
       wrapS1.classList.add('hidden');
       switchS2.classList.add('bg-ink', 'text-white', 'font-semibold');
       switchS2.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+      switchS3.classList.remove('bg-ink', 'text-white', 'font-semibold');
+      switchS3.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
       switchS1.classList.remove('bg-ink', 'text-white', 'font-semibold');
       switchS1.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
     } else {
       wrapS1.classList.remove('hidden');
+      wrapS3.classList.add('hidden');
       wrapS2.classList.add('hidden');
       switchS1.classList.add('bg-ink', 'text-white', 'font-semibold');
       switchS1.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
+      switchS3.classList.remove('bg-ink', 'text-white', 'font-semibold');
+      switchS3.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
       switchS2.classList.remove('bg-ink', 'text-white', 'font-semibold');
       switchS2.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
     }
   }
+  switchS3.addEventListener('click', () => selectSession(3));
   switchS2.addEventListener('click', () => selectSession(2));
   switchS1.addEventListener('click', () => selectSession(1));
+
+  // Session 3 Sub-tabs
+  const s3TabOverview = document.getElementById('s3-tab-overview')!;
+  const s3TabCf3 = document.getElementById('s3-tab-cf3')!;
+  const s3TabPeer = document.getElementById('s3-tab-peer')!;
+  const s3ViewOverview = document.getElementById('s3-view-overview')!;
+  const s3ViewCf3 = document.getElementById('s3-view-cf3')!;
+  const s3ViewPeer = document.getElementById('s3-view-peer')!;
+
+  function switchS3Tab(tab: 'overview' | 'cf3' | 'peer') {
+    const map = [
+      { key: 'overview', btn: s3TabOverview, view: s3ViewOverview },
+      { key: 'cf3', btn: s3TabCf3, view: s3ViewCf3 },
+      { key: 'peer', btn: s3TabPeer, view: s3ViewPeer },
+    ] as const;
+    map.forEach(({ key, btn, view }) => {
+      const active = key === tab;
+      btn.classList.toggle('border-blue', active);
+      btn.classList.toggle('text-blue', active);
+      btn.classList.toggle('font-semibold', active);
+      btn.classList.toggle('border-transparent', !active);
+      btn.classList.toggle('text-muted', !active);
+      btn.classList.toggle('font-medium', !active);
+      view.classList.toggle('hidden', !active);
+    });
+    if (tab === 'cf3') renderS3Cf3List();
+    if (tab === 'peer') renderS3PeerList();
+  }
+  s3TabOverview.addEventListener('click', () => switchS3Tab('overview'));
+  s3TabCf3.addEventListener('click', () => switchS3Tab('cf3'));
+  s3TabPeer.addEventListener('click', () => switchS3Tab('peer'));
 
   // Session 2 Sub-tabs
   const s2TabOverview = document.getElementById('s2-tab-overview')!;
@@ -525,6 +834,31 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     jumpWrap.appendChild(b);
   });
 
+  // Session 3 Jump buttons
+  const s3JumpWrap = document.getElementById('s3-jump-steps')!;
+  s3StepLabels.forEach((label, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.s3Jump = String(i);
+    b.className = 'w-7 h-7 rounded border border-navy/20 text-[12px] font-semibold hover:border-blue hover:text-blue transition-colors';
+    b.textContent = String(i);
+    b.title = `Step ${i}: ${label}`;
+    b.addEventListener('click', () => setS3Step(i));
+    s3JumpWrap.appendChild(b);
+  });
+
+  // Session 3 Reveal toggle buttons
+  const s3RevealWrap = document.getElementById('s3-reveal-controls')!;
+  s3RevealLabels.forEach((label, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.s3Reveal = String(i);
+    b.className = 'px-2.5 py-2 rounded-md border text-[12px] font-semibold transition-all text-left flex items-center justify-between gap-1 bg-paper border-navy/15 text-muted hover:border-blue hover:text-ink';
+    b.innerHTML = `<span class="truncate">${escapeHtml(label)}</span><span class="s3-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy/10">OFF</span>`;
+    b.addEventListener('click', () => toggleS3Reveal(i));
+    s3RevealWrap.appendChild(b);
+  });
+
   // Session 2 Jump buttons
   const s2JumpWrap = document.getElementById('s2-jump-steps')!;
   s2StepLabels.forEach((label, i) => {
@@ -560,8 +894,10 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
     if (mentor.role === 'admin') {
       document.getElementById('admin-reset')?.classList.remove('hidden');
       document.getElementById('s2-admin-reset')?.classList.remove('hidden');
+      document.getElementById('s3-admin-reset')?.classList.remove('hidden');
     }
 
+    selectSession(3);
     await refreshAll();
     setInterval(refreshAll, 4000);
 
@@ -575,11 +911,21 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
   async function refreshAll() {
     if (!mentor) return;
     try {
-      const [s2OverviewData, overviewData, questionsData] = await Promise.all([
+      const [s3OverviewData, s2OverviewData, overviewData, questionsData] = await Promise.all([
+        mentorS3Overview(mentor.token),
         mentorS2Overview(mentor.token),
         mentorOverview(mentor.token),
         mentorQuestions(mentor.token),
       ]);
+
+      s3Data = s3OverviewData;
+      renderS3Overview(s3OverviewData);
+      if (!s3ViewCf3.classList.contains('hidden')) renderS3Cf3List();
+      if (!s3ViewPeer.classList.contains('hidden')) renderS3PeerList();
+      if (s3InspectTeamId) {
+        const team = s3OverviewData.teams.find((t) => t.id === s3InspectTeamId);
+        if (team) renderS3InspectModalBody(team);
+      }
 
       s2Data = s2OverviewData;
       renderS2Overview(s2OverviewData);
@@ -624,6 +970,441 @@ const s2ConditionLabels: Record<string, string> = Object.fromEntries(
       }
     }
   }
+
+  /* =========================================================================
+     SESSION 3 RENDERING & HANDLERS
+     ========================================================================= */
+  function renderS3Overview(data: MentorS3Overview) {
+    const curStep = data.state?.unlocked_step ?? 0;
+    const stepLabel = document.getElementById('s3-current-step');
+    if (stepLabel) {
+      stepLabel.textContent = `Step ${curStep} · ${s3StepLabels[curStep] || ''}`;
+    }
+
+    // Update S3 jump buttons
+    document.querySelectorAll<HTMLButtonElement>('#s3-jump-steps button').forEach((b) => {
+      const step = Number(b.dataset.s3Jump);
+      const active = step === curStep;
+      b.classList.toggle('bg-blue', active);
+      b.classList.toggle('text-white', active);
+      b.classList.toggle('border-blue', active);
+    });
+
+    // Update S3 reveal buttons
+    const revs = (data.state?.revealed_steps || {}) as Record<string, boolean>;
+    document.querySelectorAll<HTMLButtonElement>('#s3-reveal-controls button').forEach((b) => {
+      const step = b.dataset.s3Reveal;
+      const isRev = step !== undefined && Boolean(revs[step]);
+      const pill = b.querySelector('.s3-rev-pill');
+      b.classList.toggle('bg-emerald-50', isRev);
+      b.classList.toggle('border-emerald-300', isRev);
+      b.classList.toggle('text-emerald-950', isRev);
+      if (pill) {
+        pill.textContent = isRev ? 'REVEALED' : 'OFF';
+        pill.className = `s3-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded font-bold ${
+          isRev ? 'bg-emerald-600 text-white' : 'bg-navy/10 text-muted'
+        }`;
+      }
+    });
+
+    // Stats
+    const teams = data.teams || [];
+    let spotsCount = 0;
+    let peelCount = 0;
+    let peerCount = 0;
+    let pendingCount = 0;
+    let approvedCount = 0;
+
+    teams.forEach((t) => {
+      if (t.step1_spots && Object.keys(t.step1_spots).length > 0) spotsCount++;
+      if (t.peel_saved || (t.improved_peel && t.improved_peel.p)) peelCount++;
+      if (t.peer_review && t.peer_review.star) peerCount++;
+      if (t.cf3_status === 'pending') pendingCount++;
+      if (t.cf3_status === 'approved') approvedCount++;
+    });
+
+    document.getElementById('s3-stat-teams')!.textContent = String(teams.length);
+    document.getElementById('s3-stat-spots')!.textContent = String(spotsCount);
+    document.getElementById('s3-stat-peel')!.textContent = String(peelCount);
+    document.getElementById('s3-stat-peer')!.textContent = String(peerCount);
+    document.getElementById('s3-stat-pending')!.textContent = String(pendingCount);
+    document.getElementById('s3-stat-approved')!.textContent = String(approvedCount);
+
+    const pendingBadge = document.getElementById('s3-cards-pending-badge');
+    const topBadge = document.getElementById('s3-top-pending-badge');
+    if (pendingBadge) {
+      pendingBadge.textContent = String(pendingCount);
+      pendingBadge.classList.toggle('hidden', pendingCount === 0);
+    }
+    if (topBadge) {
+      topBadge.textContent = String(pendingCount);
+      topBadge.classList.toggle('hidden', pendingCount === 0);
+    }
+
+    // Render S3 Table
+    const tbody = document.getElementById('s3-teams-body')!;
+    if (!teams.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-muted">No teams registered yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = teams
+      .map((t) => {
+        const spotsTagged = Object.keys(t.step1_spots || {}).length;
+        const p1Ok = Boolean(t.step2_p1 && t.step2_p1.trim());
+        const p2Ok = Boolean(t.step2_p2 && t.step2_p2.trim());
+        const peeks = (t.step2_peek1 || 0) + (t.step2_peek2 || 0);
+
+        const peelP = Boolean(t.peel?.p && t.peel.p.trim());
+        const peelE = Boolean(t.peel?.e && t.peel.e.trim());
+        const peelExp = Boolean(t.peel?.explain && t.peel.explain.trim());
+        const peelL = Boolean(t.peel?.l && t.peel.l.trim());
+
+        const peerSent = Boolean(t.peer_review?.star && t.peer_review.star.trim());
+
+        let cf3Badge = '<span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper text-muted border border-navy/10">Draft</span>';
+        if (t.cf3_status === 'approved') {
+          cf3Badge = '<span class="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">✓ Approved</span>';
+        } else if (t.cf3_status === 'pending') {
+          cf3Badge = '<span class="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500 text-white font-bold animate-pulse">● Pending</span>';
+        }
+
+        return `
+          <tr class="hover:bg-paper/60 transition-colors">
+            <td class="p-3.5 font-bold font-mono text-ink">${escapeHtml(t.name)} <span class="text-muted font-normal text-xs">(${escapeHtml(t.code)})</span></td>
+            <td class="p-3.5 text-body text-[12px] max-w-xs truncate">${escapeHtml((t.members || []).join(', ') || '—')}</td>
+            <td class="p-3.5 font-mono text-[12px]">${spotsTagged > 0 ? `<span class="text-blue font-bold">${spotsTagged}/7 tagged</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono text-[12px]">${(p1Ok || p2Ok) ? `<span class="text-emerald-700">P1:${p1Ok ? '✓' : '—'} P2:${p2Ok ? '✓' : '—'}</span> <span class="text-muted text-[10px]">(${peeks} peeks)</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono text-[12px]">${(peelP || peelE) ? `<span class="text-ink font-semibold">${peelP ? 'P' : '·'}${peelE ? 'E' : '·'}${peelExp ? 'E' : '·'}${peelL ? 'L' : '·'}</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono text-[12px]">${peerSent ? `<span class="text-emerald-700">✓ Done</span>` : '<span class="text-muted">Waiting</span>'}</td>
+            <td class="p-3.5">${cf3Badge}</td>
+            <td class="p-3.5 font-mono text-[11px] text-muted">${t.s3_updated_at ? new Date(t.s3_updated_at).toLocaleTimeString() : '—'}</td>
+            <td class="p-3.5 text-right">
+              <button type="button" class="s3-btn-inspect btn btn-sm btn-secondary btn-on-light !py-1 !px-2.5 !text-[11px]" data-team-id="${t.id}">
+                Inspect 👁️
+              </button>
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    tbody.querySelectorAll<HTMLButtonElement>('.s3-btn-inspect').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.teamId;
+        if (id) openS3InspectModal(id);
+      });
+    });
+  }
+
+  function renderS3Cf3List(preserveScroll = false) {
+    const container = document.getElementById('s3-cf3-list')!;
+    const prevScroll = container.scrollTop;
+    let teams = (s3Data?.teams || []).filter((t) => Boolean(t.peel?.p || t.improved_peel?.p || t.cf3_status !== 'draft'));
+
+    if (s3Cf3Filter === 'pending') teams = teams.filter((t) => t.cf3_status === 'pending');
+    if (s3Cf3Filter === 'approved') teams = teams.filter((t) => t.cf3_status === 'approved');
+
+    if (!teams.length) {
+      container.innerHTML = `<p class="text-center py-12 text-muted">No Case File #3 submissions matching filter "${escapeHtml(s3Cf3Filter)}".</p>`;
+      return;
+    }
+
+    container.innerHTML = teams
+      .map((t) => {
+        const p = t.improved_peel?.p ? t.improved_peel : t.peel;
+        const text = [p.p, p.e, p.explain, p.l].filter((s) => s && s.trim()).join(' ');
+        const isApproved = t.cf3_status === 'approved';
+
+        return `
+          <div class="bg-white border ${isApproved ? 'border-emerald-300' : 'border-navy/10'} rounded-xl p-5 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-3">
+              <div>
+                <span class="font-bold text-ink font-mono text-base">${escapeHtml(t.name)} (${escapeHtml(t.code)})</span>
+                <p class="text-[12px] text-muted">${escapeHtml((t.members || []).join(', ') || '—')}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                ${
+                  isApproved
+                    ? `<span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Approved (${escapeHtml(t.cf3_approved_by || 'Mentor')})</span>`
+                    : `<span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">● ${escapeHtml(t.cf3_status.toUpperCase())}</span>`
+                }
+              </div>
+            </div>
+
+            <div class="p-4 bg-paper rounded-lg space-y-2">
+              <p class="text-[15px] text-ink font-serif leading-relaxed italic">"${escapeHtml(text || '(No paragraph text submitted)')}"</p>
+              <p class="text-[12px] font-mono text-muted border-t border-navy/10 pt-2"><strong>Reference:</strong> ${escapeHtml(p.ref || sparkSession3.apaReference)}</p>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <div class="flex-1 max-w-md">
+                ${
+                  !isApproved
+                    ? `<input type="text" class="field !mt-0 !h-9 !py-1 !text-[13px] s3-mentor-comment-input" placeholder="Mentor praise (e.g. Great neutral tone &amp; careful verbs!)" value="${escapeHtml(t.cf3_mentor_comment || '')}">`
+                    : `<p class="text-[12px] text-emerald-900 italic font-medium">"${escapeHtml(t.cf3_mentor_comment || 'Approved by mentor')}"</p>`
+                }
+              </div>
+              <div>
+                ${
+                  !isApproved
+                    ? `<button type="button" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white s3-btn-approve-cf3" data-team-id="${t.id}">✓ Approve Case File #3</button>`
+                    : `<span class="text-xs font-mono text-muted">Approved at ${t.cf3_approved_at ? new Date(t.cf3_approved_at).toLocaleTimeString() : '—'}</span>`
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    if (preserveScroll) container.scrollTop = prevScroll;
+
+    container.querySelectorAll<HTMLButtonElement>('.s3-btn-approve-cf3').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        if (!mentor) return;
+        const teamId = (e.currentTarget as HTMLButtonElement).dataset.teamId;
+        if (!teamId) return;
+        const card = (e.currentTarget as HTMLElement).closest('.bg-white');
+        const comment = (card?.querySelector('.s3-mentor-comment-input') as HTMLInputElement)?.value || '';
+
+        btn.disabled = true;
+        btn.textContent = 'Approving…';
+        try {
+          await mentorS3ApproveCaseFile(mentor.token, teamId, mentor.mentorName, comment);
+          await refreshAll();
+        } catch (err: any) {
+          alert(friendlyError(err));
+          btn.disabled = false;
+          btn.textContent = '✓ Approve Case File #3';
+        }
+      });
+    });
+  }
+
+  function renderS3PeerList() {
+    const container = document.getElementById('s3-peer-list')!;
+    const teams = s3Data?.teams || [];
+    const reviews = teams.filter((t) => t.peer_review && t.peer_review.star);
+
+    const badge = document.getElementById('s3-peer-count-badge');
+    if (badge) badge.textContent = `${reviews.length} reviews`;
+
+    if (!reviews.length) {
+      container.innerHTML = '<p class="text-[13px] text-muted italic">No peer reviews submitted yet.</p>';
+      return;
+    }
+
+    container.innerHTML = reviews
+      .map((t) => {
+        const r = t.peer_review;
+        const targetTeam = teams.find((x) => x.id === (r as any).target_team_id);
+        const targetLabel = targetTeam ? `${targetTeam.name} (${targetTeam.code})` : ((r as any).target_team_code || 'Anonymous Team');
+
+        return `
+          <div class="p-3 bg-paper rounded-lg border border-navy/10 space-y-2 text-[13px]">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-ink">From: ${escapeHtml(t.name)} (${escapeHtml(t.code)}) → To: ${escapeHtml(targetLabel)}</span>
+              <span class="text-[11px] font-mono text-muted">${(r.checks || []).length}/6 checks</span>
+            </div>
+            <p><strong>🌟 Star:</strong> <span class="text-body italic">"${escapeHtml(r.star)}"</span></p>
+            <p><strong>💡 Wish:</strong> <span class="text-body italic">"${escapeHtml(r.wish)}"</span></p>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  function openS3InspectModal(teamId: string) {
+    const team = s3Data?.teams.find((t) => t.id === teamId);
+    if (!team) return;
+    s3InspectTeamId = teamId;
+    s3InspectLastHash = '';
+    renderS3InspectModalBody(team);
+    document.getElementById('s3-inspect-modal')?.classList.remove('hidden');
+  }
+
+  function renderS3InspectModalBody(t: MentorS3TeamRow) {
+    const hash = JSON.stringify(t);
+    if (hash === s3InspectLastHash) return;
+    s3InspectLastHash = hash;
+
+    document.getElementById('s3-inspect-title')!.textContent = `${t.name} (${t.code})`;
+    document.getElementById('s3-inspect-subtitle')!.textContent = `Members: ${(t.members || []).join(', ') || '—'}`;
+
+    const spotsHtml = Object.entries(t.step1_spots || {})
+      .map(([k, v]) => `<span class="px-2 py-0.5 bg-white border border-navy/10 rounded font-mono text-[11px]">${escapeHtml(k)}: ${escapeHtml(v)}</span>`)
+      .join(' ');
+
+    const body = document.getElementById('s3-inspect-body')!;
+    const prevScroll = body.scrollTop;
+    body.innerHTML = `
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 1 · Detective Mistake Tags (${Object.keys(t.step1_spots || {}).length}/7)</p>
+        <div class="flex flex-wrap gap-1.5">${spotsHtml || '<span class="text-muted">No mistakes tagged yet</span>'}</div>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 2 · Paraphrases (Peeks: P1=${t.step2_peek1 || 0}, P2=${t.step2_peek2 || 0})</p>
+        <p><strong>Sentence 1:</strong> ${t.step2_p1?.trim() ? escapeHtml(t.step2_p1) : '<span class="text-muted">—</span>'}</p>
+        <p><strong>Sentence 2:</strong> ${t.step2_p2?.trim() ? escapeHtml(t.step2_p2) : '<span class="text-muted">—</span>'}</p>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 3 · Initial PEEL Draft</p>
+        <p><strong>Point:</strong> ${t.peel?.p ? escapeHtml(t.peel.p) : '—'}</p>
+        <p><strong>Evidence:</strong> ${t.peel?.e ? escapeHtml(t.peel.e) : '—'}</p>
+        <p><strong>Explain:</strong> ${t.peel?.explain ? escapeHtml(t.peel.explain) : '—'}</p>
+        <p><strong>Link:</strong> ${t.peel?.l ? escapeHtml(t.peel.l) : '—'}</p>
+        <p><strong>Reference:</strong> ${t.peel?.ref ? escapeHtml(t.peel.ref) : '—'}</p>
+      </div>
+
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 4 · Peer Review Given</p>
+        <p><strong>Star:</strong> ${t.peer_review?.star ? escapeHtml(t.peer_review.star) : '—'}</p>
+        <p><strong>Wish:</strong> ${t.peer_review?.wish ? escapeHtml(t.peer_review.wish) : '—'}</p>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 5 · Final Case File #3 (${escapeHtml(t.cf3_status)})</p>
+          ${
+            t.cf3_status !== 'approved'
+              ? `<button type="button" id="s3-modal-quick-approve" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white !py-1 !px-3 !text-[12px]">✓ Approve Case File #3</button>`
+              : '<span class="text-emerald-700 font-semibold text-[12px]">✓ Approved</span>'
+          }
+        </div>
+        <p><strong>Final Point:</strong> ${t.improved_peel?.p || t.peel?.p ? escapeHtml(t.improved_peel?.p || t.peel?.p) : '—'}</p>
+        <p><strong>Final Evidence:</strong> ${t.improved_peel?.e || t.peel?.e ? escapeHtml(t.improved_peel?.e || t.peel?.e) : '—'}</p>
+        <p><strong>Final Explain:</strong> ${t.improved_peel?.explain || t.peel?.explain ? escapeHtml(t.improved_peel?.explain || t.peel?.explain) : '—'}</p>
+        <p><strong>Final Link:</strong> ${t.improved_peel?.l || t.peel?.l ? escapeHtml(t.improved_peel?.l || t.peel?.l) : '—'}</p>
+        <p><strong>Final Ref:</strong> ${t.improved_peel?.ref || t.peel?.ref ? escapeHtml(t.improved_peel?.ref || t.peel?.ref) : '—'}</p>
+      </div>
+    `;
+
+    body.scrollTop = prevScroll;
+
+    body.querySelector<HTMLButtonElement>('#s3-modal-quick-approve')?.addEventListener('click', async (e) => {
+      if (!mentor) return;
+      const btn = e.currentTarget as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = 'Approving…';
+      try {
+        await mentorS3ApproveCaseFile(mentor.token, t.id, mentor.mentorName);
+        await refreshAll();
+      } catch (err: any) {
+        alert(friendlyError(err));
+        btn.disabled = false;
+        btn.textContent = '✓ Approve Case File #3';
+      }
+    });
+  }
+
+  // Session 3 Controls
+  async function setS3Step(n: number) {
+    if (!mentor) return;
+    try {
+      await mentorS3SetStep(mentor.token, n);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  }
+
+  async function toggleS3Reveal(step: number) {
+    if (!mentor) return;
+    const current = Boolean(s3Data?.state?.revealed_steps?.[String(step)]);
+    try {
+      await mentorS3SetReveal(mentor.token, step, !current);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  }
+
+  document.getElementById('s3-unlock-next')?.addEventListener('click', async () => {
+    const cur = Number(s3Data?.state?.unlocked_step ?? 0);
+    await setS3Step(Math.min(5, cur + 1));
+  });
+
+  document.getElementById('s3-reveal-all')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      await mentorS3SetReveal(mentor.token, -1, true);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s3-hide-all')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      await mentorS3SetReveal(mentor.token, -1, false);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s3-admin-reset')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    if (!confirm('ADMIN RESET (Session 3): Clear all teams\' Session 3 answers, lock Session 3 back to Step 0, and hide all answer keys?\n\n(Registered teams, Session 1 & Session 2 data are kept intact.)')) return;
+    try {
+      await adminS3Reset(mentor.token);
+      await refreshAll();
+      alert('Session 3 reset cleanly to Step 0.');
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.querySelectorAll('.s3-cf3-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.s3-cf3-filter-btn').forEach((b) => {
+        b.classList.remove('bg-navy/10', 'font-medium');
+        b.classList.add('text-muted');
+      });
+      const target = e.currentTarget as HTMLButtonElement;
+      target.classList.add('bg-navy/10', 'font-medium');
+      target.classList.remove('text-muted');
+      s3Cf3Filter = target.dataset.filter as any;
+      renderS3Cf3List(true);
+    });
+  });
+
+  document.getElementById('s3-export-csv')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      const rows = await mentorS3Export(mentor.token);
+      if (!rows.length) return alert('No teams yet.');
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(','),
+        ...rows.map((r) => headers.map((h) => safeCsvCell((r as any)[h])).join(',')),
+      ].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `spark-session-3-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s3-toggle-key-ref')?.addEventListener('click', (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const body = document.getElementById('s3-mentor-key-body')!;
+    const isHidden = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !isHidden);
+    btn.textContent = isHidden ? 'Hide Answer Key' : 'Show Answer Key';
+  });
+
+  document.getElementById('s3-inspect-close')?.addEventListener('click', () => {
+    document.getElementById('s3-inspect-modal')?.classList.add('hidden');
+    s3InspectTeamId = null;
+  });
 
   /* =========================================================================
      SESSION 2 RENDERING & HANDLERS

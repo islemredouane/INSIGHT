@@ -54,8 +54,11 @@ scratch/
 
 # Internal research casework, prototypes & scratchpads
 /spark-2026/
+/spark/
 /docs/
 /design/
 /brand/
 *Answer_Key*.pdf
 *Mentor_Copy*.pdf
+*.pdf
+
