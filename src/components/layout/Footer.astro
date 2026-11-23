@@ -5,9 +5,13 @@ import { footerNav, site, mailto } from '../../data/site';
 import { assetUrl } from '../../lib/assets';
 const year = new Date().getFullYear();
 ---
-<footer class="bg-ink-deep border-t border-white/10" aria-labelledby="footer-title">
+<footer class="relative overflow-hidden bg-ink-deep border-t border-white/10" aria-labelledby="footer-title">
   <h2 id="footer-title" class="sr-only">{site.fullName}, footer</h2>
-  <div class="max-w-[1240px] mx-auto px-6 md:px-12">
+
+  <!-- Giant wordmark watermark -->
+  <p class="pointer-events-none absolute inset-x-0 -bottom-[0.12em] select-none text-center font-display text-[22vw] font-black leading-none tracking-tighter text-white/[0.035] lg:text-[17rem]" aria-hidden="true">INSIGHT</p>
+
+  <div class="relative z-10 max-w-[1240px] mx-auto px-6 md:px-12">
 
     <!-- 1. Contact band -->
     <div class="py-14 md:py-16 grid lg:grid-cols-12 gap-8 lg:items-end border-b border-white/10">
