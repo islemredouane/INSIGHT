@@ -102,7 +102,7 @@ const s3SixChecks = sparkSession3.sixChecks;
               <div class="flex flex-wrap items-center gap-2">
                 <button type="button" id="s3-unlock-next" class="btn btn-sm btn-primary">Unlock next step →</button>
                 <button type="button" id="s3-admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light text-signal border-signal/40 hover:bg-signal/5">
-                  Reset Session 3 (Admin)
+                  Reset Session 3
                 </button>
               </div>
 
@@ -306,7 +306,7 @@ const s3SixChecks = sparkSession3.sixChecks;
               <div class="flex flex-wrap items-center gap-2">
                 <button type="button" id="s2-unlock-next" class="btn btn-sm btn-primary">Unlock next step →</button>
                 <button type="button" id="s2-admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light text-signal border-signal/40 hover:bg-signal/5">
-                  Reset Session 2 (Admin)
+                  Reset Session 2
                 </button>
               </div>
 
@@ -537,7 +537,7 @@ const s3SixChecks = sparkSession3.sixChecks;
                 </div>
                 <div class="space-y-2">
                   <button type="button" id="export-csv" class="btn btn-sm btn-secondary btn-on-light w-full">Export Session 1 answers (CSV)</button>
-                  <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset session (Admin only)</button>
+                  <button type="button" id="admin-reset" class="hidden btn btn-sm btn-secondary btn-on-light w-full text-signal border-signal/40">Reset Session 1</button>
                 </div>
               </div>
             </div>
@@ -891,11 +891,10 @@ const s3SixChecks = sparkSession3.sixChecks;
     mentorBadge.classList.remove('hidden');
     mentorRoleLabel.textContent = mentor.mentorName ? `${mentor.mentorName} (${mentor.role})` : mentor.role;
 
-    if (mentor.role === 'admin') {
-      document.getElementById('admin-reset')?.classList.remove('hidden');
-      document.getElementById('s2-admin-reset')?.classList.remove('hidden');
-      document.getElementById('s3-admin-reset')?.classList.remove('hidden');
-    }
+    // All mentors now have full rights (resets, step control, reveals, approvals)
+    document.getElementById('admin-reset')?.classList.remove('hidden');
+    document.getElementById('s2-admin-reset')?.classList.remove('hidden');
+    document.getElementById('s3-admin-reset')?.classList.remove('hidden');
 
     selectSession(3);
     await refreshAll();
@@ -1349,7 +1348,7 @@ const s3SixChecks = sparkSession3.sixChecks;
 
   document.getElementById('s3-admin-reset')?.addEventListener('click', async () => {
     if (!mentor) return;
-    if (!confirm('ADMIN RESET (Session 3): Clear all teams\' Session 3 answers, lock Session 3 back to Step 0, and hide all answer keys?\n\n(Registered teams, Session 1 & Session 2 data are kept intact.)')) return;
+    if (!confirm('RESET SESSION 3: Clear all teams\' Session 3 answers, lock Session 3 back to Step 0, and hide all answer keys?\n\n(Registered teams, Session 1 & Session 2 data are kept intact.)')) return;
     try {
       await adminS3Reset(mentor.token);
       await refreshAll();
@@ -1845,7 +1844,7 @@ const s3SixChecks = sparkSession3.sixChecks;
 
   document.getElementById('s2-admin-reset')?.addEventListener('click', async () => {
     if (!mentor) return;
-    if (!confirm('ADMIN RESET (Session 2): Clear all teams\' Session 2 answers, lock Session 2 back to Step 0, and hide all answer keys?\n\n(Registered teams & Session 1 data are kept intact.)')) return;
+    if (!confirm('RESET SESSION 2: Clear all teams\' Session 2 answers, lock Session 2 back to Step 0, and hide all answer keys?\n\n(Registered teams & Session 1 data are kept intact.)')) return;
     try {
       await adminS2Reset(mentor.token);
       await refreshAll();
@@ -2179,7 +2178,7 @@ const s3SixChecks = sparkSession3.sixChecks;
 
   document.getElementById('admin-reset')?.addEventListener('click', async () => {
     if (!mentor) return;
-    if (!confirm('DANGER: Reset the whole session? This permanently deletes every team and all answers.')) return;
+    if (!confirm('RESET SESSION 1: Reset the whole session? This permanently deletes every team and all answers.')) return;
     try {
       await adminReset(mentor.token);
       await refreshAll();
