@@ -15,7 +15,7 @@ const steps = [
 ];
 ---
 <BaseLayout
-  title="The Music Case (Part 3): Write for Yacine · SPARK"
+  title="The Music Case · Session 3 · SPARK"
   description="SPARK 2026 Session 3: Write for Yacine. Detective mistake hunt, close-the-paper paraphrasing, PEEL paragraph builder, and anonymous peer review."
   noindex
 >
@@ -25,7 +25,7 @@ const steps = [
       <div>
         <p class="eyebrow text-peri">SPARK 2026 · Session 3</p>
         <div class="flex items-center gap-3 mt-1">
-          <h1 id="team-label" class="font-display text-xl sm:text-2xl font-bold">The Music Case · Part 3: Write for Yacine</h1>
+          <h1 id="team-label" class="font-display text-xl sm:text-2xl font-bold">The Music Case · Part 3</h1>
           <span id="team-badge" class="px-2.5 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-wider rounded bg-blue/20 text-peri border border-blue/40">
             Team Loading…
           </span>
@@ -144,141 +144,275 @@ const steps = [
           </div>
         </div>
 
-        <button
-          type="button"
-          id="btn-switch-team"
-          class="text-silver hover:text-white transition font-mono text-[11px] underline"
-        >
-          Change Team
-        </button>
-        <span id="live-save-status" class="text-silver text-[11px] font-mono">
-          Synced live
-        </span>
+        <span class="text-white/20">|</span>
+        <a href="/spark/session-2" class="text-silver/70 hover:text-white transition-colors flex items-center gap-1.5">
+          <span>← Session 2</span>
+        </a>
+        <span class="text-white/20">|</span>
+        <a href="/spark/join?next=/spark/session-3" id="switch-link" class="text-silver/70 hover:text-white transition-colors">
+          Switch team
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- Step Progress Bar -->
-  <nav class="bg-paper border-b border-navy/10 sticky top-16 z-20 shadow-sm" aria-label="Investigation Steps">
-    <div class="max-w-[1100px] mx-auto px-5">
-      <ol class="flex items-center gap-1 sm:gap-2 py-3 overflow-x-auto text-[12px] sm:text-[13px] font-mono">
-        {steps.map((label, i) => (
-          <li class="flex items-center shrink-0">
-            <button
-              type="button"
-              class={`step-tab px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5 ${
-                i === 0
-                  ? 'bg-blue text-white shadow-sm'
-                  : 'bg-white text-muted hover:text-ink border border-navy/10'
-              }`}
-              data-step={i}
-            >
-              <span class="step-num text-[10px] opacity-75">{String(i).padStart(2, '0')}</span>
-              <span class="step-name">{label.split(' · ')[1]}</span>
-              <span class="step-lock text-[10px] hidden">🔒</span>
-            </button>
-            {i < steps.length - 1 && (
-              <span class="text-muted/40 mx-1 select-none">/</span>
-            )}
-          </li>
-        ))}
-      </ol>
+  <!-- Sticky Progress Bar with Lock indicators (matching Session 2) -->
+  <nav id="progress" class="sticky top-[72px] xl:top-[116px] z-20 bg-white border-b border-navy/10 overflow-x-auto shadow-sm" aria-label="Session 3 progress">
+    <div class="max-w-[1100px] mx-auto px-5 flex gap-1 py-3 min-w-max">
+      {steps.map((label, i) => (
+        <button type="button" class="step-tab" data-step={i}>
+          <span class="step-num">{i}</span>
+          <span class="step-label">{label}</span>
+          <span class="step-lock-icon text-[11px] ml-1 hidden">🔒</span>
+        </button>
+      ))}
     </div>
   </nav>
 
-  <!-- Main Game Panels Container -->
-  <main class="max-w-[1100px] mx-auto px-5 py-8 sm:py-12 min-h-[60vh]">
+  <!-- Main Game Panels Container (Paper Background, not Dark Blue) -->
+  <main id="game" class="bg-paper text-ink py-10 sm:py-14 min-h-[75vh]">
+    <div class="max-w-[1040px] mx-auto px-4 sm:px-6">
 
-    <!-- Team Sign-In Banner (if guest / no team) -->
-    <div id="guest-team-banner" class="hidden mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <span class="text-amber-600 text-lg">⚠️</span>
-        <p class="text-amber-900 text-[13px] leading-snug">
-          <strong>Playing in guest preview mode.</strong> Sign in with your 6-letter team code to autosave your detective tags, paraphrases, and peer review.
-        </p>
-      </div>
-      <button type="button" id="btn-guest-login" class="btn btn-sm btn-primary shrink-0">
-        Sign in with Team Code →
-      </button>
-    </div>
-
-    <!-- =========================================================================
-         STEP 0: YACINE'S MESSAGE (3 MIN · WARM-UP)
-         ========================================================================= -->
-    <section id="panel-0" class="game-panel space-y-8">
-      <!-- Phone Message Frame -->
-      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm">
-        <div class="flex items-center justify-between border-b border-navy/10 pb-4 mb-6">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue/10 text-blue font-bold flex items-center justify-center font-display text-lg">
-              Y
+      <!-- Team Check-In & Identity Banner (matching Session 2 UI) -->
+      <div id="team-banner" class="mb-8 bg-white border border-navy/10 rounded-xl shadow-sm overflow-hidden transition-all">
+        <!-- Top Bar: Identity & Status -->
+        <div class="p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div id="banner-icon-box" class="w-10 h-10 rounded-lg bg-blue/10 text-blue flex items-center justify-center shrink-0 text-lg transition-colors">
+              👥
             </div>
-            <div>
-              <p class="font-bold text-ink text-sm sm:text-base">Yacine</p>
-              <p class="text-[11px] font-mono text-muted">Incoming SMS · Just now</p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 id="banner-team-name" class="font-display font-bold text-ink text-base sm:text-lg">
+                  Working with a team?
+                </h3>
+                <span id="banner-status-badge" class="px-2.5 py-0.5 text-[11px] font-mono rounded bg-paper text-muted border border-navy/10 font-medium">
+                  Explorer Mode
+                </span>
+              </div>
+              <p id="banner-team-members" class="text-[13px] text-body mt-0.5">
+                Have a team code from Session 1 or 2? Enter it below. New to SPARK? Register a team in 1 minute!
+              </p>
             </div>
           </div>
-          <span class="px-2.5 py-1 text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full font-semibold">
-            ● Urgent Request
-          </span>
+
+          <!-- Switch team button (Visible ONLY when connected) -->
+          <button
+            type="button"
+            id="btn-switch-team"
+            class="text-[12px] font-mono font-medium px-3 py-1.5 rounded-lg border border-navy/15 text-muted hover:text-ink hover:border-navy/30 bg-paper/50 hover:bg-paper transition-all shrink-0 items-center gap-1.5"
+          >
+            <span class="text-sm">⇄</span> Switch Team
+          </button>
         </div>
 
-        <div class="max-w-xl mx-auto bg-paper/60 p-5 rounded-2xl border border-navy/5 relative">
-          <p class="text-body text-base sm:text-lg italic leading-relaxed font-serif">
-            "{sparkSession3.yacineMessage}"
-          </p>
+        <!-- Bottom Bar: Connection Controls (Visible ONLY in guest mode) -->
+        <div id="banner-connect-panel" class="p-4 sm:px-6 bg-paper/50 border-t border-navy/5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <label for="inline-team-code" class="text-[12px] font-mono text-muted uppercase tracking-wider shrink-0 font-medium">
+              Team Code:
+            </label>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <input
+                id="inline-team-code"
+                type="text"
+                class="field !mt-0 !h-9 !w-32 uppercase text-center font-mono tracking-widest text-[14px] !py-0"
+                maxlength="6"
+                placeholder="K7P2QX"
+              />
+              <button type="button" id="inline-connect-btn" class="btn btn-sm btn-primary !h-9 !px-4 shrink-0">
+                Connect
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
+            <span class="text-[13px] text-muted">New to SPARK?</span>
+            <a
+              href="/spark/join?next=/spark/session-3"
+              id="inline-register-btn"
+              class="btn btn-sm btn-secondary btn-on-light !h-9 !px-3.5 !text-[13px] inline-flex items-center gap-1.5 shrink-0 bg-white hover:bg-blue hover:!text-white transition shadow-2xs font-semibold"
+            >
+              <span>Register Team</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
 
-        <div class="mt-6 p-4 bg-blue/5 border border-blue/15 rounded-xl flex items-start gap-3">
-          <span class="text-blue text-lg mt-0.5">💡</span>
+        <!-- Feedback / Errors -->
+        <div id="banner-feedback" class="hidden px-5 sm:px-6 py-2.5 text-[13px] border-t border-navy/5"></div>
+      </div>
+
+      <!-- =========================================================================
+           STEP 0: YACINE'S MESSAGE (3 MIN · WARM-UP & CATCH-UP)
+           ========================================================================= -->
+      <section id="panel-0" class="game-panel space-y-6">
+        <div class="flex items-center justify-between gap-3">
           <div>
-            <p class="font-bold text-ink text-sm">Mentor Prompt</p>
-            <p class="text-body text-[13px] mt-0.5 leading-relaxed">
-              "{sparkSession3.mentorCue}"
+            <span class="font-mono text-[12px] uppercase text-blue font-bold tracking-wider">Step 0 · 3 Minutes</span>
+            <h2 class="font-display text-3xl font-bold tracking-tight mt-1 text-ink">Yacine’s Urgent Message</h2>
+          </div>
+          <span class="px-3 py-1 bg-blue/10 text-blue font-mono text-[12px] font-semibold rounded">Skill: Research Synthesis</span>
+        </div>
+
+        <!-- Mentor Cue Banner (matching Session 2) -->
+        <div class="p-4 sm:p-5 bg-ink text-white rounded-lg flex items-start gap-3.5 border border-white/10">
+          <span class="text-2xl leading-none">🗣️</span>
+          <div>
+            <p class="font-mono text-[11px] uppercase tracking-wider text-peri">Mentor briefing</p>
+            <p class="mt-1 text-[15px] text-white/95 leading-relaxed font-serif italic">
+              “{sparkSession3.mentorCue}”
             </p>
           </div>
         </div>
-      </div>
 
-      <!-- 4 Pillars of a Trusted Paragraph -->
-      <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
-        <div>
-          <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">The Research Standard</span>
-          <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">What makes a paragraph something he can trust?</h2>
-          <p class="text-body text-[14px] mt-1">
-            Yacine needs an honest, evidence-based answer — not a blog post, personal feeling, or distorted overclaim.
-          </p>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-4">
-          {sparkSession3.fourPillars.map((p) => (
-            <div class="p-4 bg-paper rounded-xl border border-navy/10 flex flex-col justify-between">
+        <!-- Phone Message Frame -->
+        <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div class="flex items-center justify-between border-b border-navy/10 pb-4 mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-blue/10 text-blue font-bold flex items-center justify-center font-display text-lg">
+                Y
+              </div>
               <div>
-                <p class="font-bold text-ink text-[14px]">{p.title}</p>
-                <p class="text-body text-[13px] mt-1.5 leading-relaxed">{p.desc}</p>
+                <p class="font-bold text-ink text-sm sm:text-base">Yacine</p>
+                <p class="text-[11px] font-mono text-muted">Incoming SMS · Just now</p>
               </div>
             </div>
-          ))}
+            <span class="px-2.5 py-1 text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full font-semibold">
+              ● Urgent Request
+            </span>
+          </div>
+
+          <div class="max-w-xl mx-auto bg-paper/60 p-5 rounded-2xl border border-navy/5 relative">
+            <p class="text-body text-base sm:text-lg italic leading-relaxed font-serif">
+              "{sparkSession3.yacineMessage}"
+            </p>
+          </div>
         </div>
 
-        <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
-          <p class="text-[13px] text-muted font-mono">Ready to write for Yacine? Let's inspect a bad answer first.</p>
-          <button type="button" class="btn btn-primary btn-next-step" data-next="1">
-            Step 1 · Spot the Problems →
-          </button>
+        <!-- The Story So Far (Recap for all participants) -->
+        <div class="bg-white border border-navy/10 p-6 sm:p-8 rounded-2xl shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Background Recap</span>
+              <h3 class="font-display text-lg font-bold text-ink mt-0.5">The Case So Far</h3>
+            </div>
+            <span class="text-[12px] text-blue font-mono font-medium">From Sessions 1 &amp; 2</span>
+          </div>
+          <div class="mt-3 text-[14px] sm:text-[15px] leading-relaxed text-body space-y-3">
+            <p>
+              <strong>Yacine</strong> is a first-year university student who always listens to his favourite music with headphones while studying. He claims it helps him focus, but his sister noticed his grades dropped and told him music is distracting him.
+            </p>
+            <p>
+              In <strong>Session 1</strong>, teams followed the research trail to find the landmark empirical paper: <em>Perham &amp; Currie (2014)</em>.
+              In <strong>Session 2</strong>, teams analyzed the experiment: 30 students reading in 4 conditions. The scientific finding was clear: silence and music without lyrics performed best; songs with lyrics (whether liked or disliked) impaired reading comprehension.
+            </p>
+          </div>
         </div>
-      </div>
 
-      <!-- Answer Key Box (Key 0) -->
-      <div id="key-box-0" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-3">
-        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
-          <span>👑 Mentor Key Revealed · Step 0</span>
+        <!-- Session 2 Participation & Catch-Up Card (with choices!) -->
+        <div class="bg-white border border-navy/10 p-6 sm:p-8 rounded-2xl shadow-sm space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">Team Readiness</span>
+              <h3 class="font-display text-lg font-bold text-ink mt-0.5">Did your team participate in Session 2?</h3>
+              <p class="text-[13px] text-muted">Choose your team status so we set up your evidence card for Step 3.</p>
+            </div>
+            <span class="text-[12px] text-blue font-mono font-medium">Session 2 Check</span>
+          </div>
+
+          <!-- Choices buttons -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-1">
+            <button type="button" class="s2-participation-choice choice-btn chosen" data-choice="yes">
+              Yes, we completed Session 2
+            </button>
+            <button type="button" class="s2-participation-choice choice-btn" data-choice="no">
+              No, we're new / missed Session 2
+            </button>
+          </div>
+
+          <!-- Yes info -->
+          <div id="s2-choice-yes-info" class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-[13px] flex items-start gap-2.5">
+            <span class="text-emerald-600 text-lg leading-none mt-0.5">✓</span>
+            <div>
+              <strong>Great!</strong> Your Reading Card from Session 2 (who, what was tested, main finding, and explanation) is linked to your team code and will be ready in the drawer beside your writing boxes in Step 3.
+            </div>
+          </div>
+
+          <!-- No / Catch-up info -->
+          <div id="s2-choice-no-info" class="hidden p-5 bg-blue/5 border border-blue/20 rounded-xl space-y-3">
+            <div class="flex items-center gap-2 text-blue font-bold text-sm">
+              <span>📖</span>
+              <span>No problem at all! Here is the Session 2 Evidence Card ready for you:</span>
+            </div>
+            <p class="text-body text-[13px] leading-relaxed">
+              Here is the exact scientific evidence from <em>Perham &amp; Currie (2014)</em> that your team will need today to write Yacine’s trusted paragraph:
+            </p>
+            <div class="grid sm:grid-cols-2 gap-3 text-[12px]">
+              <div class="p-3 bg-white rounded-lg border border-navy/10">
+                <strong class="text-ink">1. Who was tested:</strong>
+                <p class="text-muted mt-0.5">30 university undergraduates (mean age 21 years) completed reading comprehension tests.</p>
+              </div>
+              <div class="p-3 bg-white rounded-lg border border-navy/10">
+                <strong class="text-ink">2. What was tested (4 conditions):</strong>
+                <p class="text-muted mt-0.5">Quiet environment, music without lyrics (instrumental), preferred songs with lyrics, and disliked songs with lyrics.</p>
+              </div>
+              <div class="p-3 bg-white rounded-lg border border-navy/10">
+                <strong class="text-ink">3. Empirical Result:</strong>
+                <p class="text-muted mt-0.5">Understanding was highest in quiet and instrumental music; lowest in both lyric conditions (whether liked or disliked).</p>
+              </div>
+              <div class="p-3 bg-white rounded-lg border border-navy/10">
+                <strong class="text-ink">4. Explanation (Mechanism):</strong>
+                <p class="text-muted mt-0.5">Lyrics contain words. The brain must spend mental effort to process and suppress those words, leaving less capacity for the reading text.</p>
+              </div>
+            </div>
+            <div class="pt-2 text-right">
+              <button type="button" id="btn-load-fallback-card" class="btn btn-sm btn-primary">
+                ✓ Use this Evidence in Step 3 Drawer
+              </button>
+            </div>
+          </div>
         </div>
-        <p class="text-emerald-950 text-[13px] leading-relaxed">
-          The goal of Session 3 is to bridge reading and writing: using <strong>Perham & Currie (2014)</strong> to craft a rigorous, 1-paragraph synthesis that answers Yacine honestly. Remind students that research writing is not about winning an argument — it's about accuracy.
-        </p>
-      </div>
-    </section>
+
+        <!-- 4 Pillars of a Trusted Paragraph -->
+        <div class="bg-white border border-navy/10 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div>
+            <span class="font-mono text-xs uppercase tracking-wider text-blue font-semibold">The Research Standard</span>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-ink mt-1">What makes a paragraph something he can trust?</h2>
+            <p class="text-body text-[14px] mt-1">
+              Yacine needs an honest, evidence-based answer — not a blog post, personal feeling, or distorted overclaim.
+            </p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            {sparkSession3.fourPillars.map((p) => (
+              <div class="p-4 bg-paper rounded-xl border border-navy/10 flex flex-col justify-between">
+                <div>
+                  <p class="font-bold text-ink text-[14px]">{p.title}</p>
+                  <p class="text-body text-[13px] mt-1.5 leading-relaxed">{p.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div class="pt-4 border-t border-navy/10 flex flex-wrap items-center justify-between gap-4">
+            <p class="text-[13px] text-muted font-mono">Ready to write for Yacine? Let's inspect a bad answer first.</p>
+            <button type="button" class="btn btn-primary btn-next-step" data-next="1">
+              Step 1 · Spot the Problems →
+            </button>
+          </div>
+        </div>
+
+        <!-- Answer Key Box (Key 0) -->
+        <div id="key-box-0" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-3">
+          <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+            <span>👑 Mentor Key Revealed · Step 0</span>
+          </div>
+          <p class="text-emerald-950 text-[13px] leading-relaxed">
+            The goal of Session 3 is to bridge reading and writing: using <strong>Perham &amp; Currie (2014)</strong> to craft a rigorous, 1-paragraph synthesis that answers Yacine honestly. Remind students that research writing is not about winning an argument — it's about accuracy.
+          </p>
+        </div>
+      </section>
 
     <!-- =========================================================================
          STEP 1: SPOT THE PROBLEMS (10 MIN · DETECTIVE STEP)
@@ -927,35 +1061,103 @@ const steps = [
       </div>
     </section>
 
-  </main>
-
-  <!-- Team Selection / Change Modal -->
-  <div id="team-modal" class="hidden fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white text-ink rounded-2xl max-w-md w-full p-6 shadow-2xl border border-navy/10 space-y-4">
-      <div class="flex items-center justify-between border-b border-navy/10 pb-3">
-        <h3 class="font-display font-bold text-lg text-ink">Sign In to Your Team</h3>
-        <button type="button" id="btn-close-team-modal" class="text-muted hover:text-ink text-xl font-mono leading-none">&times;</button>
-      </div>
-      <p class="text-body text-[13px]">
-        Enter your team's 6-letter access code (from Session 1 or 2) to continue your investigation:
-      </p>
-      <form id="team-code-form" class="space-y-3">
-        <input
-          id="team-code-input"
-          type="text"
-          maxlength="6"
-          placeholder="e.g. WKKXDF"
-          class="field uppercase tracking-widest text-center font-mono text-xl font-bold !h-12"
-          required
-        />
-        <p id="team-code-error" class="hidden text-xs text-signal font-medium"></p>
-        <button type="submit" class="btn btn-primary w-full justify-center">
-          Load Team Investigation →
-        </button>
-      </form>
     </div>
-  </div>
+  </main>
 </BaseLayout>
+
+<style>
+  /* Override global 168px min-height so compact rows="2"/rows="3" fields stay crisp */
+  #game textarea.field {
+    min-height: auto;
+  }
+
+  #game {
+    background: #F8F9FB !important;
+  }
+
+  .step-tab {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #8A94A8;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  .step-tab:hover {
+    color: #3F66B0;
+  }
+  .step-tab .step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+  }
+  .step-tab.active {
+    color: #3F66B0;
+    border-color: #3F66B0;
+    font-weight: 600;
+  }
+  .step-tab.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .step-tab.locked:hover {
+    color: #8A94A8;
+  }
+  .step-tab.locked .step-num {
+    border-style: dashed;
+  }
+  .choice-btn {
+    flex: 1;
+    height: 40px;
+    border: 1px solid rgba(27,42,85,.2);
+    font-size: 13px;
+    color: #3A4458;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: all .15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 16px;
+  }
+  .choice-btn:hover {
+    border-color: #3F66B0;
+  }
+  .choice-btn.chosen {
+    background: #3F66B0;
+    color: #fff;
+    border-color: #3F66B0;
+    font-weight: 600;
+  }
+
+  /* Team banner state architecture */
+  #team-banner.is-connected #banner-connect-panel {
+    display: none !important;
+  }
+  #team-banner.is-connected #btn-switch-team {
+    display: inline-flex !important;
+  }
+  #team-banner:not(.is-connected) #btn-switch-team {
+    display: none !important;
+  }
+  #team-banner.is-connected #banner-icon-box {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+  }
+</style>
 
 <script>
   import {
@@ -1045,9 +1247,121 @@ const steps = [
   // UI DOM Elements
   const teamLabel = document.getElementById('team-label');
   const teamBadge = document.getElementById('team-badge');
-  const guestBanner = document.getElementById('guest-team-banner');
+  const teamBanner = document.getElementById('team-banner');
+  const bannerIconBox = document.getElementById('banner-icon-box');
+  const bannerName = document.getElementById('banner-team-name');
+  const bannerMembers = document.getElementById('banner-team-members');
+  const bannerBadge = document.getElementById('banner-status-badge');
+  const switchTeamBtn = document.getElementById('btn-switch-team');
+  const bannerFeedback = document.getElementById('banner-feedback');
+  const inlineInput = document.getElementById('inline-team-code') as HTMLInputElement | null;
+  const inlineBtn = document.getElementById('inline-connect-btn') as HTMLButtonElement | null;
   const unlockedStepIndicator = document.getElementById('unlocked-step-indicator');
   const liveSaveStatus = document.getElementById('live-save-status');
+
+  function renderTeamBanner(team: { id?: string; code: string; name: string; members: string[] } | null) {
+    if (team) {
+      if (teamLabel) teamLabel.textContent = `Team ${team.name}`;
+      if (teamBadge) teamBadge.textContent = `${team.code} · ${team.members.length} Members`;
+      if (bannerName) bannerName.textContent = `Team ${team.name}`;
+      if (bannerMembers) bannerMembers.textContent = `Members: ${team.members.join(', ')} · Live sync active`;
+      if (bannerBadge) {
+        bannerBadge.textContent = `✓ Code: ${team.code}`;
+        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold';
+      }
+      if (bannerIconBox) bannerIconBox.textContent = '✨';
+      teamBanner?.classList.add('is-connected');
+    } else {
+      if (teamLabel) teamLabel.textContent = 'The Music Case · Session 3';
+      if (teamBadge) teamBadge.textContent = 'Not Connected';
+      if (bannerName) bannerName.textContent = 'Connect your team to save live!';
+      if (bannerMembers) bannerMembers.textContent = 'Enter your 6-character team code from Session 1 or 2 below, or register a new team in 1 minute so your answers go live to your mentor.';
+      if (bannerBadge) {
+        bannerBadge.textContent = 'Connect Required';
+        bannerBadge.className = 'px-2.5 py-0.5 text-[11px] font-mono rounded bg-amber-100 text-amber-900 border border-amber-300 font-semibold';
+      }
+      if (bannerIconBox) bannerIconBox.textContent = '👥';
+      teamBanner?.classList.remove('is-connected');
+    }
+  }
+
+  function showBannerFeedback(message: string, type: 'error' | 'success') {
+    if (!bannerFeedback) return;
+    bannerFeedback.textContent = message;
+    if (type === 'error') {
+      bannerFeedback.className = 'px-5 sm:px-6 py-2.5 text-[13px] border-t border-signal/20 bg-signal/5 text-signal font-medium block';
+    } else {
+      bannerFeedback.className = 'px-5 sm:px-6 py-2.5 text-[13px] border-t border-emerald-500/20 bg-emerald-50 text-emerald-800 font-medium block';
+      setTimeout(() => {
+        bannerFeedback.className = 'hidden';
+      }, 5000);
+    }
+  }
+
+  async function handleConnectCode() {
+    if (!inlineInput) return;
+    const raw = inlineInput.value.trim().toUpperCase();
+    if (!raw || raw.length < 4) {
+      showBannerFeedback('Please enter your 6-character team code.', 'error');
+      return;
+    }
+    if (inlineBtn) inlineBtn.disabled = true;
+    try {
+      const payload = await getSession3State(raw);
+      if (!payload || !payload.team) {
+        throw new Error("That code wasn't found. Check the letters or register a new team.");
+      }
+      storeTeamCode(raw);
+      teamCode = raw;
+      showBannerFeedback(`✓ Connected as Team ${payload.team.name}! Loading live workspace…`, 'success');
+      setTimeout(() => window.location.reload(), 400);
+    } catch (err: any) {
+      showBannerFeedback(friendlyError(err), 'error');
+      if (inlineBtn) inlineBtn.disabled = false;
+    }
+  }
+
+  inlineBtn?.addEventListener('click', handleConnectCode);
+  inlineInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleConnectCode();
+    }
+  });
+
+  switchTeamBtn?.addEventListener('click', () => {
+    clearTeamCode();
+    showBannerFeedback('Disconnected team. Reloading…', 'success');
+    setTimeout(() => window.location.reload(), 300);
+  });
+
+  // Session 2 Participation & Catch-up Choices
+  const s2Choices = document.querySelectorAll<HTMLButtonElement>('.s2-participation-choice');
+  const s2YesInfo = document.getElementById('s2-choice-yes-info');
+  const s2NoInfo = document.getElementById('s2-choice-no-info');
+  const loadFallbackBtn = document.getElementById('btn-load-fallback-card');
+
+  s2Choices.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      s2Choices.forEach((b) => b.classList.remove('chosen'));
+      btn.classList.add('chosen');
+      const isYes = btn.dataset.choice === 'yes';
+      s2YesInfo?.classList.toggle('hidden', !isYes);
+      s2NoInfo?.classList.toggle('hidden', isYes);
+    });
+  });
+
+  loadFallbackBtn?.addEventListener('click', () => {
+    const who = document.getElementById('s2-drawer-who');
+    const what = document.getElementById('s2-drawer-what');
+    const finding = document.getElementById('s2-drawer-finding');
+    const exp = document.getElementById('s2-drawer-explanation');
+    if (who) who.textContent = '30 university undergraduates (mean age 21 years)';
+    if (what) what.textContent = 'Reading comprehension under 4 conditions (quiet, instrumental, preferred music, disliked music)';
+    if (finding) finding.textContent = 'Highest performance in quiet & instrumental; lowest in both lyric conditions (liked or disliked)';
+    if (exp) exp.textContent = 'Lyrics compete for linguistic processing; suppressing lyrics leaves less working memory for comprehension';
+    alert('✓ Session 2 Evidence Card successfully loaded into your Step 3 writing drawer!');
+  });
 
   // Step Tabs
   const stepTabs = document.querySelectorAll('.step-tab');
@@ -1057,13 +1371,7 @@ const steps = [
     if (stepIndex < 0 || stepIndex > 5) return;
     activePanel = stepIndex;
     stepTabs.forEach((tab, idx) => {
-      if (idx === stepIndex) {
-        tab.classList.add('bg-blue', 'text-white', 'shadow-sm');
-        tab.classList.remove('bg-white', 'text-muted');
-      } else {
-        tab.classList.remove('bg-blue', 'text-white', 'shadow-sm');
-        tab.classList.add('bg-white', 'text-muted');
-      }
+      tab.classList.toggle('active', idx === stepIndex);
     });
 
     gamePanels.forEach((panel, idx) => {
@@ -1102,15 +1410,15 @@ const steps = [
 
   // Render Room State & Locks
   function renderLocks() {
-    unlockedStepIndicator!.textContent = `Step ${roomState.unlocked_step}/5`;
+    if (unlockedStepIndicator) unlockedStepIndicator.textContent = `Step ${roomState.unlocked_step}/5`;
     stepTabs.forEach((tab, idx) => {
-      const lockIcon = tab.querySelector('.step-lock');
+      const lockIcon = tab.querySelector('.step-lock-icon');
       if (idx > roomState.unlocked_step) {
         lockIcon?.classList.remove('hidden');
-        tab.classList.add('opacity-60');
+        tab.classList.add('locked');
       } else {
         lockIcon?.classList.add('hidden');
-        tab.classList.remove('opacity-60');
+        tab.classList.remove('locked');
       }
     });
 
@@ -1612,37 +1920,6 @@ const steps = [
     renderLocks();
   });
 
-  // Team Modal Logic
-  const teamModal = document.getElementById('team-modal');
-  document.getElementById('btn-switch-team')?.addEventListener('click', () => teamModal?.classList.remove('hidden'));
-  document.getElementById('btn-guest-login')?.addEventListener('click', () => teamModal?.classList.remove('hidden'));
-  document.getElementById('btn-close-team-modal')?.addEventListener('click', () => teamModal?.classList.add('hidden'));
-
-  document.getElementById('team-code-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const code = (document.getElementById('team-code-input') as HTMLInputElement)?.value.trim().toUpperCase();
-    const err = document.getElementById('team-code-error');
-    try {
-      const payload = await getSession3State(code);
-      if (!payload || !payload.team) {
-        if (err) {
-          err.textContent = 'Team code not found. Check spelling or ask your mentor.';
-          err.classList.remove('hidden');
-        }
-        return;
-      }
-      storeTeamCode(code);
-      teamCode = code;
-      teamModal?.classList.add('hidden');
-      await boot();
-    } catch (e: any) {
-      if (err) {
-        err.textContent = friendlyError(e);
-        err.classList.remove('hidden');
-      }
-    }
-  });
-
   // Boot & Watcher
   async function boot() {
     updateMentorUI();
@@ -1652,16 +1929,10 @@ const steps = [
         roomState = payload.state;
         revealedKeys = payload.revealed_keys || {};
 
+        renderTeamBanner(payload.team);
         if (payload.team) {
-          teamLabel!.textContent = `${payload.team.name} (${payload.team.code})`;
-          teamBadge!.textContent = `Team ${payload.team.code}`;
-          guestBanner?.classList.add('hidden');
           const cf3Title = document.getElementById('cf3-team-title');
           if (cf3Title) cf3Title.textContent = `${payload.team.name} (${payload.team.code})`;
-        } else {
-          teamLabel!.textContent = 'The Music Case · Part 3';
-          teamBadge!.textContent = 'Guest Preview';
-          guestBanner?.classList.remove('hidden');
         }
 
         if (payload.answers) {
@@ -1675,16 +1946,22 @@ const steps = [
         }
 
         // Render S2 Reading card in drawer
-        if (payload.s2_reading_card) {
+        const who = document.getElementById('s2-drawer-who');
+        const what = document.getElementById('s2-drawer-what');
+        const finding = document.getElementById('s2-drawer-finding');
+        const exp = document.getElementById('s2-drawer-explanation');
+
+        if (payload.s2_reading_card && (payload.s2_reading_card.who || payload.s2_reading_card.main_finding)) {
           const c = payload.s2_reading_card;
-          const who = document.getElementById('s2-drawer-who');
-          const what = document.getElementById('s2-drawer-what');
-          const finding = document.getElementById('s2-drawer-finding');
-          const exp = document.getElementById('s2-drawer-explanation');
-          if (who && c.who) who.textContent = c.who;
-          if (what && c.what_tested) what.textContent = c.what_tested;
-          if (finding && c.main_finding) finding.textContent = c.main_finding;
-          if (exp && c.explanation) exp.textContent = c.explanation;
+          if (who) who.textContent = c.who || '30 university students (Perham & Currie, 2014)';
+          if (what) what.textContent = c.what_tested || 'Reading in 4 conditions (quiet, instrumental, liked songs, disliked songs)';
+          if (finding) finding.textContent = c.main_finding || 'Quiet & instrumental = best; songs with lyrics = worst';
+          if (exp) exp.textContent = c.explanation || 'Brain suppresses song lyrics, stealing working memory from text';
+        } else {
+          if (who) who.textContent = '30 university students (Perham & Currie, 2014)';
+          if (what) what.textContent = 'Reading in 4 conditions (quiet, instrumental, liked songs, disliked songs)';
+          if (finding) finding.textContent = 'Quiet & instrumental = best; songs with lyrics = worst';
+          if (exp) exp.textContent = 'Brain suppresses song lyrics, stealing working memory from text';
         }
 
         // Render peer feedback if already received
