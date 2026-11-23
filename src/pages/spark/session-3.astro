@@ -676,9 +676,14 @@ const steps = [
                 Read their draft, tick the 6 checks, and give 1 star and 1 wish.
               </p>
             </div>
-            <span id="peer-target-code-badge" class="px-2.5 py-0.5 text-[11px] font-mono rounded bg-blue/10 text-blue font-semibold">
-              Anonymous Target
-            </span>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-refresh-peer" class="text-[11px] font-mono text-blue hover:underline">
+                🔄 Refresh peer draft
+              </button>
+              <span id="peer-target-code-badge" class="px-2.5 py-0.5 text-[11px] font-mono rounded bg-blue/10 text-blue font-semibold">
+                Anonymous Target
+              </span>
+            </div>
           </div>
 
           <!-- Peer Target Paragraph Card -->
@@ -1127,6 +1132,7 @@ const steps = [
       const sel = document.querySelector(`.mistake-selector[data-mistake-id="${m.id}"]`) as HTMLSelectElement | null;
       const row = document.querySelector(`[data-row-id="${m.id}"]`);
       const badge = row?.querySelector('.mistake-badge') as HTMLElement | null;
+      const targetSpan = document.querySelector(`.detective-target[data-id="${m.id}"]`) as HTMLElement | null;
       const assigned = answers.step1_spots?.[m.id] || '';
       if (sel) sel.value = assigned;
       if (assigned) {
@@ -1136,8 +1142,14 @@ const steps = [
           badge.classList.remove('hidden');
           badge.classList.add('bg-blue/10', 'text-blue', 'border', 'border-blue/20');
         }
-      } else if (badge) {
-        badge.classList.add('hidden');
+        if (targetSpan) {
+          targetSpan.classList.add('bg-blue/15', 'text-blue', 'font-semibold', '!border-solid', '!border-blue');
+        }
+      } else {
+        if (badge) badge.classList.add('hidden');
+        if (targetSpan) {
+          targetSpan.classList.remove('bg-blue/15', 'text-blue', 'font-semibold', '!border-solid', '!border-blue');
+        }
       }
     });
     const counter = document.getElementById('mistakes-counter');
@@ -1327,8 +1339,12 @@ const steps = [
       const src = (btn as HTMLElement).dataset.source;
       if (src === 'p1') {
         const val = answers.step2_p1 || (document.getElementById('paraphrase-input-p1') as HTMLTextAreaElement)?.value || '';
+        if (!val.trim()) {
+          alert("You haven't written Paraphrase 1 in Step 2 yet! Complete it in Step 2 first, or type directly into this Evidence box.");
+          return;
+        }
         const inp = document.getElementById('peel-input-e') as HTMLTextAreaElement | null;
-        if (inp && val) {
+        if (inp) {
           inp.value = val;
           answers.peel.e = val;
           updateCombinedPreview();
@@ -1336,8 +1352,12 @@ const steps = [
         }
       } else if (src === 'p2') {
         const val = answers.step2_p2 || (document.getElementById('paraphrase-input-p2') as HTMLTextAreaElement)?.value || '';
+        if (!val.trim()) {
+          alert("You haven't written Paraphrase 2 in Step 2 yet! Complete it in Step 2 first, or type directly into this Explain box.");
+          return;
+        }
         const inp = document.getElementById('peel-input-explain') as HTMLTextAreaElement | null;
-        if (inp && val) {
+        if (inp) {
           inp.value = val;
           answers.peel.explain = val;
           updateCombinedPreview();
@@ -1380,8 +1400,9 @@ const steps = [
       const paragraphEl = document.getElementById('peer-target-paragraph');
       const refEl = document.getElementById('peer-target-reference');
 
-      if (codeBadge) codeBadge.textContent = `Draft Team: ${target.target_team_code}`;
-      const p = target.peel;
+      const code = target.target_team_code || target.peer_code || 'ANON';
+      if (codeBadge) codeBadge.textContent = `Draft Team: ${code}`;
+      const p = target.peel || target.paragraph || ({} as any);
       const fullText = [p.p, p.e, p.explain, p.l].filter((s) => s && s.trim()).join(' ');
       if (paragraphEl) {
         paragraphEl.textContent = fullText || '(This team has not yet written their PEEL draft.)';
@@ -1393,6 +1414,11 @@ const steps = [
       console.warn('Failed to load peer target:', err);
     }
   }
+
+  document.getElementById('btn-refresh-peer')?.addEventListener('click', () => {
+    peerTarget = null;
+    loadPeerTarget();
+  });
 
   document.getElementById('btn-submit-peer-review')?.addEventListener('click', async () => {
     if (!teamCode || !peerTarget) {

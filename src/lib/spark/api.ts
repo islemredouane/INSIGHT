@@ -617,9 +617,11 @@ export interface Session3TeamPayload {
 
 export interface PeerTargetPayload {
   is_fallback?: boolean;
-  target_team_id: string;
+  target_team_id: string | null;
   target_team_code: string;
+  peer_code?: string;
   peel: PeelDraft;
+  paragraph?: PeelDraft;
 }
 
 export interface MentorS3TeamRow {
@@ -666,7 +668,11 @@ export const submitPeerReviewSession3 = (code: string, review: Record<string, un
   rpc<Session3TeamAnswers>('spark_s3_submit_peer_review', { p_code: code, p_review: review });
 
 export const submitCaseFile3 = (code: string, improvedPeel: PeelDraft) =>
-  rpc<Session3TeamAnswers>('spark_s3_submit_cf3', { p_code: code, p_improved_peel: improvedPeel });
+  rpc<Session3TeamAnswers>('spark_s3_submit_cf3', {
+    p_code: code,
+    p_cf3: improvedPeel,
+    p_improved_peel: improvedPeel,
+  });
 
 export const mentorS3Overview = (token: string) =>
   rpc<MentorS3Overview>('spark_mentor_s3_overview', { p_token: token });
