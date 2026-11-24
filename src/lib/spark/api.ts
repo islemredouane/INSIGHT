@@ -706,6 +706,220 @@ export const mentorS3Export = (token: string) =>
 export const adminS3Reset = (token: string) =>
   rpc<void>('spark_admin_s3_reset', { p_token: token });
 
+/* ---- Session 4 Live Types & RPCs ---- */
+export interface Session4RoomState {
+  unlocked_step: number;
+  revealed_steps: Record<string, boolean>;
+  updated_at?: string;
+}
+
+export interface IntroMovesDraft {
+  move1: string;
+  move2: string;
+  move3: string;
+  move4: string;
+}
+
+export interface AbstractDraft {
+  a1: string;
+  a2: string;
+  a3: string;
+  a4: string;
+  a5: string;
+}
+
+export interface PeerReviewS4Submission {
+  target_team_id?: string | null;
+  target_team_code?: string | null;
+  checks: string[];
+  star: string;
+  wish: string;
+  submitted_at?: string | null;
+}
+
+export interface PeerFeedbackS4Received {
+  reviewer_code: string;
+  checks: string[];
+  star: string;
+  wish: string;
+  submitted_at: string;
+}
+
+export interface Session4TeamAnswers {
+  team_id?: string;
+  step1_sort: Record<string, string>; // cardId -> 'I' | 'M' | 'R' | 'D'
+  step1_saved?: boolean;
+  step2_title: string;
+  step2_final_title: string;
+  step2_checks: string[];
+  step2_saved?: boolean;
+  step3_moves: IntroMovesDraft;
+  step3_saved?: boolean;
+  step4_result: string;
+  step4_discussion: string;
+  step4_saved?: boolean;
+  step5_abstract: AbstractDraft;
+  step5_saved?: boolean;
+  step5_peer_review: PeerReviewS4Submission;
+  step5_improved_abstract: AbstractDraft;
+  cf4_hardest?: string;
+  cf4_status: 'draft' | 'pending' | 'approved';
+  cf4_submitted_at?: string | null;
+  cf4_approved_at?: string | null;
+  cf4_approved_by?: string | null;
+  cf4_mentor_comment?: string | null;
+  s4_updated_at?: string;
+}
+
+export interface Session4AnswerKey {
+  step1: Record<string, { correct: string; reason: string }>;
+  step2: { realTitle: string; analysis: string; examples: string[] };
+  step3: { moves: { num: number; model: string }[] };
+  step4: { resultModel: string; discussionModel: string };
+  step5: { abstractModel: string[]; checkCriteria: string[] };
+}
+
+export interface Session4TeamPayload {
+  team: { id: string; code: string; name: string; members: string[] } | null;
+  state: Session4RoomState;
+  answers: Session4TeamAnswers | null;
+  s3_peel: PeelDraft | null;
+  s2_reading_card: Record<string, string> | null;
+  peer_feedback_received: PeerFeedbackS4Received | null;
+  revealed_keys: Partial<Session4AnswerKey>;
+}
+
+export interface PeerTargetS4Payload {
+  is_fallback?: boolean;
+  target_team_id: string | null;
+  target_team_code: string;
+  peer_code?: string;
+  abstract: AbstractDraft;
+}
+
+export interface MentorS4TeamRow {
+  id: string;
+  code: string;
+  name: string;
+  members: string[];
+  last_activity: string;
+  step1_sort: Record<string, string>;
+  step1_saved?: boolean;
+  step2_title: string;
+  step2_final_title: string;
+  step2_checks: string[];
+  step3_moves: IntroMovesDraft;
+  step4_result: string;
+  step4_discussion: string;
+  step5_abstract: AbstractDraft;
+  step5_peer_review: PeerReviewS4Submission;
+  step5_improved_abstract: AbstractDraft;
+  cf4_hardest?: string;
+  cf4_status: 'draft' | 'pending' | 'approved';
+  cf4_submitted_at?: string | null;
+  cf4_approved_at?: string | null;
+  cf4_approved_by?: string | null;
+  cf4_mentor_comment?: string | null;
+  s4_updated_at?: string | null;
+}
+
+export interface MentorS4Overview {
+  state: Session4RoomState;
+  teams: MentorS4TeamRow[];
+}
+
+export const getSession4State = (code?: string | null) =>
+  rpc<Session4TeamPayload | null>('spark_s4_get_state', { p_code: code || null });
+
+export const getSession4RevealedKeys = () =>
+  rpc<Partial<Session4AnswerKey>>('spark_s4_revealed_keys');
+
+export const saveSession4Progress = (code: string, patch: Record<string, unknown>) =>
+  rpc<Session4TeamAnswers>('spark_s4_save', { p_code: code, p_patch: patch });
+
+export const getPeerTargetSession4 = (code: string) =>
+  rpc<PeerTargetS4Payload>('spark_s4_get_peer_target', { p_code: code });
+
+export const submitPeerReviewSession4 = (code: string, review: Record<string, unknown>) =>
+  rpc<Session4TeamAnswers>('spark_s4_submit_peer_review', { p_code: code, p_review: review });
+
+export const submitCaseFile4 = (
+  code: string,
+  payload: { hardest?: string; improved_abstract?: AbstractDraft }
+) =>
+  rpc<Session4TeamAnswers>('spark_s4_submit_cf4', {
+    p_code: code,
+    p_hardest: payload.hardest || null,
+    p_improved_abstract: payload.improved_abstract || null,
+  });
+
+export const mentorS4Overview = (token: string) =>
+  rpc<MentorS4Overview>('spark_mentor_s4_overview', { p_token: token });
+
+export const mentorS4SetStep = (token: string, step: number) =>
+  rpc<void>('spark_mentor_s4_set_step', { p_token: token, p_step: step });
+
+export const mentorS4SetReveal = (token: string, step: number, revealed: boolean) =>
+  rpc<Record<string, boolean>>('spark_mentor_s4_set_reveal', {
+    p_token: token,
+    p_step: step,
+    p_revealed: revealed,
+  });
+
+export const mentorS4ApproveCaseFile = (
+  token: string,
+  teamId: string,
+  mentorName?: string,
+  comment?: string
+) =>
+  rpc<void>('spark_mentor_s4_approve_cf4', {
+    p_token: token,
+    p_team_id: teamId,
+    p_mentor_name: mentorName || null,
+    p_comment: comment || null,
+  });
+
+export const mentorS4Export = (token: string) =>
+  rpc<Record<string, unknown>[]>('spark_mentor_s4_export', { p_token: token });
+
+export const adminS4Reset = (token: string) =>
+  rpc<void>('spark_admin_s4_reset', { p_token: token });
+
+export function watchSession4State(onChange: (s: Session4RoomState) => void): () => void {
+  let stopped = false;
+  const poll = async () => {
+    if (stopped) return;
+    try {
+      const { data } = await sb()
+        .from('spark_session4_state')
+        .select('unlocked_step, revealed_steps, updated_at')
+        .eq('id', true)
+        .single();
+      if (data) onChange(data as Session4RoomState);
+    } catch {
+      /* network hiccup */
+    }
+  };
+  poll();
+  const interval = setInterval(poll, 4000);
+  const channel = sb()
+    .channel('spark-session4-state')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'spark_session4_state' },
+      (payload) => {
+        onChange(payload.new as Session4RoomState);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    stopped = true;
+    clearInterval(interval);
+    sb().removeChannel(channel);
+  };
+}
+
 export function watchSession3State(onChange: (s: Session3RoomState) => void): () => void {
   let stopped = false;
   const poll = async () => {

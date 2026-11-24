@@ -1,7 +1,7 @@
 ---
-// SPARK · The Music Case — mentor panel. Password-gated; supports Session 3 (Live), Session 2 (Archive), and Session 1 (Archive).
+// SPARK · The Music Case — mentor panel. Password-gated; supports Session 4 (Live), Session 3, Session 2, and Session 1.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { sparkSession2, sparkSession3 } from '../../data/spark';
+import { sparkSession2, sparkSession3, sparkSession4 } from '../../data/spark';
 
 const s2ReadingBoxes = sparkSession2.readingCardBoxes.map((b) => ({ id: b.id, title: b.title }));
 const s2PaperPartsCount = sparkSession2.paperParts.length;
@@ -19,7 +19,10 @@ const s3SixChecks = sparkSession3.sixChecks;
         <h1 class="mt-1 font-display text-2xl font-bold">Mentor Panel</h1>
       </div>
       <div id="mentor-badge" class="hidden text-[13px] text-silver/80 flex items-center gap-3">
-        <a href="/spark/session-3" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-blue text-white text-[12px] font-semibold transition-colors">
+        <a href="/spark/session-4" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-blue text-white text-[12px] font-semibold transition-colors">
+          Open Session 4 ↗
+        </a>
+        <a href="/spark/session-3" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[12px] font-medium transition-colors">
           Open Session 3 ↗
         </a>
         <a href="/spark/session-2" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[12px] font-medium transition-colors">
@@ -51,16 +54,24 @@ const s3SixChecks = sparkSession3.sixChecks;
       <!-- Main Panel -->
       <div id="panel" class="hidden space-y-6">
 
-        <!-- Top Session Switcher: Session 3 (Live) vs Session 2 (Archive) vs Session 1 (Archive) -->
+        <!-- Top Session Switcher: Session 4 (Live) vs Session 3 vs Session 2 vs Session 1 -->
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white border border-navy/10 p-2 rounded-lg shadow-sm">
           <div class="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              id="switch-session-3"
+              id="switch-session-4"
               class="px-4 py-2 rounded-md text-[14px] font-semibold bg-ink text-white flex items-center gap-2 transition-colors"
             >
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Session 3 · Live</span>
+              <span>Session 4 · Live</span>
+              <span id="s4-top-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button
+              type="button"
+              id="switch-session-3"
+              class="px-4 py-2 rounded-md text-[14px] font-medium text-muted hover:text-ink hover:bg-paper transition-colors flex items-center gap-2"
+            >
+              <span>Session 3 · Archive</span>
               <span id="s3-top-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
             </button>
             <button
@@ -82,6 +93,202 @@ const s3SixChecks = sparkSession3.sixChecks;
           </div>
           <div class="flex items-center gap-2 px-2 text-[12px] text-muted font-mono">
             <span id="live-sync-label">Live · syncing every 4s</span>
+          </div>
+        </div>
+
+        <!-- =========================================================================
+             SESSION 4 · LIVE PANEL (Default Active)
+             ========================================================================= -->
+        <div id="session-4-wrap" class="space-y-6">
+
+          <!-- Session 4 Control Bar: Room Step + Live Model Answer Reveals -->
+          <div class="bg-white border border-navy/10 p-5 rounded-lg shadow-sm space-y-4">
+            <!-- Row 1: Room Step Progress -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-muted uppercase font-mono text-[11px] tracking-wider">Session 4 Room Step:</span>
+                <span id="s4-current-step" class="font-display font-bold text-blue text-base">Step 0 · Yacine’s New Message</span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="s4-unlock-next" class="btn btn-sm btn-primary">Unlock next step →</button>
+                <button type="button" id="s4-export-csv" class="btn btn-sm btn-secondary btn-on-light">Export Session 4 CSV ↓</button>
+                <button type="button" id="s4-admin-reset" class="btn btn-sm btn-secondary btn-on-light text-signal border-signal/40 hover:bg-signal/5">
+                  Reset Session 4
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1.5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-navy/10">
+                <span class="text-[12px] text-muted font-mono uppercase mr-1">Jump:</span>
+                <div class="flex gap-1" id="s4-jump-steps"></div>
+              </div>
+            </div>
+
+            <!-- Row 2: Live Room Model Answer Reveals -->
+            <div class="pt-4 border-t border-navy/10 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-[12px] font-mono uppercase tracking-wider font-bold text-ink">👑 Live Model Answer Reveals (All Student Screens)</span>
+                  <p class="text-[12px] text-muted">Reveal or hide answer keys live across all team screens. Steps 1 to 5 cover sort solutions, title analysis, 4-move intro, result/discussion, and abstract.</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" id="s4-reveal-all" class="px-2.5 py-1 rounded text-[12px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                    Reveal All
+                  </button>
+                  <button type="button" id="s4-hide-all" class="px-2.5 py-1 rounded text-[12px] font-semibold bg-paper text-muted border border-navy/15 hover:text-ink transition-colors">
+                    Hide All
+                  </button>
+                </div>
+              </div>
+              <div id="s4-reveal-controls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Session 4 Quick Stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Teams Active</p>
+              <p id="s4-stat-teams" class="font-display font-bold text-2xl text-ink mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Sort Placed</p>
+              <p id="s4-stat-sort" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Titles Saved</p>
+              <p id="s4-stat-title" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-navy/10 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-muted">Intros Saved</p>
+              <p id="s4-stat-intro" class="font-display font-bold text-2xl text-blue mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-amber-200 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-amber-800">CF4 Pending</p>
+              <p id="s4-stat-pending" class="font-display font-bold text-2xl text-amber-600 mt-0.5">0</p>
+            </div>
+            <div class="bg-white border border-emerald-200 rounded-lg p-3.5 shadow-sm">
+              <p class="font-mono text-[11px] uppercase text-emerald-800">CF4 Approved</p>
+              <p id="s4-stat-approved" class="font-display font-bold text-2xl text-emerald-600 mt-0.5">0</p>
+            </div>
+          </div>
+
+          <!-- Session 4 View Sub-tabs -->
+          <div class="flex items-center gap-2 border-b border-navy/10 pb-2">
+            <button
+              type="button"
+              id="s4-tab-overview"
+              class="px-4 py-2 border-b-2 border-blue text-blue font-semibold text-sm transition-colors"
+            >
+              Overview (All Teams)
+            </button>
+            <button
+              type="button"
+              id="s4-tab-cf4"
+              class="px-4 py-2 border-b-2 border-transparent text-muted hover:text-ink font-medium text-sm transition-colors flex items-center gap-2"
+            >
+              <span>Case File #4 (Preprints)</span>
+              <span id="s4-cards-pending-badge" class="hidden text-[11px] bg-amber-500 text-white font-bold px-1.5 py-0.2 rounded-full">0</span>
+            </button>
+            <button
+              type="button"
+              id="s4-tab-models"
+              class="px-4 py-2 border-b-2 border-transparent text-muted hover:text-ink font-medium text-sm transition-colors"
+            >
+              Model Answers &amp; Guidance
+            </button>
+          </div>
+
+          <!-- Sub-view 1: Overview Table -->
+          <div id="s4-view-overview" class="space-y-4">
+            <div class="overflow-x-auto bg-white border border-navy/10 rounded-lg shadow-sm">
+              <table class="w-full text-[13px] text-left">
+                <thead class="bg-paper border-b border-navy/10 text-muted uppercase text-[11px] font-mono tracking-wider">
+                  <tr>
+                    <th class="p-3.5">Team</th>
+                    <th class="p-3.5">Members</th>
+                    <th class="p-3.5">Step 1 Sort</th>
+                    <th class="p-3.5">Step 2 Title</th>
+                    <th class="p-3.5">Step 3 Intro</th>
+                    <th class="p-3.5">Step 4 Result/Disc</th>
+                    <th class="p-3.5">Step 5 Abstract</th>
+                    <th class="p-3.5">Case File #4</th>
+                    <th class="p-3.5">Updated</th>
+                    <th class="p-3.5 text-right">Inspect</th>
+                  </tr>
+                </thead>
+                <tbody id="s4-teams-body" class="divide-y divide-navy/10">
+                  <tr><td colspan="10" class="p-6 text-center text-muted">Loading live Session 4 teams…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Sub-view 2: Case File #4 Cards (Preprints with Green ✓ Approval) -->
+          <div id="s4-view-cf4" class="hidden space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <button type="button" class="s4-filter-btn px-3 py-1 rounded-md text-xs font-semibold bg-ink text-white" data-filter="all">All</button>
+                <button type="button" class="s4-filter-btn px-3 py-1 rounded-md text-xs font-medium text-muted hover:text-ink bg-white border border-navy/10" data-filter="pending">Pending Approval</button>
+                <button type="button" class="s4-filter-btn px-3 py-1 rounded-md text-xs font-medium text-muted hover:text-ink bg-white border border-navy/10" data-filter="approved">Approved ✓</button>
+              </div>
+            </div>
+            <div id="s4-cf4-list" class="space-y-4">
+              <p class="text-sm text-muted p-6 text-center bg-white rounded-lg border border-navy/10">No Case File #4 submissions yet.</p>
+            </div>
+          </div>
+
+          <!-- Sub-view 3: Model Answers & Guidance -->
+          <div id="s4-view-models" class="hidden bg-white border border-navy/10 rounded-xl p-6 sm:p-8 space-y-6">
+            <div>
+              <h3 class="font-display font-bold text-lg text-ink">Session 4 · Mentor Answer Keys &amp; Pedagogical Guidance</h3>
+              <p class="text-xs text-muted">Reference answers from the developer specification for Perham &amp; Currie (2014).</p>
+            </div>
+
+            <!-- Step 1 Sort Answers -->
+            <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2">
+              <span class="font-mono text-xs font-bold text-blue uppercase">Step 1 · Sort Solutions:</span>
+              <div class="grid sm:grid-cols-2 gap-2 text-xs">
+                {sparkSession4.sortCards.map((c) => (
+                  <div class="p-2 bg-white rounded border border-navy/5 flex items-start gap-2">
+                    <span class="font-mono font-bold text-blue shrink-0">Card {c.id} ({c.correct}):</span>
+                    <span>{c.reason}</span>
+                  </div>
+                ))}
+              </div>
+              <p class="text-[11px] text-muted italic pt-1">
+                Note on Sentence H: It is said as a weakness, so it is a limit, and limits belong strictly in the Discussion.
+              </p>
+            </div>
+
+            <!-- Step 2 Title Guidance -->
+            <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2 text-xs">
+              <span class="font-mono font-bold text-blue uppercase">Step 2 · Title Criteria:</span>
+              <p><strong>Published Real Title:</strong> "{sparkSession4.titleRecipe.realTitle}"</p>
+              <p><strong>Approve if:</strong> Gives the topic and who, in neutral words (no exclamation marks or subjective drama). Ask, don't correct: "Would a stranger know what the paper is about?"</p>
+            </div>
+
+            <!-- Step 3 Intro Guidance -->
+            <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2 text-xs">
+              <span class="font-mono font-bold text-blue uppercase">Step 3 · Model Introduction (4 Moves):</span>
+              {sparkSession4.introMoves.map((m) => (
+                <p><strong>Move {m.num} ({m.title}):</strong> {m.model}</p>
+              ))}
+            </div>
+
+            <!-- Step 4 Result & Discussion Guidance -->
+            <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2 text-xs">
+              <span class="font-mono font-bold text-blue uppercase">Step 4 · Result &amp; Discussion Models:</span>
+              <p><strong>Result (Facts Only):</strong> {sparkSession4.resultDiscussion.result.model}</p>
+              <p><strong>Discussion (Mechanism + Limit):</strong> {sparkSession4.resultDiscussion.discussion.model}</p>
+            </div>
+
+            <!-- Step 5 Abstract Model -->
+            <div class="p-4 bg-paper rounded-xl border border-navy/10 space-y-2 text-xs">
+              <span class="font-mono font-bold text-blue uppercase">Step 5 · Model 5-Sentence Abstract:</span>
+              {sparkSession4.abstractGuide.map((b) => (
+                <p><strong>{b.num}. {b.name}:</strong> {b.model}</p>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -567,6 +774,22 @@ const s3SixChecks = sparkSession3.sixChecks;
     </div>
   </section>
 
+  <!-- Session 4 Team Inspect Modal -->
+  <div id="s4-inspect-modal" class="hidden fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white text-ink rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
+      <div class="px-6 py-4 bg-ink text-white flex items-center justify-between gap-4">
+        <div>
+          <h3 id="s4-inspect-title" class="font-display font-bold text-lg text-white">Team Details</h3>
+          <p id="s4-inspect-subtitle" class="text-[12px] text-silver/80 font-mono mt-0.5"></p>
+        </div>
+        <button type="button" id="s4-inspect-close" class="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-sm font-semibold">
+          Close ✕
+        </button>
+      </div>
+      <div id="s4-inspect-body" class="p-6 overflow-y-auto space-y-5 text-[14px] text-ink"></div>
+    </div>
+  </div>
+
   <!-- Session 3 Team Inspect Modal -->
   <div id="s3-inspect-modal" class="hidden fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white text-ink rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-navy/15 overflow-hidden">
@@ -614,11 +837,15 @@ const s3SixChecks = sparkSession3.sixChecks;
     mentorS2Export, mentorSession2Key,
     mentorS3Overview, mentorS3SetStep, mentorS3SetReveal, mentorS3ApproveCaseFile,
     mentorS3Export, adminS3Reset,
+    mentorS4Overview, mentorS4SetStep, mentorS4SetReveal, mentorS4ApproveCaseFile,
+    mentorS4Export, adminS4Reset,
     adminReset, adminS2Reset, getStoredMentor, storeMentor, clearMentor, friendlyError, escapeHtml,
     type MentorOverview, type MentorSession, type MentorQuestionItem,
     type MentorS2Overview, type MentorS2TeamRow, type Session2AnswerKey,
     type MentorS3Overview, type MentorS3TeamRow,
+    type MentorS4Overview, type MentorS4TeamRow,
   } from '../../lib/spark/api';
+  import { sparkSession4 } from '../../data/spark';
 
   const READING_BOXES: { id: string; title: string }[] = (window as any).__S2_READING_BOXES || [];
   const CONDITION_LABELS: Record<string, string> = (window as any).__S2_CONDITION_LABELS || {};
@@ -665,6 +892,23 @@ const s3SixChecks = sparkSession3.sixChecks;
     'Key 5 · Approval',
   ];
 
+  const s4StepLabels = [
+    'Yacine’s New Message',
+    'Sort the Pieces',
+    'The Title',
+    'The Introduction',
+    'Result or Meaning?',
+    'The Abstract + Swap',
+    'Case File #4',
+  ];
+  const s4RevealLabels = [
+    'Key 1 · Sort Solutions',
+    'Key 2 · Real Title',
+    'Key 3 · 4-Move Intro',
+    'Key 4 · Result & Meaning',
+    'Key 5 · Abstract Model',
+  ];
+
   const loginForm = document.getElementById('login-form') as HTMLFormElement;
   const panel = document.getElementById('panel')!;
   const mentorBadge = document.getElementById('mentor-badge')!;
@@ -673,6 +917,12 @@ const s3SixChecks = sparkSession3.sixChecks;
   let mentor: MentorSession | null = getStoredMentor();
   let currentQuestions: MentorQuestionItem[] = [];
   let questionFilter: 'all' | 'pending' | 'approved' = 'all';
+
+  // Session 4 state
+  let s4Data: MentorS4Overview | null = null;
+  let s4Cf4Filter: 'all' | 'pending' | 'approved' = 'all';
+  let s4InspectTeamId: string | null = null;
+  let s4InspectLastHash = '';
 
   // Session 3 state
   let s3Data: MentorS3Overview | null = null;
@@ -688,46 +938,35 @@ const s3SixChecks = sparkSession3.sixChecks;
   let s2AnswerKeyCache: Session2AnswerKey | null = null;
 
   // Top Session Switcher
+  const switchS4 = document.getElementById('switch-session-4')!;
   const switchS3 = document.getElementById('switch-session-3')!;
   const switchS2 = document.getElementById('switch-session-2')!;
   const switchS1 = document.getElementById('switch-session-1')!;
+  const wrapS4 = document.getElementById('session-4-wrap')!;
   const wrapS3 = document.getElementById('session-3-wrap')!;
   const wrapS2 = document.getElementById('session-2-wrap')!;
   const wrapS1 = document.getElementById('session-1-wrap')!;
 
-  function selectSession(num: 1 | 2 | 3) {
-    if (num === 3) {
-      wrapS3.classList.remove('hidden');
-      wrapS2.classList.add('hidden');
-      wrapS1.classList.add('hidden');
-      switchS3.classList.add('bg-ink', 'text-white', 'font-semibold');
-      switchS3.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-      switchS2.classList.remove('bg-ink', 'text-white', 'font-semibold');
-      switchS2.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-      switchS1.classList.remove('bg-ink', 'text-white', 'font-semibold');
-      switchS1.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-    } else if (num === 2) {
-      wrapS2.classList.remove('hidden');
-      wrapS3.classList.add('hidden');
-      wrapS1.classList.add('hidden');
-      switchS2.classList.add('bg-ink', 'text-white', 'font-semibold');
-      switchS2.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-      switchS3.classList.remove('bg-ink', 'text-white', 'font-semibold');
-      switchS3.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-      switchS1.classList.remove('bg-ink', 'text-white', 'font-semibold');
-      switchS1.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-    } else {
-      wrapS1.classList.remove('hidden');
-      wrapS3.classList.add('hidden');
-      wrapS2.classList.add('hidden');
-      switchS1.classList.add('bg-ink', 'text-white', 'font-semibold');
-      switchS1.classList.remove('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-      switchS3.classList.remove('bg-ink', 'text-white', 'font-semibold');
-      switchS3.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-      switchS2.classList.remove('bg-ink', 'text-white', 'font-semibold');
-      switchS2.classList.add('text-muted', 'hover:text-ink', 'hover:bg-paper', 'font-medium');
-    }
+  function selectSession(num: 1 | 2 | 3 | 4) {
+    const list = [
+      { n: 4, wrap: wrapS4, btn: switchS4 },
+      { n: 3, wrap: wrapS3, btn: switchS3 },
+      { n: 2, wrap: wrapS2, btn: switchS2 },
+      { n: 1, wrap: wrapS1, btn: switchS1 },
+    ];
+    list.forEach(({ n, wrap, btn }) => {
+      const active = n === num;
+      wrap?.classList.toggle('hidden', !active);
+      btn?.classList.toggle('bg-ink', active);
+      btn?.classList.toggle('text-white', active);
+      btn?.classList.toggle('font-semibold', active);
+      btn?.classList.toggle('text-muted', !active);
+      btn?.classList.toggle('hover:text-ink', !active);
+      btn?.classList.toggle('hover:bg-paper', !active);
+      btn?.classList.toggle('font-medium', !active);
+    });
   }
+  switchS4.addEventListener('click', () => selectSession(4));
   switchS3.addEventListener('click', () => selectSession(3));
   switchS2.addEventListener('click', () => selectSession(2));
   switchS1.addEventListener('click', () => selectSession(1));
@@ -822,6 +1061,139 @@ const s3SixChecks = sparkSession3.sixChecks;
     }
   }
 
+  // Session 4 Sub-tabs
+  const s4TabOverview = document.getElementById('s4-tab-overview')!;
+  const s4TabCf4 = document.getElementById('s4-tab-cf4')!;
+  const s4TabModels = document.getElementById('s4-tab-models')!;
+  const s4ViewOverview = document.getElementById('s4-view-overview')!;
+  const s4ViewCf4 = document.getElementById('s4-view-cf4')!;
+  const s4ViewModels = document.getElementById('s4-view-models')!;
+
+  function switchS4Tab(tab: 'overview' | 'cf4' | 'models') {
+    const map = [
+      { key: 'overview', btn: s4TabOverview, view: s4ViewOverview },
+      { key: 'cf4', btn: s4TabCf4, view: s4ViewCf4 },
+      { key: 'models', btn: s4TabModels, view: s4ViewModels },
+    ] as const;
+    map.forEach(({ key, btn, view }) => {
+      const active = key === tab;
+      btn?.classList.toggle('border-blue', active);
+      btn?.classList.toggle('text-blue', active);
+      btn?.classList.toggle('font-semibold', active);
+      btn?.classList.toggle('border-transparent', !active);
+      btn?.classList.toggle('text-muted', !active);
+      btn?.classList.toggle('font-medium', !active);
+      view?.classList.toggle('hidden', !active);
+    });
+    if (tab === 'cf4') renderS4Cf4List();
+  }
+  s4TabOverview?.addEventListener('click', () => switchS4Tab('overview'));
+  s4TabCf4?.addEventListener('click', () => switchS4Tab('cf4'));
+  s4TabModels?.addEventListener('click', () => switchS4Tab('models'));
+
+  // Session 4 Jump buttons
+  const s4JumpWrap = document.getElementById('s4-jump-steps')!;
+  s4StepLabels.forEach((label, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.s4Jump = String(i);
+    b.className = 'w-7 h-7 rounded border border-navy/20 text-[12px] font-semibold hover:border-blue hover:text-blue transition-colors';
+    b.textContent = String(i);
+    b.title = `Step ${i}: ${label}`;
+    b.addEventListener('click', () => setS4Step(i));
+    s4JumpWrap?.appendChild(b);
+  });
+
+  // Session 4 Reveal toggle buttons
+  const s4RevealWrap = document.getElementById('s4-reveal-controls')!;
+  s4RevealLabels.forEach((label, idx) => {
+    const stepNum = idx + 1; // Keys 1 to 5
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.s4Reveal = String(stepNum);
+    b.className = 'px-2.5 py-2 rounded-md border text-[12px] font-semibold transition-all text-left flex items-center justify-between gap-1 bg-paper border-navy/15 text-muted hover:border-blue hover:text-ink';
+    b.innerHTML = `<span class="truncate">${escapeHtml(label)}</span><span class="s4-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy/10">OFF</span>`;
+    b.addEventListener('click', () => toggleS4Reveal(stepNum));
+    s4RevealWrap?.appendChild(b);
+  });
+
+  async function setS4Step(step: number) {
+    if (!mentor) return;
+    try {
+      await mentorS4SetStep(mentor.token, step);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  }
+
+  async function toggleS4Reveal(step: number) {
+    if (!mentor) return;
+    try {
+      const cur = Boolean(s4Data?.state?.revealed_steps?.[String(step)]);
+      await mentorS4SetReveal(mentor.token, step, !cur);
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  }
+
+  document.getElementById('s4-unlock-next')?.addEventListener('click', async () => {
+    const cur = s4Data?.state?.unlocked_step ?? 0;
+    if (cur >= 6) return alert('Session 4 is already at Step 6 (Case File #4).');
+    await setS4Step(cur + 1);
+  });
+
+  document.getElementById('s4-reveal-all')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      for (let i = 1; i <= 5; i++) {
+        await mentorS4SetReveal(mentor.token, i, true);
+      }
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s4-hide-all')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      for (let i = 1; i <= 5; i++) {
+        await mentorS4SetReveal(mentor.token, i, false);
+      }
+      await refreshAll();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s4-admin-reset')?.addEventListener('click', async () => {
+    if (!confirm('Reset Session 4 to Step 0 for all teams?')) return;
+    if (!mentor) return;
+    try {
+      await adminS4Reset(mentor.token);
+      await refreshAll();
+      alert('Session 4 reset cleanly to Step 0.');
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.querySelectorAll('.s4-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.s4-filter-btn').forEach((b) => {
+        b.classList.remove('bg-ink', 'text-white', 'font-semibold');
+        b.classList.add('bg-white', 'text-muted', 'font-medium');
+      });
+      const target = e.currentTarget as HTMLButtonElement;
+      target.classList.add('bg-ink', 'text-white', 'font-semibold');
+      target.classList.remove('bg-white', 'text-muted', 'font-medium');
+      s4Cf4Filter = target.dataset.filter as any;
+      renderS4Cf4List();
+    });
+  });
+
   // Session 1 Jump buttons
   const jumpWrap = document.getElementById('jump-steps')!;
   stepLabels.forEach((_, i) => {
@@ -895,8 +1267,9 @@ const s3SixChecks = sparkSession3.sixChecks;
     document.getElementById('admin-reset')?.classList.remove('hidden');
     document.getElementById('s2-admin-reset')?.classList.remove('hidden');
     document.getElementById('s3-admin-reset')?.classList.remove('hidden');
+    document.getElementById('s4-admin-reset')?.classList.remove('hidden');
 
-    selectSession(3);
+    selectSession(4);
     await refreshAll();
     setInterval(refreshAll, 4000);
 
@@ -910,12 +1283,23 @@ const s3SixChecks = sparkSession3.sixChecks;
   async function refreshAll() {
     if (!mentor) return;
     try {
-      const [s3OverviewData, s2OverviewData, overviewData, questionsData] = await Promise.all([
+      const [s4OverviewData, s3OverviewData, s2OverviewData, overviewData, questionsData] = await Promise.all([
+        mentorS4Overview(mentor.token).catch(() => null),
         mentorS3Overview(mentor.token),
         mentorS2Overview(mentor.token),
         mentorOverview(mentor.token),
         mentorQuestions(mentor.token),
       ]);
+
+      if (s4OverviewData) {
+        s4Data = s4OverviewData;
+        renderS4Overview(s4OverviewData);
+        if (!s4ViewCf4.classList.contains('hidden')) renderS4Cf4List();
+        if (s4InspectTeamId) {
+          const team = s4OverviewData.teams.find((t) => t.id === s4InspectTeamId);
+          if (team) renderS4InspectModalBody(team);
+        }
+      }
 
       s3Data = s3OverviewData;
       renderS3Overview(s3OverviewData);
@@ -969,6 +1353,438 @@ const s3SixChecks = sparkSession3.sixChecks;
       }
     }
   }
+
+  /* =========================================================================
+     SESSION 4 RENDERING & HANDLERS
+     ========================================================================= */
+  function renderS4Overview(data: MentorS4Overview) {
+    const curStep = data.state?.unlocked_step ?? 0;
+    const stepLabel = document.getElementById('s4-current-step');
+    if (stepLabel) {
+      stepLabel.textContent = `Step ${curStep} · ${s4StepLabels[curStep] || ''}`;
+    }
+
+    // Update S4 jump buttons
+    document.querySelectorAll<HTMLButtonElement>('#s4-jump-steps button').forEach((b) => {
+      const step = Number(b.dataset.s4Jump);
+      const active = step === curStep;
+      b.classList.toggle('bg-blue', active);
+      b.classList.toggle('text-white', active);
+      b.classList.toggle('border-blue', active);
+    });
+
+    // Update S4 reveal buttons
+    const revs = (data.state?.revealed_steps || {}) as Record<string, boolean>;
+    document.querySelectorAll<HTMLButtonElement>('#s4-reveal-controls button').forEach((b) => {
+      const step = b.dataset.s4Reveal;
+      const isRev = step !== undefined && Boolean(revs[step]);
+      const pill = b.querySelector('.s4-rev-pill');
+      b.classList.toggle('bg-emerald-50', isRev);
+      b.classList.toggle('border-emerald-300', isRev);
+      b.classList.toggle('text-emerald-950', isRev);
+      if (pill) {
+        pill.textContent = isRev ? 'REVEALED' : 'OFF';
+        pill.className = `s4-rev-pill font-mono text-[10px] px-1.5 py-0.5 rounded font-bold ${
+          isRev ? 'bg-emerald-600 text-white' : 'bg-navy/10 text-muted'
+        }`;
+      }
+    });
+
+    // Stats
+    const teams = data.teams || [];
+    let sortCount = 0;
+    let titleCount = 0;
+    let introCount = 0;
+    let pendingCount = 0;
+    let approvedCount = 0;
+
+    teams.forEach((t) => {
+      if (t.step1_sort && Object.keys(t.step1_sort).length > 0) sortCount++;
+      if (t.step2_final_title || t.step2_title) titleCount++;
+      const m = t.step3_moves as any;
+      if (m && (m.move1 || m.move2 || m.move3 || m.move4 || m.m1 || m.m2 || m.m3 || m.m4)) introCount++;
+      if (t.cf4_status === 'pending') pendingCount++;
+      if (t.cf4_status === 'approved') approvedCount++;
+    });
+
+    const statTeams = document.getElementById('s4-stat-teams');
+    const statSort = document.getElementById('s4-stat-sort');
+    const statTitle = document.getElementById('s4-stat-title');
+    const statIntro = document.getElementById('s4-stat-intro');
+    const statPending = document.getElementById('s4-stat-pending');
+    const statApproved = document.getElementById('s4-stat-approved');
+    const pendingBadge = document.getElementById('s4-cards-pending-badge');
+
+    if (statTeams) statTeams.textContent = String(teams.length);
+    if (statSort) statSort.textContent = String(sortCount);
+    if (statTitle) statTitle.textContent = String(titleCount);
+    if (statIntro) statIntro.textContent = String(introCount);
+    if (statPending) statPending.textContent = String(pendingCount);
+    if (statApproved) statApproved.textContent = String(approvedCount);
+    if (pendingBadge) {
+      pendingBadge.textContent = String(pendingCount);
+      pendingBadge.classList.toggle('hidden', pendingCount === 0);
+    }
+
+    // Render S4 Table
+    const tbody = document.getElementById('s4-teams-body');
+    if (!tbody) return;
+    if (!teams.length) {
+      tbody.innerHTML = '<tr><td colspan="10" class="p-6 text-center text-muted">No teams registered yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = teams
+      .map((t) => {
+        const sortCardsCount = Object.keys(t.step1_sort || {}).length;
+        const titleText = (t.step2_final_title || t.step2_title || '').trim();
+        const m = (t.step3_moves || {}) as any;
+        const introFilled = [
+          m.move1 || m.m1,
+          m.move2 || m.m2,
+          m.move3 || m.m3,
+          m.move4 || m.m4,
+        ].filter((str) => str && str.trim().length > 0).length;
+        const resOk = Boolean(t.step4_result && t.step4_result.trim());
+        const discOk = Boolean(t.step4_discussion && t.step4_discussion.trim());
+        const absObj = (t.step5_improved_abstract || t.step5_abstract || {}) as any;
+        const absFilled = [
+          absObj.a1 || absObj.c,
+          absObj.a2 || absObj.g,
+          absObj.a3 || absObj.m,
+          absObj.a4 || absObj.r,
+          absObj.a5 || absObj.meaning,
+        ].filter((s) => s && s.trim().length > 0).length;
+
+        let cf4Badge = '<span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper text-muted border border-navy/10">Draft</span>';
+        if (t.cf4_status === 'approved') {
+          cf4Badge = '<span class="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">✓ Approved</span>';
+        } else if (t.cf4_status === 'pending') {
+          cf4Badge = '<span class="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500 text-white font-bold animate-pulse">● Pending</span>';
+        }
+
+        const updatedStr = t.s4_updated_at ? new Date(t.s4_updated_at).toLocaleTimeString() : '—';
+
+        return `
+          <tr class="hover:bg-paper/60 transition-colors">
+            <td class="p-3.5 font-bold font-mono text-ink">${escapeHtml(t.name)} <span class="text-muted font-normal text-xs">(${escapeHtml(t.code)})</span></td>
+            <td class="p-3.5 text-body text-[12px] max-w-xs truncate">${escapeHtml((t.members || []).join(', ') || '—')}</td>
+            <td class="p-3.5 font-mono text-[12px]">${sortCardsCount > 0 ? `<span class="text-blue font-bold">${sortCardsCount}/8 sorted</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 text-[12px] max-w-xs truncate" title="${escapeHtml(titleText)}">${titleText ? escapeHtml(titleText) : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono text-[12px]">${introFilled > 0 ? `<span class="text-emerald-700 font-semibold">${introFilled}/4 moves</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono text-[12px]">${(resOk || discOk) ? `<span class="text-blue font-semibold">R:${resOk ? '✓' : '—'} D:${discOk ? '✓' : '—'}</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5 font-mono text-[12px]">${absFilled > 0 ? `<span class="text-ink font-semibold">${absFilled}/5 sents</span>` : '<span class="text-muted">—</span>'}</td>
+            <td class="p-3.5">${cf4Badge}</td>
+            <td class="p-3.5 font-mono text-[11px] text-muted">${updatedStr}</td>
+            <td class="p-3.5 text-right">
+              <button type="button" class="s4-inspect-btn px-2.5 py-1 text-xs font-semibold rounded bg-paper hover:bg-white text-ink border border-navy/15 shadow-2xs" data-team-id="${escapeHtml(t.id)}">
+                Inspect ↗
+              </button>
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    tbody.querySelectorAll<HTMLButtonElement>('.s4-inspect-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.teamId;
+        if (id) openS4InspectModal(id);
+      });
+    });
+  }
+
+  function renderS4Cf4List() {
+    const container = document.getElementById('s4-cf4-list');
+    if (!container) return;
+    let teams = (s4Data?.teams || []).filter((t) => {
+      const hasContent = Boolean(
+        t.step2_final_title ||
+        t.step2_title ||
+        t.step5_abstract?.c ||
+        t.step5_improved_abstract?.c ||
+        t.cf4_status !== 'draft'
+      );
+      return hasContent;
+    });
+
+    if (s4Cf4Filter === 'pending') teams = teams.filter((t) => t.cf4_status === 'pending');
+    if (s4Cf4Filter === 'approved') teams = teams.filter((t) => t.cf4_status === 'approved');
+
+    if (!teams.length) {
+      container.innerHTML = `<p class="text-center py-12 text-muted">No Case File #4 submissions matching filter "${escapeHtml(s4Cf4Filter)}".</p>`;
+      return;
+    }
+
+    container.innerHTML = teams
+      .map((t) => {
+        const finalTitle = t.step2_final_title || t.step2_title || 'Untitled Mini Paper';
+        const abs = (t.step5_improved_abstract || t.step5_abstract || {}) as any;
+        const abstractFull = [
+          abs.a1 || abs.c,
+          abs.a2 || abs.g,
+          abs.a3 || abs.m,
+          abs.a4 || abs.r,
+          abs.a5 || abs.meaning,
+        ].filter((s) => s && s.trim()).join(' ');
+        const m = (t.step3_moves || {}) as any;
+        const m1 = m.move1 || m.m1;
+        const m2 = m.move2 || m.m2;
+        const m3 = m.move3 || m.m3;
+        const m4 = m.move4 || m.m4;
+        const introMoves = [
+          m1 ? `<strong>Move 1 (Context):</strong> ${escapeHtml(m1)}` : '',
+          m2 ? `<strong>Move 2 (Gap):</strong> ${escapeHtml(m2)}` : '',
+          m3 ? `<strong>Move 3 (Question):</strong> ${escapeHtml(m3)}` : '',
+          m4 ? `<strong>Move 4 (Roadmap):</strong> ${escapeHtml(m4)}` : '',
+        ].filter(Boolean).join('<br/>');
+
+        const isApproved = t.cf4_status === 'approved';
+        const isPending = t.cf4_status === 'pending';
+
+        return `
+          <div class="bg-white border ${isApproved ? 'border-emerald-300 ring-1 ring-emerald-200' : isPending ? 'border-amber-300 ring-1 ring-amber-200' : 'border-navy/10'} rounded-xl p-6 shadow-sm space-y-4" data-team-id="${escapeHtml(t.id)}">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-3">
+              <div>
+                <span class="font-bold text-ink font-mono text-base">${escapeHtml(t.name)} (${escapeHtml(t.code)})</span>
+                <p class="text-[12px] text-muted">${escapeHtml((t.members || []).join(', ') || '—')}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                ${
+                  isApproved
+                    ? `<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded text-[12px] flex items-center gap-1">✓ Approved ${t.cf4_approved_by ? `by ${escapeHtml(t.cf4_approved_by)}` : ''}</span>`
+                    : isPending
+                    ? '<span class="bg-amber-100 text-amber-900 font-semibold px-2.5 py-1 rounded text-[12px] animate-pulse">● Pending Approval</span>'
+                    : '<span class="bg-paper text-muted border border-navy/10 px-2.5 py-1 rounded text-[12px]">Draft</span>'
+                }
+                <button type="button" class="s4-inspect-btn text-[12px] text-blue hover:underline font-mono ml-2" data-team-id="${escapeHtml(t.id)}">Inspect full →</button>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-bold">Paper Title:</span>
+              <p class="font-display font-bold text-base sm:text-lg text-ink">"${escapeHtml(finalTitle)}"</p>
+            </div>
+
+            <div class="bg-paper p-4 rounded-lg border border-navy/10 space-y-2">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-blue font-bold">Abstract (5 Sentences):</span>
+              <p class="text-[13px] text-ink leading-relaxed font-serif">${abstractFull ? escapeHtml(abstractFull) : '<span class="text-muted italic">No abstract written yet</span>'}</p>
+            </div>
+
+            ${
+              introMoves
+                ? `
+              <div class="text-[12px] text-body bg-paper/60 p-3 rounded border border-navy/10 space-y-1">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-muted font-bold block">Introduction (4 Moves):</span>
+                ${introMoves}
+              </div>
+            `
+                : ''
+            }
+
+            <div class="grid sm:grid-cols-2 gap-3 text-[12px] bg-paper/40 p-3 rounded border border-navy/10">
+              <div>
+                <strong class="text-ink block">Result (Facts Only):</strong>
+                <p class="text-body mt-0.5">${t.step4_result ? escapeHtml(t.step4_result) : '<span class="text-muted">—</span>'}</p>
+              </div>
+              <div>
+                <strong class="text-ink block">Discussion (Mechanism + Limit):</strong>
+                <p class="text-body mt-0.5">${t.step4_discussion ? escapeHtml(t.step4_discussion) : '<span class="text-muted">—</span>'}</p>
+              </div>
+            </div>
+
+            ${
+              t.cf4_hardest
+                ? `
+              <div class="text-[12px] text-muted italic">
+                <strong>What was hardest:</strong> "${escapeHtml(t.cf4_hardest)}"
+              </div>
+            `
+                : ''
+            }
+
+            ${
+              !isApproved
+                ? `
+              <div class="pt-2 border-t border-navy/10 flex flex-wrap items-center justify-between gap-3">
+                <p class="text-xs text-muted">Approving records green ✓ and unlocks final preprint celebration on team screen.</p>
+                <button type="button" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white font-semibold s4-approve-btn flex items-center gap-1.5" data-team-id="${escapeHtml(t.id)}">
+                  <span>✓ Approve Case File #4</span>
+                </button>
+              </div>
+            `
+                : ''
+            }
+          </div>
+        `;
+      })
+      .join('');
+
+    container.querySelectorAll<HTMLButtonElement>('.s4-inspect-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.teamId;
+        if (id) openS4InspectModal(id);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('.s4-approve-btn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        if (!mentor) return;
+        const target = e.currentTarget as HTMLButtonElement;
+        const teamId = target.dataset.teamId!;
+        target.disabled = true;
+        target.textContent = 'Approving…';
+        try {
+          await mentorS4ApproveCaseFile(mentor.token, teamId, mentor.mentorName);
+          await refreshAll();
+        } catch (err: any) {
+          alert(friendlyError(err));
+          target.disabled = false;
+          target.textContent = '✓ Approve Case File #4';
+        }
+      });
+    });
+  }
+
+  function openS4InspectModal(teamId: string) {
+    s4InspectTeamId = teamId;
+    const team = (s4Data?.teams || []).find((t) => t.id === teamId);
+    if (!team) return;
+    document.getElementById('s4-inspect-modal')?.classList.remove('hidden');
+    renderS4InspectModalBody(team);
+  }
+
+  function renderS4InspectModalBody(t: MentorS4TeamRow) {
+    document.getElementById('s4-inspect-title')!.textContent = `${t.name} (${t.code})`;
+    document.getElementById('s4-inspect-subtitle')!.textContent = `Members: ${(t.members || []).join(', ') || '—'}`;
+
+    const body = document.getElementById('s4-inspect-body')!;
+    const prevScroll = body.scrollTop;
+
+    const sortCardsHtml = Object.entries(t.step1_sort || {})
+      .map(([card, col]) => `<span class="px-2 py-0.5 bg-paper border border-navy/10 rounded font-mono text-[11px]">Card ${escapeHtml(card)}: <strong>${escapeHtml(col)}</strong></span>`)
+      .join(' ');
+
+    const titleChecksHtml = (t.step2_checks || [])
+      .map((c) => `<span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded text-[11px] font-semibold">✓ ${escapeHtml(c)}</span>`)
+      .join(' ');
+
+    const isApproved = t.cf4_status === 'approved';
+
+    body.innerHTML = `
+      <!-- Step 1 Sort -->
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 1 · IMRD Sentence Sort (${Object.keys(t.step1_sort || {}).length}/8 Placed)</p>
+        <div class="flex flex-wrap gap-1.5">${sortCardsHtml || '<span class="text-muted">No cards sorted yet</span>'}</div>
+      </div>
+
+      <!-- Step 2 Title -->
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 2 · Title Recipe &amp; Final Title</p>
+        <p><strong>Working Draft:</strong> ${t.step2_title?.trim() ? escapeHtml(t.step2_title) : '<span class="text-muted">—</span>'}</p>
+        <p><strong>Final Polished Title:</strong> ${t.step2_final_title?.trim() ? `<span class="text-ink font-semibold">"${escapeHtml(t.step2_final_title)}"</span>` : '<span class="text-muted">—</span>'}</p>
+        <div class="flex flex-wrap gap-1.5 pt-1">${titleChecksHtml || '<span class="text-muted text-xs">No self-checks checked yet</span>'}</div>
+      </div>
+
+      <!-- Step 3 Intro -->
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 3 · The 4-Move Introduction</p>
+        <div class="space-y-1.5 text-[13px] bg-paper p-3 rounded border border-navy/10">
+          <p><strong>Move 1 (Context):</strong> ${(t.step3_moves as any)?.move1 || (t.step3_moves as any)?.m1 ? escapeHtml((t.step3_moves as any)?.move1 || (t.step3_moves as any)?.m1) : '—'}</p>
+          <p><strong>Move 2 (Gap):</strong> ${(t.step3_moves as any)?.move2 || (t.step3_moves as any)?.m2 ? escapeHtml((t.step3_moves as any)?.move2 || (t.step3_moves as any)?.m2) : '—'}</p>
+          <p><strong>Move 3 (Question):</strong> ${(t.step3_moves as any)?.move3 || (t.step3_moves as any)?.m3 ? escapeHtml((t.step3_moves as any)?.move3 || (t.step3_moves as any)?.m3) : '—'}</p>
+          <p><strong>Move 4 (Roadmap):</strong> ${(t.step3_moves as any)?.move4 || (t.step3_moves as any)?.m4 ? escapeHtml((t.step3_moves as any)?.move4 || (t.step3_moves as any)?.m4) : '—'}</p>
+        </div>
+      </div>
+
+      <!-- Step 4 Result & Discussion -->
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 4 · Result or Meaning?</p>
+        <p><strong>Result (Pure Facts):</strong> ${t.step4_result?.trim() ? escapeHtml(t.step4_result) : '<span class="text-muted">—</span>'}</p>
+        <p><strong>Discussion (Mechanism + Limit):</strong> ${t.step4_discussion?.trim() ? escapeHtml(t.step4_discussion) : '<span class="text-muted">—</span>'}</p>
+      </div>
+
+      <!-- Step 5 Abstract & Peer Review -->
+      <div class="space-y-2 border-b border-navy/10 pb-4">
+        <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 5 · Abstract Draft &amp; Peer Review</p>
+        <div class="space-y-1 text-[13px] bg-paper p-3 rounded border border-navy/10">
+          <p><strong>1. Context:</strong> ${(t.step5_improved_abstract as any)?.a1 || (t.step5_abstract as any)?.a1 || (t.step5_improved_abstract as any)?.c || (t.step5_abstract as any)?.c ? escapeHtml((t.step5_improved_abstract as any)?.a1 || (t.step5_abstract as any)?.a1 || (t.step5_improved_abstract as any)?.c || (t.step5_abstract as any)?.c) : '—'}</p>
+          <p><strong>2. Gap/Aim:</strong> ${(t.step5_improved_abstract as any)?.a2 || (t.step5_abstract as any)?.a2 || (t.step5_improved_abstract as any)?.g || (t.step5_abstract as any)?.g ? escapeHtml((t.step5_improved_abstract as any)?.a2 || (t.step5_abstract as any)?.a2 || (t.step5_improved_abstract as any)?.g || (t.step5_abstract as any)?.g) : '—'}</p>
+          <p><strong>3. Method:</strong> ${(t.step5_improved_abstract as any)?.a3 || (t.step5_abstract as any)?.a3 || (t.step5_improved_abstract as any)?.m || (t.step5_abstract as any)?.m ? escapeHtml((t.step5_improved_abstract as any)?.a3 || (t.step5_abstract as any)?.a3 || (t.step5_improved_abstract as any)?.m || (t.step5_abstract as any)?.m) : '—'}</p>
+          <p><strong>4. Result:</strong> ${(t.step5_improved_abstract as any)?.a4 || (t.step5_abstract as any)?.a4 || (t.step5_improved_abstract as any)?.r || (t.step5_abstract as any)?.r ? escapeHtml((t.step5_improved_abstract as any)?.a4 || (t.step5_abstract as any)?.a4 || (t.step5_improved_abstract as any)?.r || (t.step5_abstract as any)?.r) : '—'}</p>
+          <p><strong>5. Meaning:</strong> ${(t.step5_improved_abstract as any)?.a5 || (t.step5_abstract as any)?.a5 || (t.step5_improved_abstract as any)?.meaning || (t.step5_abstract as any)?.meaning ? escapeHtml((t.step5_improved_abstract as any)?.a5 || (t.step5_improved_abstract as any)?.a5 || (t.step5_improved_abstract as any)?.meaning || (t.step5_abstract as any)?.meaning) : '—'}</p>
+        </div>
+        ${
+          t.step5_peer_review?.star
+            ? `
+          <div class="text-xs space-y-1 pt-1">
+            <p><strong>Peer Review Given:</strong> ★ ${escapeHtml(t.step5_peer_review.star)} | 💡 ${escapeHtml(t.step5_peer_review.wish || '—')}</p>
+          </div>
+        `
+            : ''
+        }
+      </div>
+
+      <!-- Step 6 Case File #4 -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <p class="font-mono text-[11px] uppercase font-bold text-blue">Step 6 · Case File #4 Status (${escapeHtml(t.cf4_status)})</p>
+          ${
+            !isApproved
+              ? `<button type="button" id="s4-modal-quick-approve" class="btn btn-sm btn-primary bg-emerald-600 hover:bg-emerald-700 text-white !py-1 !px-3 !text-[12px]">✓ Approve Case File #4</button>`
+              : '<span class="text-emerald-700 font-semibold text-[12px]">✓ Approved</span>'
+          }
+        </div>
+        ${
+          t.cf4_hardest
+            ? `<p class="text-xs text-muted"><strong>Reflection:</strong> "${escapeHtml(t.cf4_hardest)}"</p>`
+            : ''
+        }
+      </div>
+    `;
+
+    body.scrollTop = prevScroll;
+
+    body.querySelector<HTMLButtonElement>('#s4-modal-quick-approve')?.addEventListener('click', async (e) => {
+      if (!mentor) return;
+      const btn = e.currentTarget as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = 'Approving…';
+      try {
+        await mentorS4ApproveCaseFile(mentor.token, t.id, mentor.mentorName);
+        await refreshAll();
+      } catch (err: any) {
+        alert(friendlyError(err));
+        btn.disabled = false;
+        btn.textContent = '✓ Approve Case File #4';
+      }
+    });
+  }
+
+  document.getElementById('s4-export-csv')?.addEventListener('click', async () => {
+    if (!mentor) return;
+    try {
+      const rows = await mentorS4Export(mentor.token);
+      if (!rows.length) return alert('No teams yet.');
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(','),
+        ...rows.map((r) => headers.map((h) => safeCsvCell((r as any)[h])).join(',')),
+      ].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `spark-session-4-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    } catch (e) {
+      alert(friendlyError(e));
+    }
+  });
+
+  document.getElementById('s4-inspect-close')?.addEventListener('click', () => {
+    document.getElementById('s4-inspect-modal')?.classList.add('hidden');
+    s4InspectTeamId = null;
+  });
 
   /* =========================================================================
      SESSION 3 RENDERING & HANDLERS
