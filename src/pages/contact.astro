@@ -8,6 +8,7 @@ import SectionHeader from '../components/ui/SectionHeader.astro';
 import Icon from '../components/ui/Icon.astro';
 import { getDepartmentHeads } from '../lib/content';
 import { initials } from '../lib/format';
+import { assetUrl } from '../lib/assets';
 import { site, registrations } from '../data/site';
 import { contactForm, contactTopics, mapUrl } from '../data/contact';
 
@@ -129,7 +130,7 @@ const contactSchema = {
               <ul class="grid gap-px bg-navy/10 border-t border-navy/10" role="list">
                 {p.heads.map((m) => (
                   <li class="person-row">
-                    <span class="person-avatar">{m.data.photo ? <img src={m.data.photo} alt="" loading="lazy" /> : initials(m.data.name)}</span>
+                    <span class="person-avatar">{m.data.photo ? <img src={assetUrl(m.data.photo)} alt="" loading="lazy" /> : initials(m.data.name)}</span>
                     <span>
                       <span class="block text-[15px] font-semibold text-ink">{m.data.name}</span>
                       <span class="block font-mono text-[12px] text-muted">Head · {p.dept.data.name.split(' & ')[0]}</span>

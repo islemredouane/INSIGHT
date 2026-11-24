@@ -62,3 +62,9 @@ scratch/
 *Mentor_Copy*.pdf
 *.pdf
 
+# Large photos are hosted on Cloudflare R2 (assetUrl() points the site there), so they
+# must never be bundled into the Vercel deployment. Keep the files locally in public/
+# and publish them with `npm run sync-r2`. See CONTRIBUTING.md.
+/public/crew/
+/public/events/welcome-day-2026/
+

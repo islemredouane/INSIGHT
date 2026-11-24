@@ -15,7 +15,7 @@ const crew = defineCollection({
     department: z.string().optional(), // department id
     pole: z.string().optional(), // pole id
     duty: z.string().optional(), // one line, shown on cards
-    photo: z.string().optional(), // path under /public, e.g. /crew/faci.jpg
+    photo: z.string().optional(), // path under /public, e.g. /crew/faci.webp
     photoPosition: z.string().optional(), // CSS object-position, e.g. "top" or "center 20%"
     order: z.number().default(100),
     season: z.string().default('2026/27'),

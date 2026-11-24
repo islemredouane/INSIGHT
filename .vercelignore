@@ -1,0 +1,31 @@
+# Files skipped when deploying from this machine with the `vercel` CLI.
+# (Git-connected deploys build from the repo itself, so this file does not affect them.)
+#
+# IMPORTANT: every folder pattern starts with "/" so it only matches the repo root.
+# Without the slash, `spark/` would also swallow src/pages/spark/ and `brand/` would
+# swallow public/brand/ (the logo), which would break the site.
+
+# Local-only work, raw media and scratch folders
+/spark/
+/spark-2026/
+/design/
+/brand/
+/docs/
+/scratch/
+
+# Large photos are served from Cloudflare R2, never bundled (see CONTRIBUTING.md)
+/public/crew/
+/public/events/welcome-day-2026/
+
+# Loose files in the project root (answer keys, specs, raw video)
+/*.pdf
+/*.MOV
+/*.mp4
+
+# Tooling state, build output and secrets
+/dist/
+/.astro/
+/.claude/
+/.vscode/
+.env
+.env.*

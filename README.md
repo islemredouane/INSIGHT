@@ -273,6 +273,8 @@ npm run sync-r2
 ```
 The script (`scripts/sync-r2.mjs`) scans `public/` media directories (`events`, `crew`, `researchers`, `labs`, `brand`, `og`), skips cached assets by size/hash, uploads new files, and sets immutable 1-year cache headers (`Cache-Control: public, max-age=31536000, immutable`).
 
+> `public/crew/` and `public/events/welcome-day-2026/` are gitignored: those photos live on R2 only, so they are not stored again in every Vercel deployment. See [CONTRIBUTING.md](CONTRIBUTING.md#-engineering--architectural-standards) for how to add one.
+
 <br>
 
 ---

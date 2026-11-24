@@ -18,26 +18,26 @@ programme:
     text: Live from IBM Research, New York (11:30 local time), on trustworthy AI, adversarial robustness and LLM safety.
   - title: Game time
     text: The crew meets the new recruits.
-cover: /events/welcome-day-2026/cover.jpg
+cover: /events/welcome-day-2026/cover.webp
 gallery:
-  - /events/welcome-day-2026/welcome-day-1.jpg
-  - /events/welcome-day-2026/welcome-day-2.jpg
-  - /events/welcome-day-2026/welcome-day-3.jpg
-  - /events/welcome-day-2026/welcome-day-4.jpg
-  - /events/welcome-day-2026/welcome-day-5.jpg
-  - /events/welcome-day-2026/live.jpg
-  - /events/welcome-day-2026/welcome-day-6.jpg
-  - /events/welcome-day-2026/welcome-day-7.jpg
-  - /events/welcome-day-2026/game.jpg
-  - /events/welcome-day-2026/welcome-day-8.jpg
-  - /events/welcome-day-2026/welcome-day-9.jpg
-  - /events/welcome-day-2026/welcome-day-10.jpg
-  - /events/welcome-day-2026/welcome-day-11.jpg
-  - /events/welcome-day-2026/welcome-day-12.jpg
-  - /events/welcome-day-2026/winners-and-prizes.jpg
-  - /events/welcome-day-2026/welcome-day-13.png
-  - /events/welcome-day-2026/welcome-day-14.png
-  - /events/welcome-day-2026/welcome-day-15.png
+  - /events/welcome-day-2026/welcome-day-1.webp
+  - /events/welcome-day-2026/welcome-day-2.webp
+  - /events/welcome-day-2026/welcome-day-3.webp
+  - /events/welcome-day-2026/welcome-day-4.webp
+  - /events/welcome-day-2026/welcome-day-5.webp
+  - /events/welcome-day-2026/live.webp
+  - /events/welcome-day-2026/welcome-day-6.webp
+  - /events/welcome-day-2026/welcome-day-7.webp
+  - /events/welcome-day-2026/game.webp
+  - /events/welcome-day-2026/welcome-day-8.webp
+  - /events/welcome-day-2026/welcome-day-9.webp
+  - /events/welcome-day-2026/welcome-day-10.webp
+  - /events/welcome-day-2026/welcome-day-11.webp
+  - /events/welcome-day-2026/welcome-day-12.webp
+  - /events/welcome-day-2026/winners-and-prizes.webp
+  - /events/welcome-day-2026/welcome-day-13.webp
+  - /events/welcome-day-2026/welcome-day-14.webp
+  - /events/welcome-day-2026/welcome-day-15.webp
 ---
 
 On 4 November 2026, INSIGHT officially set sail at ESTIN in Amizour, Béjaïa. The opening ceremony gathered students, faculty, and research enthusiasts to introduce the vision of the school's dedicated scientific research club: an open, student-led environment designed to bridge the gap between undergraduate computer science studies and peer-reviewed scientific discovery.

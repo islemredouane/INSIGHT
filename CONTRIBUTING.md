@@ -84,6 +84,11 @@ All user-facing surfaces adhere to INSIGHT's established tokens:
 ### 2. Media Decoupling
 To keep Git history lean, heavy event photography and high-res keynote recordings are stored in **Cloudflare R2** and resolved via `src/lib/assets.ts`. Avoid committing multi-megabyte raw photos directly into `public/`.
 
+Every Vercel deployment stores a full copy of the build, so big files multiply on every push. The crew portraits (`public/crew/`) and the Welcome Day gallery (`public/events/welcome-day-2026/`) are therefore **gitignored on purpose**: they live only on your machine and on R2. To add or change a photo:
+1. Export it as **WebP** (portraits about 800px wide, gallery photos at most 1920px wide, under about 250 KB).
+2. Save it in the matching `public/` folder and run `npm run sync-r2` (needs the `R2_*` keys in `.env.local`).
+3. Reference it by path (for example `/crew/name.webp`) in `src/content/`. The site resolves it to the R2 URL.
+
 ### 3. Pre-Flight Verification
 Before opening a Pull Request or pushing commits to `main`:
 1. Run `npm run build` to verify clean static page generation.

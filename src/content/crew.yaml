@@ -1,5 +1,7 @@
 # The crew, 2026/27 — from the Welcome Day 2026 deck.
-# group: helm | department | pole | member      photo: put the file in public/crew/ and write e.g. /crew/faci.jpg
+# group: helm | department | pole | member
+# photo: save a WebP (about 800px wide) in public/crew/, run `npm run sync-r2` to upload it to R2,
+#        then write e.g. /crew/faci.webp. public/crew/ is gitignored on purpose (it lives on R2).
 
 # ---------- The Helm ----------
 - id: faci-souhaib-abdelouakil
@@ -7,14 +9,14 @@
   role: President
   group: helm
   duty: Leads the club and represents it.
-  photo: /crew/faci-souhaib-abdelouakil.jpg
+  photo: /crew/faci-souhaib-abdelouakil.webp
   order: 1
 - id: madaoui-sara
   name: Madaoui Sara
   role: Founder · Vice-president
   group: helm
   duty: Runs meetings and strategy.
-  photo: /crew/madaoui-sara.png
+  photo: /crew/madaoui-sara.webp
   photoPosition: "center 70%"
   email: s_madaoui@estin.dz
   order: 2
@@ -23,14 +25,14 @@
   role: Vice-president
   group: helm
   duty: Runs meetings and strategy.
-  photo: /crew/redouane-mohamed-islem.jpg
+  photo: /crew/redouane-mohamed-islem.webp
   order: 3
 - id: feltane-anayis
   name: Feltane Anayis
   role: Secretary general
   group: helm
   duty: Keeps the club's records and documents.
-  photo: /crew/feltane-anayis.jpg
+  photo: /crew/feltane-anayis.webp
   photoPosition: top
   order: 4
 - id: madoui-roufaida
@@ -38,7 +40,7 @@
   role: Secretary general
   group: helm
   duty: Keeps the club's records and documents.
-  photo: /crew/madoui-roufaida.jpg
+  photo: /crew/madoui-roufaida.webp
   photoPosition: top
   order: 5
 - id: ghasmoune-mohammed
@@ -46,33 +48,33 @@
   role: Treasurer
   group: helm
   duty: Manages the budget and funding.
-  photo: /crew/ghasmoune-mohammed.jpg
+  photo: /crew/ghasmoune-mohammed.webp
   photoPosition: top
   order: 6
 
 # ---------- Department heads ----------
-- { id: manadi-tasnime, name: Manadi Tasnime, role: Head, group: department, department: communication, photo: /crew/manadi-tasnime.jpg, photoPosition: "35% center", order: 10 }
-- { id: bouras-firas, name: Bouras Firas, role: Head, group: department, department: communication, photo: /crew/bouras-firas.jpg, photoPosition: top, order: 11 }
-- { id: rachedi-aya-meriem, name: Rachedi Aya Meriem, role: Head, group: department, department: communication, photo: /crew/rachedi-aya-meriem.png, order: 12 }
-- { id: djeddi-lila, name: Djeddi Lila, role: Head, group: department, department: design, photo: /crew/djeddi-lila.png, photoPosition: top, order: 20 }
+- { id: manadi-tasnime, name: Manadi Tasnime, role: Head, group: department, department: communication, photo: /crew/manadi-tasnime.webp, photoPosition: "35% center", order: 10 }
+- { id: bouras-firas, name: Bouras Firas, role: Head, group: department, department: communication, photo: /crew/bouras-firas.webp, photoPosition: top, order: 11 }
+- { id: rachedi-aya-meriem, name: Rachedi Aya Meriem, role: Head, group: department, department: communication, photo: /crew/rachedi-aya-meriem.webp, order: 12 }
+- { id: djeddi-lila, name: Djeddi Lila, role: Head, group: department, department: design, photo: /crew/djeddi-lila.webp, photoPosition: top, order: 20 }
 - { id: boursasa-lotfi-abdelmoumene, name: Boursasa Lotfi Abdelmoumene, role: Head, group: department, department: design, order: 21 }
-- { id: sadok-ikram, name: Sadok Ikram, role: Head, group: department, department: design, photo: /crew/sadok-ikram.jpg, photoPosition: "right center", order: 22 }
-- { id: richi-roufaida, name: Richi Roufaida, role: Head, group: department, department: events, photo: /crew/richi-roufaida.jpg, order: 30 }
-- { id: belkaioua-nouha, name: Belkaioua Nouha, role: Head, group: department, department: events, photo: /crew/belkaioua-nouha.jpg, order: 31 }
-- { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, photo: /crew/diabi-lyna.jpg, photoPosition: top, order: 32 }
-- { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, photo: /crew/bey-ahmed-khernache-mounir.png, photoPosition: top, email: m_beyahmedkhernache@estin.dz, order: 40 }
-- { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, photo: /crew/abadelia-mohammed-abdelghani.jpg, photoPosition: top, order: 41 }
+- { id: sadok-ikram, name: Sadok Ikram, role: Head, group: department, department: design, photo: /crew/sadok-ikram.webp, photoPosition: "right center", order: 22 }
+- { id: richi-roufaida, name: Richi Roufaida, role: Head, group: department, department: events, photo: /crew/richi-roufaida.webp, order: 30 }
+- { id: belkaioua-nouha, name: Belkaioua Nouha, role: Head, group: department, department: events, photo: /crew/belkaioua-nouha.webp, order: 31 }
+- { id: diabi-lyna, name: Diabi Lyna, role: Head, group: department, department: events, photo: /crew/diabi-lyna.webp, photoPosition: top, order: 32 }
+- { id: bey-ahmed-khernache-mounir, name: Bey Ahmed Khernache Mounir, role: Head, group: department, department: external-relations, photo: /crew/bey-ahmed-khernache-mounir.webp, photoPosition: top, email: m_beyahmedkhernache@estin.dz, order: 40 }
+- { id: abadelia-mohammed-abdelghani, name: Abadelia Mohammed Abdelghani, role: Head, group: department, department: external-relations, photo: /crew/abadelia-mohammed-abdelghani.webp, photoPosition: top, order: 41 }
 - { id: dou-abderraouf, name: Dou Abderraouf, role: Head, group: department, department: external-relations, order: 42 }
-- { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, photo: /crew/belkerrouche-asma.jpg, photoPosition: top, order: 50 }
-- { id: hachemi-zakaria, name: Hachemi Zakaria, role: Head, group: department, department: hr, photo: /crew/hachemi-zakaria.jpg, photoPosition: "right top", order: 51 }
-- { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, photo: /crew/allaoua-ait-abdelghani.jpg, order: 60 }
-- { id: sakhri-mohammed-firas, name: Sakhri Mohammed Firas, role: Head of Training, group: department, department: training, photo: /crew/sakhri-mohammed-firas.png, photoPosition: top, order: 70 }
+- { id: belkerrouche-asma, name: Belkerrouche Asma, role: Head, group: department, department: hr, photo: /crew/belkerrouche-asma.webp, photoPosition: top, order: 50 }
+- { id: hachemi-zakaria, name: Hachemi Zakaria, role: Head, group: department, department: hr, photo: /crew/hachemi-zakaria.webp, photoPosition: "right top", order: 51 }
+- { id: allaoua-ait-abdelghani, name: Allaoua Ait Abdelghani, role: Head of Research, group: department, department: research, photo: /crew/allaoua-ait-abdelghani.webp, order: 60 }
+- { id: sakhri-mohammed-firas, name: Sakhri Mohammed Firas, role: Head of Training, group: department, department: training, photo: /crew/sakhri-mohammed-firas.webp, photoPosition: top, order: 70 }
 
 # ---------- Research pole leads ----------
 - { id: ghedjati-maroua, name: Ghedjati Maroua, role: Pole lead, group: pole, pole: ai, order: 81 }
-- { id: kaouche-malek, name: Kaouche Malek, role: Pole lead, group: pole, pole: ai, photo: /crew/kaouche-malek.jpg, photoPosition: "center 30%", order: 82 }
-- { id: belaloui-taha-abderrahmane, name: Belaloui Taha Abderrahmane, role: Pole lead, group: pole, pole: security, photo: /crew/belaloui-taha-abderrahmane.jpg, photoPosition: top, order: 90 }
-- { id: laghrour-mohamed-dhia-eddine, name: Laghrour Mohamed Dhia Eddine, role: Pole lead, group: pole, pole: security, photo: /crew/laghrour-mohamed-dhia-eddine.jpeg, photoPosition: top, order: 91 }
-- { id: koua-mohamed-anis, name: Koua Mohamed Anis, role: Pole lead, group: pole, pole: software, photo: /crew/koua-mohamed-anis.jpg, order: 100 }
-- { id: merzougui-abdellah-el-ghazali, name: Merzougui Abdellah El Ghazali, role: Pole lead, group: pole, pole: networks, photo: /crew/merzougui-abdellah-el-ghazali.png, photoPosition: top, order: 110 }
-- { id: nacef-abdelmouheimene, name: Nacef Abdelmouheimene, role: Pole lead, group: pole, pole: networks, photo: /crew/nacef-abdelmouheimene.jpg, photoPosition: top, order: 111 }
+- { id: kaouche-malek, name: Kaouche Malek, role: Pole lead, group: pole, pole: ai, photo: /crew/kaouche-malek.webp, photoPosition: "center 30%", order: 82 }
+- { id: belaloui-taha-abderrahmane, name: Belaloui Taha Abderrahmane, role: Pole lead, group: pole, pole: security, photo: /crew/belaloui-taha-abderrahmane.webp, photoPosition: top, order: 90 }
+- { id: laghrour-mohamed-dhia-eddine, name: Laghrour Mohamed Dhia Eddine, role: Pole lead, group: pole, pole: security, photo: /crew/laghrour-mohamed-dhia-eddine.webp, photoPosition: top, order: 91 }
+- { id: koua-mohamed-anis, name: Koua Mohamed Anis, role: Pole lead, group: pole, pole: software, photo: /crew/koua-mohamed-anis.webp, order: 100 }
+- { id: merzougui-abdellah-el-ghazali, name: Merzougui Abdellah El Ghazali, role: Pole lead, group: pole, pole: networks, photo: /crew/merzougui-abdellah-el-ghazali.webp, photoPosition: top, order: 110 }
+- { id: nacef-abdelmouheimene, name: Nacef Abdelmouheimene, role: Pole lead, group: pole, pole: networks, photo: /crew/nacef-abdelmouheimene.webp, photoPosition: top, order: 111 }
